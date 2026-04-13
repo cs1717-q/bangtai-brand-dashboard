@@ -212,12 +212,12 @@ textarea{resize:vertical;min-height:60px}
     <div style="font-size:20px;font-weight:800;color:var(--text);margin-bottom:6px">邦泰物业品牌条线</div>
     <div style="font-size:14px;color:var(--text-muted);margin-bottom:32px">2026工作管理看板</div>
   </div>
-  <div style="display:flex;flex-direction:column;gap:10px;align-items:center">
-    <input id="nameInput" type="text" placeholder="请输入你的名字" style="padding:12px 20px;font-size:15px;border-radius:10px;border:1px solid var(--border);width:220px;text-align:center">
-    <button onclick="loginWithName()" style="padding:12px 32px;background:var(--primary);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;box-shadow:0 4px 12px rgba(91,127,255,.3)">进入看板</button>
-  </div>
+  <button id="googleLoginBtn" onclick="signInWithGoogle()" style="display:flex;align-items:center;gap:10px;padding:12px 28px;background:#fff;border:1px solid var(--border);border-radius:12px;cursor:pointer;font-size:14px;font-weight:600;color:var(--text);box-shadow:var(--shadow-sm);transition:all .2s">
+    <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z"/><path fill="#FBBC05" d="M3.964 10.707c-.18-.54-.282-1.117-.282-1.707s.102-1.167.282-1.707V4.961H.957C.347 6.173 0 7.548 0 9s.348 2.827.957 4.039l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.961L3.964 7.293C4.672 5.166 6.656 3.58 9 3.58z"/></svg>
+    使用 Google 账号登录
+  </button>
   <div id="loginError" style="color:var(--red);font-size:13px;display:none"></div>
-  <div style="font-size:12px;color:var(--text-light);margin-top:8px">所有人输入同一个名字即可协同编辑</div>
+  <div style="font-size:12px;color:var(--text-light);margin-top:8px">登录后可多人协同查看和编辑数据</div>
 </div>
 
 <div class="header">
@@ -225,7 +225,8 @@ textarea{resize:vertical;min-height:60px}
   <div class="header-title">邦泰物业品牌条线2026工作管理看板</div>
   <div class="header-right">
     <div class="header-date" id="todayDate"></div>
-    <div id="userInfo" style="display:none;align-items:center;gap:8px">
+    <div id="userInfo" style="display:none;display:flex;align-items:center;gap:8px">
+      <img id="userAvatar" src="" style="width:28px;height:28px;border-radius:50%;border:2px solid var(--border)">
       <span id="userName" style="font-size:12px;font-weight:600;color:var(--text);max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span>
       <button class="btn" onclick="signOut()" style="padding:4px 10px;font-size:11px">退出</button>
     </div>
@@ -690,14 +691,14 @@ function initFirebase() {
   firebase.initializeApp(FIREBASE_CONFIG);
   auth = firebase.auth();
   db = firebase.database();
-  // 监听实时数据（匿名登录）
   auth.onAuthStateChanged(function(user) {
     if (user) {
       currentUser = user;
-      var name = localStorage.getItem('bt_user_name') || user.uid;
-      document.getElementById('userName').textContent = name;
+      document.getElementById('userAvatar').src = user.photoURL || 'https://www.gstatic.com/images/branding/product/1x/avatar_1x.png';
+      document.getElementById('userName').textContent = user.displayName || user.email;
       document.getElementById('userInfo').style.display = 'flex';
       document.getElementById('loginOverlay').style.display = 'none';
+      // 监听实时数据
       db.ref('bt_brand_v3').off();
       db.ref('bt_brand_v3').on('value', function(snap) {
         var d = snap.val();
@@ -723,27 +724,26 @@ function initFirebase() {
         if (isFirebaseReady) renderAll();
         isFirebaseReady = true;
       });
+    } else {
+      currentUser = null;
+      document.getElementById('userInfo').style.display = 'none';
+      document.getElementById('loginOverlay').style.display = 'flex';
     }
   });
-  // 自动匿名登录
-  auth.signInAnonymously().catch(function(err) {
-    document.getElementById('loginError').textContent = '连接失败，请刷新重试';
+}
+
+function signInWithGoogle() {
+  var provider = new firebase.auth.GoogleAuthProvider();
+  auth.signInWithPopup(provider).then(function(result) {
+    document.getElementById('loginError').style.display = 'none';
+  }).catch(function(error) {
+    document.getElementById('loginError').textContent = '登录失败：' + error.message;
     document.getElementById('loginError').style.display = 'block';
   });
 }
 
-function loginWithName() {
-  var name = document.getElementById('nameInput').value.trim();
-  if (!name) { alert('请输入名字'); return; }
-  localStorage.setItem('bt_user_name', name);
-  document.getElementById('userName').textContent = name;
-  document.getElementById('userInfo').style.display = 'flex';
-  document.getElementById('loginOverlay').style.display = 'none';
-}
-
 function signOut() {
   auth.signOut();
-  document.getElementById('loginOverlay').style.display = 'flex';
 }
 
 // ==================== 数据定义 ====================
