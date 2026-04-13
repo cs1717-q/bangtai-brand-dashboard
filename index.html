@@ -350,6 +350,7 @@ textarea{resize:vertical;min-height:60px}
       <div class="table-title">2026年度工作明细总表 <span class="table-count" id="worksCount">15项</span></div>
       <div class="table-actions">
         <button class="btn" onclick="exportWorks()">导出</button>
+        <button class="btn" onclick="openNewWorkModal()">+ 新建工作</button>
         <button class="btn primary" onclick="openWorkModal()">+ 编辑状态</button>
       </div>
     </div>
@@ -630,6 +631,37 @@ textarea{resize:vertical;min-height:60px}
 </div>
 </div>
 
+<!-- 新建工作项 -->
+<div class="modal-overlay" id="newWorkModal">
+<div class="modal large">
+  <div class="modal-header"><div class="modal-title">+ 新建工作项</div><div class="modal-close" onclick="closeModal('newWorkModal')">×</div></div>
+  <div class="modal-body">
+    <div class="form-grid">
+      <div class="form-group"><div class="form-label required">所属模块</div>
+        <select id="nwf-module"><option value="">请选择</option><option>可持续友好</option><option>产品品牌</option><option>社会化营销</option><option>新媒体</option><option>临时专项</option></select></div>
+      <div class="form-group"><div class="form-label required">工作事项名称</div><input id="nwf-name" placeholder="如：延安锦天府儿童救援事件推广"></div></div>
+    <div class="form-grid">
+      <div class="form-group"><div class="form-label required">优先级级别</div>
+        <select id="nwf-level" onchange="nwfUpdateLn()"><option value="">请选择</option><option>一级一类</option><option>一级二类</option><option>二级</option><option>紧急</option></select></div>
+      <div class="form-group"><div class="form-label required">所属季度</div>
+        <select id="nwf-q"><option value="">请选择</option><option>Q1</option><option>Q2</option><option>Q3</option><option>Q4</option><option>Q1-Q3</option><option>Q2-Q3</option><option>Q2-Q4</option><option>全年</option></select></div></div>
+    <div class="form-grid">
+      <div class="form-group"><div class="form-label required">负责人</div>
+        <select id="nwf-owner"><option value="">请选择</option><option>何晓婷</option><option>龙晶晶</option><option>宋香回</option><option>张樊若兰</option></select></div>
+      <div class="form-group"><div class="form-label required">截止日期</div><input type="date" id="nwf-end"></div></div>
+    <div class="form-grid">
+      <div class="form-group"><div class="form-label">当前状态</div>
+        <select id="nwf-status"><option value="待启动">待启动</option><option value="进行中">进行中</option><option value="已完成">已完成</option><option value="持续进行">持续进行</option><option value="需求分析/立项">需求分析/立项</option><option value="资料调研">资料调研</option><option value="方案策划">方案策划</option><option value="方案提报">方案提报</option><option value="流程审批">流程审批</option><option value="资源协调">资源协调</option><option value="正式执行">正式执行</option><option value="过程跟进/督导">过程跟进/督导</option><option value="阶段性汇报">阶段性汇报</option><option value="宣传推广">宣传推广</option><option value="复盘沉淀">复盘沉淀</option></select></div>
+      <div class="form-group"><div class="form-label">完成进度</div><input id="nwf-progress" type="number" min="0" max="100" value="0"> %</div></div>
+    <div class="form-grid">
+      <div class="form-group" style="grid-column:1/-1"><div class="form-label">预期产出</div><input id="nwf产出" placeholder="如：≥10家媒体报道"></div></div>
+    <div class="form-grid">
+      <div class="form-group" style="grid-column:1/-1"><div class="form-label">备注</div><textarea id="nwf-note" placeholder="补充说明"></textarea></div></div>
+  </div>
+  <div class="modal-footer"><button class="btn" onclick="closeModal('newWorkModal')">取消</button><button class="btn primary" onclick="saveNewWork()">保存并添加</button></div>
+</div>
+</div>
+
 <!-- 更新团队KPI -->
 <div class="modal-overlay" id="teamKpiModal">
 <div class="modal">
@@ -888,7 +920,9 @@ var TEAM = [
 ];
 
 // ==================== 本地存储 ====================
-var CASES = [], EVENTS = [], MEDIA_RECORDS = [], TARGETS = {social:3000,deliver:1000,newmedia:1000};
+var CASES = [], EVENTS = [
+  {subject:'锣马假日',type:'品牌传播',date:'2026/2/1',city:'',project:'',owner:'宋香回',status:'已完成',own:'5','media-exp':'0',topic:'0',other:'0',mcount:'0',reprint:'',award:'',level:'',media:'',leader:'',note:''}
+], MEDIA_RECORDS = [], TARGETS = {social:3000,deliver:1000,newmedia:1000};
 
 function loadAll() {
   var raw = localStorage.getItem(LS);
@@ -1464,6 +1498,53 @@ function saveWork() {
   w.note=el('wf-note').value;
   closeModal('workModal');
   renderAll();
+}
+
+function openNewWorkModal() {
+  el('nwf-module').value = '';
+  el('nwf-name').value = '';
+  el('nwf-level').value = '';
+  el('nwf-q').value = '';
+  el('nwf-owner').value = '';
+  el('nwf-end').value = '';
+  el('nwf-status').value = '待启动';
+  el('nwf-progress').value = '0';
+  el('nwf产出').value = '';
+  el('nwf-note').value = '';
+  openModal('newWorkModal');
+}
+
+function nwfUpdateLn() {
+  // ln auto-set by level, no extra action needed
+}
+
+function saveNewWork() {
+  var module = el('nwf-module').value;
+  var name = el('nwf-name').value.trim();
+  var level = el('nwf-level').value;
+  var q = el('nwf-q').value;
+  var owner = el('nwf-owner').value;
+  var end = el('nwf-end').value;
+  if (!module || !name || !level || !q || !owner || !end) { alert('请填写必填项（模块/名称/级别/季度/负责人/截止日期）'); return; }
+  var lnMap = {'紧急':0,'一级一类':1,'一级二类':2,'二级':3};
+  var ln = lnMap[level] !== undefined ? lnMap[level] : 3;
+  var newId = 1;
+  for (var i = 0; i < WORKS.length; i++) if (WORKS[i].id >= newId) newId = WORKS[i].id + 1;
+  var newWork = {
+    id: newId, module: module, name: name, level: level, ln: ln, q: q,
+    owner: owner, end: end, status: el('nwf-status').value,
+    progress: parseInt(el('nwf-progress').value) || 0,
+    '产出': el('nwf产出').value || '',
+    effect: '', leaderReview: '', verify: '', note: el('nwf-note').value || ''
+  };
+  WORKS.push(newWork);
+  WORKS.sort(function(a, b) { return a.id - b.id; });
+  closeModal('newWorkModal');
+  saveAll();
+  renderWorks();
+  renderKanban();
+  renderOverview();
+  el('worksCount').textContent = WORKS.length + '项';
 }
 
 // 案例
