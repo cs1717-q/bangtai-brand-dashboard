@@ -198,9 +198,7 @@ textarea{resize:vertical;min-height:60px}
 @media(max-width:1200px){.kanban-board{grid-template-columns:repeat(2,1fr)}.stats-4{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:768px){.kanban-board{grid-template-columns:1fr}.stats-4,.stats-3{grid-template-columns:1fr 1fr}}
 </style>
-<!-- Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+<!-- Firebase REST API -->
 </head>
 <body>
 
@@ -671,31 +669,56 @@ textarea{resize:vertical;min-height:60px}
 </div>
 
 <script>
-// ==================== Firebase 配置 ====================
-var FIREBASE_CONFIG = {
-  apiKey: "AIzaSyBa15Rj8TnwGnhYg6gRN9wy5RwlvHk5tVA",
-  authDomain: "bangtai-kanban.firebaseapp.com",
-  databaseURL: "https://bangtai-kanban-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "bangtai-kanban",
-  storageBucket: "bangtai-kanban.firebasestorage.app",
-  messagingSenderId: "505111934572",
-  appId: "1:505111934572:web:30ce87766d04a7a42c4a49"
-};
-var db, currentUser = null;
-var isFirebaseReady = false;
+// ==================== Firebase REST API 配置 ====================
+var DB_URL = 'https://bangtai-kanban-default-rtdb.asia-southeast1.firebasedatabase.app';
+var firebaseEtag = null;
+var firebaseSSE = null;
 
-// ==================== Firebase 初始化（无认证） ====================
+// ==================== Firebase REST 实时同步 ====================
+function fbGet(callback) {
+  var xhr = new XMLHttpRequest();
+  xhr.open('GET', DB_URL + '/bt_brand_v3.json');
+  xhr.onload = function() {
+    if (xhr.status === 200) {
+      var d = JSON.parse(xhr.responseText);
+      firebaseEtag = xhr.getResponseHeader('ETag');
+      callback(d);
+    }
+  };
+  xhr.send();
+}
+
+function fbPut(data, callback) {
+  var xhr = new XMLHttpRequest();
+  xhr.open('PUT', DB_URL + '/bt_brand_v3.json');
+  xhr.setRequestHeader('Content-Type', 'application/json');
+  xhr.onload = function() {
+    if (xhr.status === 200 && callback) callback();
+  };
+  xhr.send(JSON.stringify(data));
+}
+
+function fbListen(callback) {
+  if (firebaseSSE) firebaseSSE.close();
+  firebaseSSE = new EventSource(DB_URL + '/bt_brand_v3.json?ns=bt_brand_v3&format=sse');
+  firebaseSSE.onmessage = function(e) {
+    if (e.data && e.data !== 'null') {
+      try {
+        var d = JSON.parse(e.data);
+        if (d && typeof d === 'object') callback(d);
+      } catch(err) {}
+    }
+  };
+}
+
 function initFirebase() {
-  firebase.initializeApp(FIREBASE_CONFIG);
-  db = firebase.database();
-  // 先尝试加载本地+网络合并，再监听实时更新
   var name = localStorage.getItem('bt_user_name') || '访客';
   document.getElementById('userName').textContent = name;
   document.getElementById('userInfo').style.display = 'flex';
   document.getElementById('loginOverlay').style.display = 'none';
-  db.ref('bt_brand_v3').off();
-  db.ref('bt_brand_v3').on('value', function(snap) {
-    var d = snap.val();
+
+  // 首次加载
+  fbGet(function(d) {
     if (d) {
       CASES = d.cases || [];
       EVENTS = d.events || [];
@@ -715,8 +738,31 @@ function initFirebase() {
     document.getElementById('t-social').value = TARGETS.social;
     document.getElementById('t-deliver').value = TARGETS.deliver;
     document.getElementById('t-newmedia').value = TARGETS.newmedia;
-    if (isFirebaseReady) renderAll();
-    isFirebaseReady = true;
+    renderAll();
+  });
+
+  // 监听实时更新
+  fbListen(function(d) {
+    if (d) {
+      CASES = d.cases || [];
+      EVENTS = d.events || [];
+      MEDIA_RECORDS = d.mediaRecords || [];
+      TARGETS = d.targets || {social:3000,deliver:1000,newmedia:1000};
+      if (d.teamKpi) {
+        TEAM.forEach(function(t,i) {
+          if (d.teamKpi[i]) t.kpis.forEach(function(k,j) { if (d.teamKpi[i][j]) k.current = d.teamKpi[i][j].current||0; });
+        });
+      }
+      if (d.mediaChannels) {
+        d.mediaChannels.forEach(function(mc,i) {
+          if (MEDIA_CHANNELS[i]) { MEDIA_CHANNELS[i].fanTotal=mc.fanTotal||0; MEDIA_CHANNELS[i].exposeTotal=mc.exposeTotal||0; MEDIA_CHANNELS[i].readTotal=mc.readTotal||0; }
+        });
+      }
+    }
+    document.getElementById('t-social').value = TARGETS.social;
+    document.getElementById('t-deliver').value = TARGETS.deliver;
+    document.getElementById('t-newmedia').value = TARGETS.newmedia;
+    renderAll();
   });
 }
 
@@ -879,9 +925,7 @@ function saveAll() {
     targets:TARGETS, teamKpi:teamKpiData, mediaChannels:mediaChannelsData
   };
   localStorage.setItem(LS, JSON.stringify(data));
-  if (db) {
-    db.ref('bt_brand_v3').set(data);
-  }
+  fbPut(data);
 }
 
 // ==================== 工具 ====================
