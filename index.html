@@ -671,44 +671,58 @@ textarea{resize:vertical;min-height:60px}
 <script>
 // ==================== Firebase REST API 配置 ====================
 var DB_URL = 'https://bangtai-kanban-default-rtdb.asia-southeast1.firebasedatabase.app';
-var firebaseEtag = null;
-var firebaseSSE = null;
+var lastDataHash = '';
 
-// ==================== Firebase REST 实时同步 ====================
+// ==================== Firebase REST 实时同步（轮询） ====================
 function fbGet(callback) {
   var xhr = new XMLHttpRequest();
   xhr.open('GET', DB_URL + '/bt_brand_v3.json');
   xhr.onload = function() {
     if (xhr.status === 200) {
-      var d = JSON.parse(xhr.responseText);
-      firebaseEtag = xhr.getResponseHeader('ETag');
-      callback(d);
+      callback(JSON.parse(xhr.responseText));
     }
   };
   xhr.send();
 }
 
-function fbPut(data, callback) {
+function fbPut(data) {
   var xhr = new XMLHttpRequest();
   xhr.open('PUT', DB_URL + '/bt_brand_v3.json');
   xhr.setRequestHeader('Content-Type', 'application/json');
-  xhr.onload = function() {
-    if (xhr.status === 200 && callback) callback();
-  };
   xhr.send(JSON.stringify(data));
 }
 
-function fbListen(callback) {
-  if (firebaseSSE) firebaseSSE.close();
-  firebaseSSE = new EventSource(DB_URL + '/bt_brand_v3.json?ns=bt_brand_v3&format=sse');
-  firebaseSSE.onmessage = function(e) {
-    if (e.data && e.data !== 'null') {
-      try {
-        var d = JSON.parse(e.data);
-        if (d && typeof d === 'object') callback(d);
-      } catch(err) {}
+function loadFromFirebase() {
+  var raw = localStorage.getItem(LS);
+  if (raw) {
+    var d = JSON.parse(raw);
+    CASES = d.cases || [];
+    EVENTS = d.events || [];
+    MEDIA_RECORDS = d.mediaRecords || [];
+    TARGETS = d.targets || {social:3000,deliver:1000,newmedia:1000};
+    if (d.teamKpi) {
+      TEAM.forEach(function(t,i) {
+        if (d.teamKpi[i]) t.kpis.forEach(function(k,j) { if (d.teamKpi[i][j]) k.current = d.teamKpi[i][j].current||0; });
+      });
     }
-  };
+    if (d.mediaChannels) {
+      d.mediaChannels.forEach(function(mc,i) {
+        if (MEDIA_CHANNELS[i]) { MEDIA_CHANNELS[i].fanTotal=mc.fanTotal||0; MEDIA_CHANNELS[i].exposeTotal=mc.exposeTotal||0; MEDIA_CHANNELS[i].readTotal=mc.readTotal||0; }
+      });
+    }
+  }
+  document.getElementById('t-social').value = TARGETS.social;
+  document.getElementById('t-deliver').value = TARGETS.deliver;
+  document.getElementById('t-newmedia').value = TARGETS.newmedia;
+  renderAll();
+}
+
+function saveToFirebase() {
+  var teamKpiData = TEAM.map(function(t) { return t.kpis.map(function(k) { return {current: k.current||0}; }); });
+  var mediaChannelsData = MEDIA_CHANNELS.map(function(m) { return {fanTotal:m.fanTotal,exposeTotal:m.exposeTotal,readTotal:m.readTotal}; });
+  var data = {cases:CASES, events:EVENTS, mediaRecords:MEDIA_RECORDS, targets:TARGETS, teamKpi:teamKpiData, mediaChannels:mediaChannelsData};
+  localStorage.setItem(LS, JSON.stringify(data));
+  fbPut(data);
 }
 
 function initFirebase() {
@@ -717,23 +731,22 @@ function initFirebase() {
   document.getElementById('userInfo').style.display = 'flex';
   document.getElementById('loginOverlay').style.display = 'none';
 
-  // 首次加载
+  // 首次加载（本地优先，再合并网络数据）
   fbGet(function(d) {
+    var localRaw = localStorage.getItem(LS);
     if (d) {
+      // 用网络数据更新本地
       CASES = d.cases || [];
       EVENTS = d.events || [];
       MEDIA_RECORDS = d.mediaRecords || [];
       TARGETS = d.targets || {social:3000,deliver:1000,newmedia:1000};
       if (d.teamKpi) {
-        TEAM.forEach(function(t,i) {
-          if (d.teamKpi[i]) t.kpis.forEach(function(k,j) { if (d.teamKpi[i][j]) k.current = d.teamKpi[i][j].current||0; });
-        });
+        TEAM.forEach(function(t,i) { if (d.teamKpi[i]) t.kpis.forEach(function(k,j) { if (d.teamKpi[i][j]) k.current = d.teamKpi[i][j].current||0; }); });
       }
       if (d.mediaChannels) {
-        d.mediaChannels.forEach(function(mc,i) {
-          if (MEDIA_CHANNELS[i]) { MEDIA_CHANNELS[i].fanTotal=mc.fanTotal||0; MEDIA_CHANNELS[i].exposeTotal=mc.exposeTotal||0; MEDIA_CHANNELS[i].readTotal=mc.readTotal||0; }
-        });
+        d.mediaChannels.forEach(function(mc,i) { if (MEDIA_CHANNELS[i]) { MEDIA_CHANNELS[i].fanTotal=mc.fanTotal||0; MEDIA_CHANNELS[i].exposeTotal=mc.exposeTotal||0; MEDIA_CHANNELS[i].readTotal=mc.readTotal||0; } });
       }
+      localStorage.setItem(LS, JSON.stringify({cases:CASES, events:EVENTS, mediaRecords:MEDIA_RECORDS, targets:TARGETS, teamKpi:TEAM.map(function(t){return t.kpis.map(function(k){return {current:k.current||0};});}), mediaChannels:MEDIA_CHANNELS.map(function(m){return {fanTotal:m.fanTotal,exposeTotal:m.exposeTotal,readTotal:m.readTotal};})}));
     }
     document.getElementById('t-social').value = TARGETS.social;
     document.getElementById('t-deliver').value = TARGETS.deliver;
@@ -741,29 +754,27 @@ function initFirebase() {
     renderAll();
   });
 
-  // 监听实时更新
-  fbListen(function(d) {
-    if (d) {
-      CASES = d.cases || [];
-      EVENTS = d.events || [];
-      MEDIA_RECORDS = d.mediaRecords || [];
-      TARGETS = d.targets || {social:3000,deliver:1000,newmedia:1000};
-      if (d.teamKpi) {
-        TEAM.forEach(function(t,i) {
-          if (d.teamKpi[i]) t.kpis.forEach(function(k,j) { if (d.teamKpi[i][j]) k.current = d.teamKpi[i][j].current||0; });
-        });
+  // 每3秒轮询检查更新（有人改了数据就自动刷新）
+  setInterval(function() {
+    fbGet(function(d) {
+      if (d) {
+        var hash = JSON.stringify({c:d.cases?d.cases.length:0,e:d.events?d.events.length:0});
+        if (hash !== lastDataHash) {
+          lastDataHash = hash;
+          CASES = d.cases || [];
+          EVENTS = d.events || [];
+          MEDIA_RECORDS = d.mediaRecords || [];
+          TARGETS = d.targets || {social:3000,deliver:1000,newmedia:1000};
+          if (d.teamKpi) { TEAM.forEach(function(t,i) { if (d.teamKpi[i]) t.kpis.forEach(function(k,j) { if (d.teamKpi[i][j]) k.current = d.teamKpi[i][j].current||0; }); }); }
+          if (d.mediaChannels) { d.mediaChannels.forEach(function(mc,i) { if (MEDIA_CHANNELS[i]) { MEDIA_CHANNELS[i].fanTotal=mc.fanTotal||0; MEDIA_CHANNELS[i].exposeTotal=mc.exposeTotal||0; MEDIA_CHANNELS[i].readTotal=mc.readTotal||0; } }); }
+          document.getElementById('t-social').value = TARGETS.social;
+          document.getElementById('t-deliver').value = TARGETS.deliver;
+          document.getElementById('t-newmedia').value = TARGETS.newmedia;
+          renderAll();
+        }
       }
-      if (d.mediaChannels) {
-        d.mediaChannels.forEach(function(mc,i) {
-          if (MEDIA_CHANNELS[i]) { MEDIA_CHANNELS[i].fanTotal=mc.fanTotal||0; MEDIA_CHANNELS[i].exposeTotal=mc.exposeTotal||0; MEDIA_CHANNELS[i].readTotal=mc.readTotal||0; }
-        });
-      }
-    }
-    document.getElementById('t-social').value = TARGETS.social;
-    document.getElementById('t-deliver').value = TARGETS.deliver;
-    document.getElementById('t-newmedia').value = TARGETS.newmedia;
-    renderAll();
-  });
+    });
+  }, 3000);
 }
 
 function loginWithName() {
@@ -926,6 +937,7 @@ function saveAll() {
   };
   localStorage.setItem(LS, JSON.stringify(data));
   fbPut(data);
+  lastDataHash = JSON.stringify({c:CASES.length,e:EVENTS.length});
 }
 
 // ==================== 工具 ====================
