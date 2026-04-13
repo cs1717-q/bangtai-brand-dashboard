@@ -200,7 +200,6 @@ textarea{resize:vertical;min-height:60px}
 </style>
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
 </head>
 <body>
@@ -682,53 +681,42 @@ var FIREBASE_CONFIG = {
   messagingSenderId: "505111934572",
   appId: "1:505111934572:web:30ce87766d04a7a42c4a49"
 };
-var db, auth, currentUser = null;
+var db, currentUser = null;
 var isFirebaseReady = false;
 
-// ==================== Firebase 初始化 ====================
+// ==================== Firebase 初始化（无认证） ====================
 function initFirebase() {
   firebase.initializeApp(FIREBASE_CONFIG);
-  auth = firebase.auth();
   db = firebase.database();
-  // 监听实时数据（匿名登录）
-  auth.onAuthStateChanged(function(user) {
-    if (user) {
-      currentUser = user;
-      var name = localStorage.getItem('bt_user_name') || user.uid;
-      document.getElementById('userName').textContent = name;
-      document.getElementById('userInfo').style.display = 'flex';
-      document.getElementById('loginOverlay').style.display = 'none';
-      db.ref('bt_brand_v3').off();
-      db.ref('bt_brand_v3').on('value', function(snap) {
-        var d = snap.val();
-        if (d) {
-          CASES = d.cases || [];
-          EVENTS = d.events || [];
-          MEDIA_RECORDS = d.mediaRecords || [];
-          TARGETS = d.targets || {social:3000,deliver:1000,newmedia:1000};
-          if (d.teamKpi) {
-            TEAM.forEach(function(t,i) {
-              if (d.teamKpi[i]) t.kpis.forEach(function(k,j) { if (d.teamKpi[i][j]) k.current = d.teamKpi[i][j].current||0; });
-            });
-          }
-          if (d.mediaChannels) {
-            d.mediaChannels.forEach(function(mc,i) {
-              if (MEDIA_CHANNELS[i]) { MEDIA_CHANNELS[i].fanTotal=mc.fanTotal||0; MEDIA_CHANNELS[i].exposeTotal=mc.exposeTotal||0; MEDIA_CHANNELS[i].readTotal=mc.readTotal||0; }
-            });
-          }
-        }
-        document.getElementById('t-social').value = TARGETS.social;
-        document.getElementById('t-deliver').value = TARGETS.deliver;
-        document.getElementById('t-newmedia').value = TARGETS.newmedia;
-        if (isFirebaseReady) renderAll();
-        isFirebaseReady = true;
-      });
+  // 先尝试加载本地+网络合并，再监听实时更新
+  var name = localStorage.getItem('bt_user_name') || '访客';
+  document.getElementById('userName').textContent = name;
+  document.getElementById('userInfo').style.display = 'flex';
+  document.getElementById('loginOverlay').style.display = 'none';
+  db.ref('bt_brand_v3').off();
+  db.ref('bt_brand_v3').on('value', function(snap) {
+    var d = snap.val();
+    if (d) {
+      CASES = d.cases || [];
+      EVENTS = d.events || [];
+      MEDIA_RECORDS = d.mediaRecords || [];
+      TARGETS = d.targets || {social:3000,deliver:1000,newmedia:1000};
+      if (d.teamKpi) {
+        TEAM.forEach(function(t,i) {
+          if (d.teamKpi[i]) t.kpis.forEach(function(k,j) { if (d.teamKpi[i][j]) k.current = d.teamKpi[i][j].current||0; });
+        });
+      }
+      if (d.mediaChannels) {
+        d.mediaChannels.forEach(function(mc,i) {
+          if (MEDIA_CHANNELS[i]) { MEDIA_CHANNELS[i].fanTotal=mc.fanTotal||0; MEDIA_CHANNELS[i].exposeTotal=mc.exposeTotal||0; MEDIA_CHANNELS[i].readTotal=mc.readTotal||0; }
+        });
+      }
     }
-  });
-  // 自动匿名登录
-  auth.signInAnonymously().catch(function(err) {
-    document.getElementById('loginError').textContent = '连接失败，请刷新重试';
-    document.getElementById('loginError').style.display = 'block';
+    document.getElementById('t-social').value = TARGETS.social;
+    document.getElementById('t-deliver').value = TARGETS.deliver;
+    document.getElementById('t-newmedia').value = TARGETS.newmedia;
+    if (isFirebaseReady) renderAll();
+    isFirebaseReady = true;
   });
 }
 
@@ -742,7 +730,6 @@ function loginWithName() {
 }
 
 function signOut() {
-  auth.signOut();
   document.getElementById('loginOverlay').style.display = 'flex';
 }
 
@@ -892,7 +879,7 @@ function saveAll() {
     targets:TARGETS, teamKpi:teamKpiData, mediaChannels:mediaChannelsData
   };
   localStorage.setItem(LS, JSON.stringify(data));
-  if (db && currentUser) {
+  if (db) {
     db.ref('bt_brand_v3').set(data);
   }
 }
