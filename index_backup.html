@@ -1,0 +1,1899 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>邦泰物业品牌条线2026工作管理看板</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif; background: #f0f2f5; color: #1f2329; font-size: 13px; }
+
+/* 顶部 */
+.header { background: #fff; height: 52px; border-bottom: 1px solid #e5e6eb; display: flex; align-items: center; padding: 0 20px; gap: 12px; position: sticky; top: 0; z-index: 100; }
+.header-logo { width: 26px; height: 26px; background: linear-gradient(135deg, #165dff 0%, #4080ff 100%); border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 11px; }
+.header-title { font-size: 15px; font-weight: 600; color: #1f2329; }
+.header-right { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+.header-date { font-size: 12px; color: #86909c; }
+.btn { padding: 5px 14px; border-radius: 6px; font-size: 12px; cursor: pointer; border: 1px solid #e5e6eb; background: #fff; color: #4e5969; transition: all 0.15s; font-family: inherit; }
+.btn:hover { background: #f2f3f5; }
+.btn.primary { background: #165dff; color: #fff; border-color: #165dff; }
+.btn.primary:hover { background: #3c6ef5; }
+.btn.success { background: #00c9a7; color: #fff; border-color: #00c9a7; }
+.btn.danger { background: #fff1f0; color: #f53f3f; border-color: #f53f3f; }
+
+/* 标签 */
+.tabs { background: #fff; border-bottom: 1px solid #e5e6eb; display: flex; padding: 0 20px; overflow-x: auto; }
+.tab { padding: 12px 18px; font-size: 13px; color: #646a73; cursor: pointer; border-bottom: 2px solid transparent; white-space: nowrap; transition: all 0.15s; flex-shrink: 0; }
+.tab:hover { color: #1f2329; }
+.tab.active { color: #165dff; border-bottom-color: #165dff; font-weight: 600; }
+
+/* 布局 */
+.content { padding: 16px 20px; max-width: 1600px; margin: 0 auto; }
+.panel { display: none; }
+.panel.active { display: block; }
+
+/* 统计行 */
+.stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px; }
+.stat-card { background: #fff; border-radius: 10px; padding: 16px; border: 1px solid #e5e6eb; position: relative; overflow: hidden; }
+.stat-card::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; }
+.stat-card.blue::before { background: #165dff; }
+.stat-card.green::before { background: #00c9a7; }
+.stat-card.orange::before { background: #ff7a45; }
+.stat-card.purple::before { background: #a371f7; }
+.stat-card.red::before { background: #f53f3f; }
+.stat-label { font-size: 11px; color: #86909c; margin-bottom: 6px; display: flex; align-items: center; gap: 4px; }
+.stat-value { font-size: 26px; font-weight: 700; color: #1f2329; }
+.stat-value span { font-size: 14px; font-weight: 400; color: #86909c; }
+.stat-bar { height: 4px; background: #f2f3f5; border-radius: 2px; margin-top: 10px; overflow: hidden; }
+.stat-bar-fill { height: 100%; border-radius: 2px; transition: width 0.6s ease; }
+.stat-bar-fill.blue { background: linear-gradient(90deg, #165dff, #4080ff); }
+.stat-bar-fill.green { background: linear-gradient(90deg, #00c9a7, #14c9c0); }
+.stat-bar-fill.orange { background: linear-gradient(90deg, #ff7a45, #ffb369); }
+.stat-bar-fill.purple { background: linear-gradient(90deg, #a371f7, #c49fff); }
+.stat-meta { display: flex; justify-content: space-between; align-items: center; margin-top: 4px; }
+.stat-meta-left { font-size: 10px; color: #c9cdd4; }
+.stat-progress-text { font-size: 11px; color: #86909c; }
+
+/* 筛选栏 */
+.filter-bar { background: #fff; border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.filter-label { font-size: 12px; color: #646a73; font-weight: 500; }
+.filter-chip { padding: 3px 10px; border-radius: 14px; font-size: 11px; cursor: pointer; background: #f4f5f7; color: #646a73; border: 1px solid transparent; transition: all 0.15s; }
+.filter-chip:hover { background: #e8e9ed; }
+.filter-chip.active { background: #d9e0ff; color: #165dff; border-color: #165dff; }
+.filter-bar-right { margin-left: auto; display: flex; gap: 8px; }
+
+/* 看板 */
+.kanban-board { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.kanban-col { background: #f4f5f7; border-radius: 10px; padding: 10px; min-height: 300px; }
+.kanban-col-header { display: flex; align-items: center; justify-content: space-between; padding: 6px 4px 10px; }
+.kanban-col-title { font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 5px; }
+.kanban-col-count { font-size: 10px; padding: 2px 6px; border-radius: 8px; font-weight: 600; }
+.count-urgent { background: #ffede8; color: #f53f3f; }
+.count-normal { background: #e8e9ed; color: #646a73; }
+.count-ok { background: #e8fff8; color: #00c9a7; }
+
+.card { background: #fff; border-radius: 8px; padding: 12px; margin-bottom: 8px; border: 1px solid #ebedf0; cursor: pointer; transition: all 0.15s; }
+.card:hover { border-color: #165dff; box-shadow: 0 2px 8px rgba(22,93,255,0.1); }
+.card-top { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+.priority-tag { font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 3px; }
+.priority-1 { background: #f53f3f; color: #fff; }
+.priority-2 { background: #ff7a45; color: #fff; }
+.priority-3 { background: #e8e9ed; color: #646a73; }
+.quarter-tag { font-size: 9px; padding: 2px 6px; border-radius: 3px; background: #f4f5f7; color: #646a73; }
+.quarter-tag.q2 { background: #fff3e8; color: #ff7a45; }
+.quarter-tag.q3 { background: #e8fff8; color: #00c9a7; }
+.quarter-tag.q4 { background: #f5e8ff; color: #a371f7; }
+.card-title { font-size: 12px; font-weight: 600; color: #1f2329; line-height: 1.4; margin-bottom: 6px; }
+.card-tags { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 6px; }
+.card-tag { font-size: 9px; padding: 1px 6px; border-radius: 3px; background: #f4f5f7; color: #646a73; }
+.card-desc { font-size: 10px; color: #86909c; line-height: 1.5; margin-bottom: 8px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.card-footer { display: flex; align-items: center; gap: 5px; }
+.card-owner-dot { width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 8px; font-weight: 700; color: #fff; flex-shrink: 0; }
+.card-owner { font-size: 10px; color: #86909c; flex: 1; }
+.card-date { font-size: 10px; color: #b2b2b2; }
+.card-date.overdue { color: #f53f3f; }
+.card-status { font-size: 10px; padding: 2px 6px; border-radius: 3px; margin-left: auto; }
+.status-done { background: #f6ffed; color: #52c41a; }
+.status-progress { background: #e6f7ff; color: #1890ff; }
+.status-pending { background: #fff7e6; color: #fa8c16; }
+.status-urgent { background: #fff1f0; color: #f53f3f; }
+
+/* 表格 */
+.table-card { background: #fff; border-radius: 10px; border: 1px solid #e5e6eb; overflow: hidden; margin-bottom: 16px; }
+.table-header { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border-bottom: 1px solid #ebedf0; }
+.table-title { font-size: 13px; font-weight: 600; color: #1f2329; display: flex; align-items: center; gap: 6px; }
+.table-title-count { font-size: 10px; background: #f4f5f7; color: #86909c; padding: 2px 7px; border-radius: 8px; font-weight: 500; }
+.table-actions { display: flex; gap: 8px; }
+table { width: 100%; border-collapse: collapse; }
+thead { background: #fafafa; }
+th { padding: 9px 12px; text-align: left; font-size: 11px; font-weight: 600; color: #646a73; border-bottom: 1px solid #ebedf0; white-space: nowrap; }
+td { padding: 10px 12px; font-size: 12px; color: #1f2329; border-bottom: 1px solid #f0f0f2; vertical-align: middle; }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: #fafafa; }
+
+/* 表单字段 */
+select, input, textarea { font-family: inherit; font-size: 12px; border: 1px solid #e5e6eb; border-radius: 5px; padding: 5px 8px; background: #fff; color: #1f2329; outline: none; transition: border-color 0.15s; }
+select:focus, input:focus, textarea:focus { border-color: #165dff; }
+select { cursor: pointer; min-width: 80px; }
+textarea { resize: vertical; min-height: 60px; }
+.field-inline { display: flex; align-items: center; gap: 6px; }
+.field-inline select, .field-inline input { flex: 1; }
+
+/* 表单行 */
+.form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-bottom: 10px; }
+.form-group { display: flex; flex-direction: column; gap: 4px; }
+.form-label { font-size: 11px; color: #86909c; font-weight: 500; }
+.form-label.required::after { content: ' *'; color: #f53f3f; }
+
+/* 弹窗 */
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 500; align-items: center; justify-content: center; }
+.modal-overlay.show { display: flex; }
+.modal { background: #fff; border-radius: 12px; width: 92%; max-width: 700px; max-height: 88vh; overflow: hidden; display: flex; flex-direction: column; }
+.modal.large { max-width: 900px; }
+.modal-header { padding: 16px 20px; border-bottom: 1px solid #ebedf0; display: flex; align-items: center; justify-content: space-between; }
+.modal-title { font-size: 14px; font-weight: 700; color: #1f2329; }
+.modal-close { width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #86909c; font-size: 16px; }
+.modal-close:hover { background: #f2f3f5; }
+.modal-body { padding: 20px; overflow-y: auto; flex: 1; }
+.modal-footer { padding: 12px 20px; border-top: 1px solid #ebedf0; display: flex; gap: 8px; justify-content: flex-end; }
+
+/* 数据区 */
+.data-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; }
+.data-section { background: #fff; border-radius: 10px; padding: 16px; border: 1px solid #e5e6eb; }
+.data-section-title { font-size: 12px; font-weight: 700; color: #1f2329; margin-bottom: 12px; display: flex; align-items: center; gap: 5px; }
+.data-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #f4f5f7; font-size: 12px; }
+.data-item:last-child { border-bottom: none; }
+.data-item-label { color: #646a73; }
+.data-item-value { font-weight: 600; color: #1f2329; display: flex; align-items: center; gap: 5px; }
+.data-item-value input { width: 80px; text-align: right; font-weight: 600; font-size: 12px; }
+.data-item-value span { font-size: 11px; color: #86909c; font-weight: 400; }
+
+/* 进度环 */
+.progress-ring-wrap { display: flex; justify-content: center; margin-bottom: 12px; }
+.progress-ring { position: relative; width: 80px; height: 80px; }
+.progress-ring svg { transform: rotate(-90deg); }
+.progress-ring-bg { fill: none; stroke: #f2f3f5; stroke-width: 8; }
+.progress-ring-fill { fill: none; stroke-width: 8; stroke-linecap: round; transition: stroke-dashoffset 0.8s; }
+.progress-ring-text { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; color: #1f2329; }
+.progress-ring-sub { font-size: 9px; color: #86909c; font-weight: 400; }
+
+/* 团队卡片 */
+.team-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; }
+.team-card { background: #fff; border-radius: 10px; padding: 16px; border: 1px solid #e5e6eb; }
+.team-card-top { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.team-avatar { width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: #fff; flex-shrink: 0; }
+.team-info-name { font-size: 13px; font-weight: 700; color: #1f2329; }
+.team-info-title { font-size: 10px; color: #86909c; margin-top: 1px; }
+.team-kpi { background: #f4f5f7; border-radius: 6px; padding: 8px 10px; margin-bottom: 8px; }
+.team-kpi-row { display: flex; justify-content: space-between; font-size: 11px; padding: 2px 0; }
+.team-kpi-label { color: #86909c; }
+.team-kpi-value { font-weight: 600; color: #1f2329; }
+.team-urgent { background: #fff1f0; border-radius: 6px; padding: 8px 10px; font-size: 11px; color: #f53f3f; display: flex; align-items: center; gap: 5px; }
+.team-resp { font-size: 11px; color: #646a73; line-height: 1.7; padding-left: 14px; }
+.team-resp li { margin-bottom: 2px; }
+
+/* 数字编辑 */
+.editable-cell { padding: 3px 6px; border: 1px solid transparent; border-radius: 4px; cursor: text; transition: all 0.15s; min-width: 40px; display: inline-block; text-align: center; }
+.editable-cell:hover { border-color: #d9d9d9; background: #fafafa; }
+.editable-cell:focus { border-color: #165dff; background: #fff; outline: none; }
+
+/* 提示 */
+.tip { background: #f0f5ff; border: 1px solid #d9e0ff; border-radius: 6px; padding: 10px 14px; font-size: 11px; color: #3c6ef5; line-height: 1.6; margin-bottom: 14px; display: flex; gap: 6px; align-items: flex-start; }
+.tip-icon { flex-shrink: 0; }
+
+/* 空状态 */
+.empty-state { text-align: center; padding: 40px 20px; color: #b2b2b2; }
+.empty-state-icon { font-size: 32px; margin-bottom: 8px; }
+.empty-state-text { font-size: 12px; }
+
+/* 弹窗内的表格 */
+.modal-table { width: 100%; border-collapse: collapse; }
+.modal-table th { background: #fafafa; padding: 8px 10px; text-align: left; font-size: 11px; font-weight: 600; color: #646a73; border-bottom: 1px solid #ebedf0; }
+.modal-table td { padding: 8px 10px; font-size: 12px; color: #1f2329; border-bottom: 1px solid #f0f0f2; }
+.modal-table tr:hover td { background: #fafafa; }
+.modal-table input, .modal-table select, .modal-table textarea { width: 100%; min-width: unset; }
+.modal-table textarea { min-height: 50px; resize: vertical; }
+
+/* 红绿灯指示 */
+.traffic-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
+.traffic-green { background: #52c41a; }
+.traffic-yellow { background: #fa8c16; }
+.traffic-red { background: #f53f3f; }
+
+/* 响应式 */
+@media (max-width: 1200px) { .kanban-board { grid-template-columns: repeat(2, 1fr); } .stats-row { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 768px) { .kanban-board { grid-template-columns: 1fr; } .stats-row { grid-template-columns: 1fr 1fr; } }
+
+/* 标记行 */
+.tr-highlight td { background: #fffbe6 !important; }
+.tr-done td { opacity: 0.6; }
+</style>
+</head>
+<body>
+
+<!-- 顶部 -->
+<div class="header">
+  <div class="header-logo">BT</div>
+  <div class="header-title">邦泰物业品牌条线2026工作管理看板</div>
+  <div class="header-right">
+    <div class="header-date" id="today"></div>
+    <button class="btn" onclick="exportAllData()">📤 导出数据</button>
+    <button class="btn primary" onclick="openAddModal()">➕ 新增记录</button>
+  </div>
+</div>
+
+<!-- 标签 -->
+<div class="tabs">
+  <div class="tab active" data-tab="overview">📊 年度总览</div>
+  <div class="tab" data-tab="kanban">📋 Q2工作看板</div>
+  <div class="tab" data-tab="q3">📋 Q3重点工作</div>
+  <div class="tab" data-tab="q4">📋 Q4重点工作</div>
+  <div class="tab" data-tab="cases">🎯 10w+标杆案例库</div>
+  <div class="tab" data-tab="events">🏆 行业影响力事件</div>
+  <div class="tab" data-tab="projects">🏗️ 交付项目追踪</div>
+  <div class="tab" data-tab="team">👥 团队分工</div>
+  <div class="tab" data-tab="allwork">📝 全部工作明细</div>
+</div>
+
+<div class="content">
+
+<!-- ===== 年度总览 ===== -->
+<div class="panel active" id="panel-overview">
+
+<div class="tip">
+  <span class="tip-icon">💡</span>
+  <div>数据自动汇总：填写下方「10w+标杆案例库」「行业影响力事件」「业主内容」后，年度总览数据自动更新。建议优先完善案例库，所有数据均存储在本地，刷新不丢失。</div>
+</div>
+
+<!-- KPI统计 -->
+<div class="stats-row">
+  <div class="stat-card blue">
+    <div class="stat-label">全渠道曝光目标 <span id="sm_曝光_完成" style="color:#52c41a;font-size:10px;display:none;">✓</span></div>
+    <div class="stat-value"><span id="val_曝光_完成">0</span><span> / 5000万</span></div>
+    <div class="stat-bar"><div class="stat-bar-fill blue" id="bar_曝光" style="width:0%"></div></div>
+    <div class="stat-meta">
+      <span class="stat-meta-left">社会营销(3000w) <span id="val_社媒">0</span>w</span>
+      <span class="stat-progress-text" id="txt_曝光">0%</span>
+    </div>
+  </div>
+  <div class="stat-card green">
+    <div class="stat-label">区域10w+标杆案例</div>
+    <div class="stat-value"><span id="val_案例">0</span><span> / 20个</span></div>
+    <div class="stat-bar"><div class="stat-bar-fill green" id="bar_案例" style="width:0%"></div></div>
+    <div class="stat-meta">
+      <span class="stat-meta-left">累计阅读/播放量</span>
+      <span class="stat-progress-text" id="txt_案例">0%</span>
+    </div>
+  </div>
+  <div class="stat-card orange">
+    <div class="stat-label">行业影响力事件</div>
+    <div class="stat-value"><span id="val_事件">0</span><span> / 2个</span></div>
+    <div class="stat-bar"><div class="stat-bar-fill orange" id="bar_事件" style="width:0%"></div></div>
+    <div class="stat-meta">
+      <span class="stat-meta-left">媒体报道次数</span>
+      <span class="stat-progress-text" id="txt_事件">0%</span>
+    </div>
+  </div>
+  <div class="stat-card purple">
+    <div class="stat-label">业主自发内容 & 创作者</div>
+    <div class="stat-value"><span id="val_业主内容">0</span><span> / 2100条</span></div>
+    <div class="stat-bar"><div class="stat-bar-fill purple" id="bar_业主内容" style="width:0%"></div></div>
+    <div class="stat-meta">
+      <span class="stat-meta-left">孵化业主创作者 <span id="val_创作者">0</span>人</span>
+      <span class="stat-progress-text" id="txt_业主内容">0%</span>
+    </div>
+  </div>
+</div>
+
+<!-- 补充统计 -->
+<div class="stats-row" style="grid-template-columns: repeat(3,1fr);">
+  <div class="stat-card blue">
+    <div class="stat-label">生活有好报增粉</div>
+    <div class="stat-value"><span id="val_增粉">0</span><span> / 1万</span></div>
+    <div class="stat-bar"><div class="stat-bar-fill blue" id="bar_增粉" style="width:0%"></div></div>
+    <div class="stat-meta">
+      <span class="stat-meta-left">总部账号</span>
+      <span class="stat-progress-text" id="txt_增粉">0%</span>
+    </div>
+  </div>
+  <div class="stat-card green">
+    <div class="stat-label">媒体报道数量</div>
+    <div class="stat-value"><span id="val_媒体">0</span><span> / 20家</span></div>
+    <div class="stat-bar"><div class="stat-bar-fill green" id="bar_媒体" style="width:0%"></div></div>
+    <div class="stat-meta">
+      <span class="stat-meta-left">国/省/市/县域四级</span>
+      <span class="stat-progress-text" id="txt_媒体">0%</span>
+    </div>
+  </div>
+  <div class="stat-card red">
+    <div class="stat-label">工作完成进度</div>
+    <div class="stat-value"><span id="val_完成率">0</span><span>%</span></div>
+    <div class="stat-bar"><div class="stat-bar-fill" id="bar_完成率" style="width:0%;background:linear-gradient(90deg,#f53f3f,#ff7a45)"></div></div>
+    <div class="stat-meta">
+      <span class="stat-meta-left">一级一类事项优先</span>
+      <span class="stat-progress-text" id="txt_完成率">0%</span>
+    </div>
+  </div>
+</div>
+
+<!-- 各模块进度 -->
+<div class="data-grid">
+  <div class="data-section">
+    <div class="data-section-title">🌿 可持续友好品牌标签</div>
+    <div class="data-item"><span class="data-item-label">Q1 内部宣贯</span><span class="data-item-value"><span class="status-done card-status">已完成</span></span></div>
+    <div class="data-item"><span class="data-item-label">Q2 品牌物料推出</span><span class="data-item-value"><span class="status-progress card-status">进行中</span></span></div>
+    <div class="data-item"><span class="data-item-label">Q3 "我家的友好刻度"事件</span><span class="data-item-value"><span class="status-pending card-status">待启动</span></span></div>
+    <div class="data-item"><span class="data-item-label">Q4 产学研课题认证</span><span class="data-item-value"><span class="status-pending card-status">待启动</span></span></div>
+    <div class="data-item"><span class="data-item-label">负责人</span><span class="data-item-value">何晓婷</span></div>
+  </div>
+  <div class="data-section">
+    <div class="data-section-title">🏢 产品品牌（司雅+司和）</div>
+    <div class="data-item"><span class="data-item-label">Q1 团队配置+系统规划</span><span class="data-item-value"><span class="status-done card-status">已完成</span></span></div>
+    <div class="data-item"><span class="data-item-label">Q2-Q3 标杆交付事件</span><span class="data-item-value"><span class="status-progress card-status">进行中</span></span></div>
+    <div class="data-item"><span class="data-item-label">Q4 产品品牌号起号</span><span class="data-item-value"><span class="status-pending card-status">待启动</span></span></div>
+    <div class="data-item"><span class="data-item-label">负责人</span><span class="data-item-value">龙晶晶</span></div>
+  </div>
+  <div class="data-section">
+    <div class="data-section-title">📣 社会化营销</div>
+    <div class="data-item"><span class="data-item-label">Q1 锣马假日新春推广</span><span class="data-item-value"><span class="status-done card-status">已完成</span></span></div>
+    <div class="data-item"><span class="data-item-label">Q2 小事件营销模式</span><span class="data-item-value"><span class="status-progress card-status">进行中</span></span></div>
+    <div class="data-item"><span class="data-item-label">Q3 应急事件（生命友好）</span><span class="data-item-value"><span class="status-pending card-status">待启动</span></span></div>
+    <div class="data-item"><span class="data-item-label">Q4 邦泰新职人计划</span><span class="data-item-value"><span class="status-pending card-status">待启动</span></span></div>
+    <div class="data-item"><span class="data-item-label">负责人</span><span class="data-item-value">宋香回</span></div>
+  </div>
+  <div class="data-section">
+    <div class="data-section-title">📱 新媒体精耕</div>
+    <div class="data-item"><span class="data-item-label">Q1-Q4 新闻快报爆款</span><span class="data-item-value"><span class="status-progress card-status">持续进行</span></span></div>
+    <div class="data-item"><span class="data-item-label">Q2-Q3 内容创客激励</span><span class="data-item-value"><span class="status-progress card-status">进行中</span></span></div>
+    <div class="data-item"><span class="data-item-label">Q4 全年运营复盘</span><span class="data-item-value"><span class="status-pending card-status">待启动</span></span></div>
+    <div class="data-item"><span class="data-item-label">负责人</span><span class="data-item-value">张樊若兰</span></div>
+  </div>
+</div>
+
+</div>
+
+<!-- ===== Q2工作看板 ===== -->
+<div class="panel" id="panel-kanban">
+
+<div class="stats-row" style="grid-template-columns: repeat(4,1fr);">
+  <div class="stat-card red">
+    <div class="stat-label">Q2一级一类（最高优先）</div>
+    <div class="stat-value" id="q2_一级一类_待完成">3<span> 项</span></div>
+    <div class="stat-meta"><span class="stat-meta-left">何晓婷+龙晶晶+宋香回</span></div>
+  </div>
+  <div class="stat-card orange">
+    <div class="stat-label">Q2到期工作项</div>
+    <div class="stat-value" id="q2_到期数">3<span> 项</span></div>
+    <div class="stat-meta"><span class="stat-meta-left">截至 6月30日</span></div>
+  </div>
+  <div class="stat-card blue">
+    <div class="stat-label">延安锦天府事件</div>
+    <div class="stat-value" style="font-size:18px;color:#f53f3f;" id="延安_状态_text">进行中</div>
+    <div class="stat-meta"><span class="stat-meta-left">4月13日 今日截止</span></div>
+  </div>
+  <div class="stat-card green">
+    <div class="stat-label">Q2工作完成率</div>
+    <div class="stat-value"><span id="q2_完成率">0</span><span>%</span></div>
+    <div class="stat-bar"><div class="stat-bar-fill green" id="bar_q2" style="width:0%"></div></div>
+  </div>
+</div>
+
+<div class="filter-bar">
+  <span class="filter-label">负责人：</span>
+  <span class="filter-chip active" data-owner="all">全部</span>
+  <span class="filter-chip" data-owner="何晓婷">何晓婷</span>
+  <span class="filter-chip" data-owner="龙晶晶">龙晶晶</span>
+  <span class="filter-chip" data-owner="宋香回">宋香回</span>
+  <span class="filter-chip" data-owner="张樊若兰">张樊若兰</span>
+  <span class="filter-label" style="margin-left:12px;">级别：</span>
+  <span class="filter-chip active" data-level="all">全部</span>
+  <span class="filter-chip" data-level="1">一级一类</span>
+  <span class="filter-chip" data-level="2">一级二类</span>
+  <span class="filter-label" style="margin-left:12px;">状态：</span>
+  <span class="filter-chip active" data-status="all">全部</span>
+  <span class="filter-chip" data-status="已完成">已完成</span>
+  <span class="filter-chip" data-status="进行中">进行中</span>
+  <span class="filter-chip" data-status="待启动">待启动</span>
+</div>
+
+<div class="kanban-board" id="kanbanBoard">
+</div>
+
+</div>
+
+<!-- ===== Q3重点工作 ===== -->
+<div class="panel" id="panel-q3">
+<div class="stats-row" style="grid-template-columns: repeat(3,1fr);">
+  <div class="stat-card blue">
+    <div class="stat-label">Q3核心事件</div>
+    <div class="stat-value" style="font-size:18px;">"我家的友好刻度"</div>
+    <div class="stat-meta"><span class="stat-meta-left">目标：品牌出圈·儿童+社区共建</span></div>
+  </div>
+  <div class="stat-card orange">
+    <div class="stat-label">Q3交付高峰</div>
+    <div class="stat-value">8<span> 个项目</span></div>
+    <div class="stat-meta"><span class="stat-meta-left">司雅+司和重点批次集中</span></div>
+  </div>
+  <div class="stat-card green">
+    <div class="stat-label">Q3完成率</div>
+    <div class="stat-value"><span id="q3_完成率">0</span><span>%</span></div>
+    <div class="stat-bar"><div class="stat-bar-fill green" id="bar_q3" style="width:0%"></div></div>
+  </div>
+</div>
+<div class="kanban-board" id="kanbanQ3"></div>
+</div>
+
+<!-- ===== Q4重点工作 ===== -->
+<div class="panel" id="panel-q4">
+<div class="stats-row" style="grid-template-columns: repeat(4,1fr);">
+  <div class="stat-card purple">
+    <div class="stat-label">Q4核心任务</div>
+    <div class="stat-value" style="font-size:18px;">产学研认证+新职人</div>
+    <div class="stat-meta"><span class="stat-meta-left">目标：权威背书+品牌高度</span></div>
+  </div>
+  <div class="stat-card green">
+    <div class="stat-label">Q4交付收尾</div>
+    <div class="stat-value">5<span> 个项目</span></div>
+    <div class="stat-meta"><span class="stat-meta-left">全年交付项目收尾</span></div>
+  </div>
+  <div class="stat-card blue">
+    <div class="stat-label">产品品牌起号</div>
+    <div class="stat-value" style="font-size:18px;">完成目标</div>
+    <div class="stat-meta"><span class="stat-meta-left">Q4关键里程碑</span></div>
+  </div>
+  <div class="stat-card orange">
+    <div class="stat-label">Q4完成率</div>
+    <div class="stat-value"><span id="q4_完成率">0</span><span>%</span></div>
+    <div class="stat-bar"><div class="stat-bar-fill orange" id="bar_q4" style="width:0%"></div></div>
+  </div>
+</div>
+<div class="kanban-board" id="kanbanQ4"></div>
+</div>
+
+<!-- ===== 10w+标杆案例库 ===== -->
+<div class="panel" id="panel-cases">
+<div class="table-card">
+  <div class="table-header">
+    <div class="table-title">🎯 区域10w+标杆案例库 <span class="table-title-count" id="casesCount">0</span></div>
+    <div class="table-actions">
+      <button class="btn" onclick="exportCases()">📥 导出</button>
+      <button class="btn primary" onclick="openModal('caseModal')">➕ 新增案例</button>
+    </div>
+  </div>
+  <div style="overflow-x:auto;">
+    <table>
+      <thead>
+        <tr>
+          <th>序号</th>
+          <th>分公司</th>
+          <th>城市</th>
+          <th>案例主题</th>
+          <th>内容摘要</th>
+          <th>内容形式</th>
+          <th>发布时间</th>
+          <th>阅读/播放量</th>
+          <th>曝光量（万）</th>
+          <th>所属模块</th>
+          <th>负责人</th>
+          <th>状态</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody id="casesBody">
+      </tbody>
+    </table>
+  </div>
+  <div id="casesEmpty" class="empty-state">
+    <div class="empty-state-icon">📝</div>
+    <div class="empty-state-text">暂无案例数据，点击右上角「新增案例」添加第一条记录</div>
+  </div>
+</div>
+
+<!-- 案例统计汇总 -->
+<div class="data-grid" style="margin-top:16px;">
+  <div class="data-section">
+    <div class="data-section-title">📊 曝光量统计（自动汇总）</div>
+    <div class="data-item"><span class="data-item-label">社会营销渠道曝光</span><span class="data-item-value" id="sum_社媒">0<span> 万</span></span></div>
+    <div class="data-item"><span class="data-item-label">交付事件渠道曝光</span><span class="data-item-value" id="sum_交付">0<span> 万</span></span></div>
+    <div class="data-item"><span class="data-item-label">新媒体矩阵曝光</span><span class="data-item-value" id="sum_新媒">0<span> 万</span></span></div>
+    <div class="data-item" style="background:#f4f5f7;border-radius:6px;padding:8px 12px;"><span class="data-item-label" style="font-weight:600;">合计曝光量</span><span class="data-item-value" style="color:#165dff;font-size:14px;" id="sum_总计">0<span> 万</span></span></div>
+  </div>
+  <div class="data-section">
+    <div class="data-section-title">📈 案例分布（自动汇总）</div>
+    <div class="data-item"><span class="data-item-label">已完成案例数</span><span class="data-item-value" id="cnt_已完成">0</span></div>
+    <div class="data-item"><span class="data-item-label">进行中案例数</span><span class="data-item-value" id="cnt_进行中">0</span></div>
+    <div class="data-item"><span class="data-item-label">司雅相关案例</span><span class="data-item-value" id="cnt_司雅">0</span></div>
+    <div class="data-item"><span class="data-item-label">司和相关案例</span><span class="data-item-value" id="cnt_司和">0</span></div>
+    <div class="data-item"><span class="data-item-label">可持续友好相关</span><span class="data-item-value" id="cnt_友好">0</span></div>
+  </div>
+</div>
+</div>
+
+<!-- ===== 行业影响力事件 ===== -->
+<div class="panel" id="panel-events">
+<div class="table-card">
+  <div class="table-header">
+    <div class="table-title">🏆 行业影响力事件 <span class="table-title-count" id="eventsCount">0</span></div>
+    <div class="table-actions">
+      <button class="btn" onclick="exportEvents()">📥 导出</button>
+      <button class="btn primary" onclick="openModal('eventModal')">➕ 新增事件</button>
+    </div>
+  </div>
+  <div style="overflow-x:auto;">
+    <table>
+      <thead>
+        <tr>
+          <th>序号</th>
+          <th>事件名称</th>
+          <th>事件类型</th>
+          <th>发生日期</th>
+          <th>涉及项目/城市</th>
+          <th>媒体曝光次数</th>
+          <th>媒体报道明细</th>
+          <th>转载量</th>
+          <th>获得认证/奖项</th>
+          <th>负责人</th>
+          <th>状态</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody id="eventsBody">
+      </tbody>
+    </table>
+  </div>
+  <div id="eventsEmpty" class="empty-state">
+    <div class="empty-state-icon">🏆</div>
+    <div class="empty-state-text">暂无事件数据，点击右上角「新增事件」添加</div>
+  </div>
+</div>
+
+<div class="data-grid" style="margin-top:16px;">
+  <div class="data-section">
+    <div class="data-section-title">📊 媒体报道汇总</div>
+    <div class="data-item"><span class="data-item-label">媒体报道总次数</span><span class="data-item-value" id="sum_媒体">0</span></div>
+    <div class="data-item"><span class="data-item-label">完成目标</span><span class="data-item-value"><span id="txt_媒体进度">0/20</span></span></div>
+    <div class="data-item"><span class="data-item-label">行业影响力事件数</span><span class="data-item-value" id="sum_事件数">0<span> / 2个</span></span></div>
+  </div>
+  <div class="data-section">
+    <div class="data-section-title">🏅 获得认证/奖项汇总</div>
+    <div class="data-item"><span class="data-item-label">国家级认证</span><span class="data-item-value" id="cnt_国家级">0</span></div>
+    <div class="data-item"><span class="data-item-label">省级认证</span><span class="data-item-value" id="cnt_省级">0</span></div>
+    <div class="data-item"><span class="data-item-label">市级认证</span><span class="data-item-value" id="cnt_市级">0</span></div>
+    <div class="data-item"><span class="data-item-label">县域认证</span><span class="data-item-value" id="cnt_县级">0</span></div>
+  </div>
+</div>
+</div>
+
+<!-- ===== 交付项目追踪 ===== -->
+<div class="panel" id="panel-projects">
+<div class="table-card">
+  <div class="table-header">
+    <div class="table-title">🏗️ 2026年待交付新项目一览 <span class="table-title-count">18个项目</span></div>
+    <div class="table-actions">
+      <button class="btn" onclick="exportProjects()">📥 导出</button>
+      <button class="btn primary" onclick="openModal('projectModal')">➕ 新增/编辑项目</button>
+    </div>
+  </div>
+  <div style="overflow-x:auto;">
+    <table>
+      <thead>
+        <tr>
+          <th>序号</th>
+          <th>城市</th>
+          <th>项目名称</th>
+          <th>产品系</th>
+          <th>批次</th>
+          <th>项目分级</th>
+          <th>首批次交付</th>
+          <th>内控交付日</th>
+          <th>合同交付日</th>
+          <th>交付状态</th>
+          <th>宣传状态</th>
+          <th>品牌亮点</th>
+          <th>项目负责人</th>
+          <th>品牌对接人</th>
+        </tr>
+      </thead>
+      <tbody id="projectsBody">
+      </tbody>
+    </table>
+  </div>
+</div>
+</div>
+
+<!-- ===== 团队分工 ===== -->
+<div class="panel" id="panel-team">
+<div class="tip" style="margin-bottom:12px;">
+  <span class="tip-icon">👥</span>
+  <div>团队核心KPI一览，数据同步更新至年度总览。点击各成员卡片下方的「更新KPI」可填入最新数据。</div>
+</div>
+<div class="team-grid" id="teamGrid">
+</div>
+</div>
+
+<!-- ===== 全部工作明细 ===== -->
+<div class="panel" id="panel-allwork">
+<div class="table-card">
+  <div class="table-header">
+    <div class="table-title">📝 2026年度工作明细总表 <span class="table-title-count">15项</span></div>
+    <div class="table-actions">
+      <button class="btn" onclick="exportWorks()">📥 导出</button>
+      <button class="btn primary" onclick="openModal('workModal')">➕ 编辑状态</button>
+    </div>
+  </div>
+  <div style="overflow-x:auto;">
+    <table>
+      <thead>
+        <tr>
+          <th>序号</th>
+          <th>所属模块</th>
+          <th>工作事项</th>
+          <th>级别</th>
+          <th>Q</th>
+          <th>负责人</th>
+          <th>截止日期</th>
+          <th>当前状态</th>
+          <th>完成进度</th>
+          <th>关键产出</th>
+          <th>效果评估</th>
+          <th>验收文件</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody id="worksBody">
+      </tbody>
+    </table>
+  </div>
+</div>
+</div>
+
+</div>
+
+<!-- ===== 弹窗们 ===== -->
+
+<!-- 新增案例 -->
+<div class="modal-overlay" id="caseModal">
+<div class="modal large">
+  <div class="modal-header">
+    <div class="modal-title">➕ 新增10w+标杆案例</div>
+    <div class="modal-close" onclick="closeModal('caseModal')">×</div>
+  </div>
+  <div class="modal-body">
+    <div class="form-row">
+      <div class="form-group">
+        <div class="form-label required">分公司</div>
+        <select id="caseForm_分公司">
+          <option value="">请选择</option>
+          <option>川西</option><option>川东北</option><option>云广</option>
+          <option>华中</option><option>西北</option><option>成都</option>
+          <option>总部</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <div class="form-label">城市</div>
+        <input id="caseForm_城市" placeholder="如：西昌、绵阳">
+      </div>
+      <div class="form-group">
+        <div class="form-label required">案例主题</div>
+        <input id="caseForm_主题" placeholder="简要概括案例主题">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <div class="form-label required">内容摘要</div>
+        <textarea id="caseForm_摘要" placeholder="简述内容核心、传播亮点"></textarea>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <div class="form-label required">内容形式</div>
+        <select id="caseForm_形式">
+          <option value="">请选择</option>
+          <option>短视频</option><option>图文</option><option>长图</option>
+          <option>直播</option><option>朋友圈</option><option>小红书笔记</option>
+          <option>抖音/视频号</option><option>新闻稿</option><option>其他</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <div class="form-label required">所属模块</div>
+        <select id="caseForm_模块">
+          <option value="">请选择</option>
+          <option>社会营销</option><option>交付事件</option>
+          <option>新媒体矩阵</option><option>可持续友好</option>
+          <option>产品品牌</option><option>品牌体系</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <div class="form-label required">发布日期</div>
+        <input type="date" id="caseForm_日期">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <div class="form-label required">阅读/播放量</div>
+        <input id="caseForm_阅读量" type="number" placeholder="如：120000" min="0">
+      </div>
+      <div class="form-group">
+        <div class="form-label required">曝光量（万）</div>
+        <input id="caseForm_曝光量" type="number" placeholder="如：15" min="0" step="0.1">
+      </div>
+      <div class="form-group">
+        <div class="form-label">负责人</div>
+        <select id="caseForm_负责人">
+          <option value="">请选择</option>
+          <option>何晓婷</option><option>龙晶晶</option>
+          <option>宋香回</option><option>张樊若兰</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <div class="form-label required">状态</div>
+        <select id="caseForm_状态">
+          <option value="已完成">已完成</option>
+          <option value="进行中">进行中</option>
+          <option value="待启动">待启动</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <div class="form-label">关联交付项目</div>
+        <input id="caseForm_关联项目" placeholder="如：南宁璟和、延安臻境">
+      </div>
+      <div class="form-group">
+        <div class="form-label">备注</div>
+        <input id="caseForm_备注" placeholder="补充说明">
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn" onclick="closeModal('caseModal')">取消</button>
+    <button class="btn primary" onclick="saveCase()">保存</button>
+  </div>
+</div>
+</div>
+
+<!-- 新增影响力事件 -->
+<div class="modal-overlay" id="eventModal">
+<div class="modal large">
+  <div class="modal-header">
+    <div class="modal-title">➕ 新增行业影响力事件</div>
+    <div class="modal-close" onclick="closeModal('eventModal')">×</div>
+  </div>
+  <div class="modal-body">
+    <div class="form-row">
+      <div class="form-group">
+        <div class="form-label required">事件名称</div>
+        <input id="eventForm_名称" placeholder="事件名称">
+      </div>
+      <div class="form-group">
+        <div class="form-label required">事件类型</div>
+        <select id="eventForm_类型">
+          <option value="">请选择</option>
+          <option>救援/应急</option><option>公益/社会责任</option>
+          <option>创新服务</option><option>社区共建</option>
+          <option>品牌传播</option><option>行业峰会</option>
+          <option>政府合作</option><option>媒体报道</option>
+          <option>认证/获奖</option><option>其他</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <div class="form-label required">发生日期</div>
+        <input type="date" id="eventForm_日期">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <div class="form-label">涉及项目/城市</div>
+        <input id="eventForm_涉及" placeholder="如：延安锦天府、成都">
+      </div>
+      <div class="form-group">
+        <div class="form-label required">媒体曝光次数</div>
+        <input id="eventForm_曝光次数" type="number" placeholder="如：5" min="0">
+      </div>
+      <div class="form-group">
+        <div class="form-label">转载量</div>
+        <input id="eventForm_转载量" type="number" placeholder="如：1000" min="0">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <div class="form-label">媒体报道明细</div>
+        <textarea id="eventForm_媒体明细" placeholder="媒体名称，每行一个，如：延安日报、新华财经"></textarea>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <div class="form-label">获得认证/奖项</div>
+        <input id="eventForm_认证" placeholder="如：物业协会优秀案例、国家级媒体正面报道">
+      </div>
+      <div class="form-group">
+        <div class="form-label">认证级别</div>
+        <select id="eventForm_认证级别">
+          <option value="">请选择</option>
+          <option>国家级</option><option>省级</option>
+          <option>市级</option><option>县域级</option>
+          <option>无</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <div class="form-label">负责人</div>
+        <select id="eventForm_负责人">
+          <option value="">请选择</option>
+          <option>何晓婷</option><option>龙晶晶</option>
+          <option>宋香回</option><option>张樊若兰</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <div class="form-label required">状态</div>
+        <select id="eventForm_状态">
+          <option value="已完成">已完成</option>
+          <option value="进行中">进行中</option>
+          <option value="待启动">待启动</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <div class="form-label">备注</div>
+        <textarea id="eventForm_备注" placeholder="补充说明"></textarea>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn" onclick="closeModal('eventModal')">取消</button>
+    <button class="btn primary" onclick="saveEvent()">保存</button>
+  </div>
+</div>
+</div>
+
+<!-- 编辑交付项目 -->
+<div class="modal-overlay" id="projectModal">
+<div class="modal large">
+  <div class="modal-header">
+    <div class="modal-title">🏗️ 编辑交付项目信息</div>
+    <div class="modal-close" onclick="closeModal('projectModal')">×</div>
+  </div>
+  <div class="modal-body">
+    <div class="form-row">
+      <div class="form-group">
+        <div class="form-label required">序号</div>
+        <input id="projForm_序号" type="number" placeholder="1-18">
+      </div>
+      <div class="form-group">
+        <div class="form-label required">项目名称</div>
+        <input id="projForm_名称" placeholder="如：南宁璟和">
+      </div>
+      <div class="form-group">
+        <div class="form-label required">城市</div>
+        <input id="projForm_城市" placeholder="如：南宁">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <div class="form-label required">产品系</div>
+        <select id="projForm_产品系">
+          <option value="">请选择</option>
+          <option>司雅</option><option>司和</option>
+          <option>司典</option><option>司嘉</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <div class="form-label required">分公司</div>
+        <select id="projForm_分公司">
+          <option value="">请选择</option>
+          <option>川西</option><option>川东北</option><option>云广</option>
+          <option>华中</option><option>西北</option><option>成都</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <div class="form-label">批次</div>
+        <input id="projForm_批次" placeholder="如：1期、整体">
+      </div>
+      <div class="form-group">
+        <div class="form-label">项目分级</div>
+        <select id="projForm_分级">
+          <option value="">请选择</option>
+          <option>A</option><option>B</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <div class="form-label required">内控交付日</div>
+        <input type="date" id="projForm_内控日">
+      </div>
+      <div class="form-group">
+        <div class="form-label required">合同交付日</div>
+        <input type="date" id="projForm_合同日">
+      </div>
+      <div class="form-group">
+        <div class="form-label required">交付状态</div>
+        <select id="projForm_交付状态">
+          <option value="">请选择</option>
+          <option>已交付</option><option>筹备中</option>
+          <option>未开始</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <div class="form-label required">宣传状态</div>
+        <select id="projForm_宣传状态">
+          <option value="">请选择</option>
+          <option>提前介入</option><option>已启动</option>
+          <option>未启动</option><option>待复盘</option>
+          <option>已完成</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <div class="form-label">品牌亮点</div>
+        <textarea id="projForm_亮点" placeholder="该项目的核心服务亮点、品牌宣传切入点"></textarea>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <div class="form-label">项目负责人</div>
+        <input id="projForm_项目负责人" placeholder="项目负责人姓名">
+      </div>
+      <div class="form-group">
+        <div class="form-label">品牌对接人</div>
+        <input id="projForm_品牌对接人" value="龙晶晶" placeholder="品牌对接人">
+      </div>
+      <div class="form-group">
+        <div class="form-label">首批次交付</div>
+        <select id="projForm_首批">
+          <option value="">请选择</option>
+          <option>是</option><option>否</option>
+        </select>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn" onclick="closeModal('projectModal')">取消</button>
+    <button class="btn success" onclick="saveProject()">保存</button>
+  </div>
+</div>
+</div>
+
+<!-- 编辑工作状态 -->
+<div class="modal-overlay" id="workModal">
+<div class="modal large">
+  <div class="modal-header">
+    <div class="modal-title">📝 编辑工作状态与效果评估</div>
+    <div class="modal-close" onclick="closeModal('workModal')">×</div>
+  </div>
+  <div class="modal-body">
+    <div class="form-row">
+      <div class="form-group">
+        <div class="form-label required">选择工作项</div>
+        <select id="workForm_选择" onchange="loadWorkItem()">
+          <option value="">请选择要编辑的工作项</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <div class="form-label required">当前状态</div>
+        <select id="workForm_状态">
+          <option value="">请选择</option>
+          <option>已完成</option><option>进行中</option><option>待启动</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <div class="form-label">完成进度</div>
+        <input id="workForm_进度" type="number" min="0" max="100" placeholder="0-100%"> %
+      </div>
+      <div class="form-group">
+        <div class="form-label">完成日期</div>
+        <input type="date" id="workForm_完成日期">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <div class="form-label">效果评估</div>
+        <textarea id="workForm_效果" placeholder="描述该工作项的实际效果、亮点与不足"></textarea>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <div class="form-label">验收文件/产出</div>
+        <textarea id="workForm_验收" placeholder="如：品牌物料体系_v1.pdf、交付事件传播报告.docx"></textarea>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <div class="form-label">备注</div>
+        <textarea id="workForm_备注" placeholder="补充说明"></textarea>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn" onclick="closeModal('workModal')">取消</button>
+    <button class="btn primary" onclick="saveWork()">保存</button>
+  </div>
+</div>
+</div>
+
+<!-- 新增记录（汇总入口） -->
+<div class="modal-overlay" id="addModal">
+<div class="modal">
+  <div class="modal-header">
+    <div class="modal-title">➕ 新增记录</div>
+    <div class="modal-close" onclick="closeModal('addModal')">×</div>
+  </div>
+  <div class="modal-body">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <button class="btn" style="padding:16px;display:flex;flex-direction:column;align-items:center;gap:6px;" onclick="closeModal('addModal');openModal('caseModal')">
+        <span style="font-size:24px;">🎯</span>
+        <span style="font-size:13px;font-weight:600;">10w+标杆案例</span>
+        <span style="font-size:11px;color:#86909c;">填写案例信息，自动汇总曝光量</span>
+      </button>
+      <button class="btn" style="padding:16px;display:flex;flex-direction:column;align-items:center;gap:6px;" onclick="closeModal('addModal');openModal('eventModal')">
+        <span style="font-size:24px;">🏆</span>
+        <span style="font-size:13px;font-weight:600;">行业影响力事件</span>
+        <span style="font-size:11px;color:#86909c;">记录媒体曝光、认证奖项</span>
+      </button>
+      <button class="btn" style="padding:16px;display:flex;flex-direction:column;align-items:center;gap:6px;" onclick="closeModal('addModal');openModal('projectModal')">
+        <span style="font-size:24px;">🏗️</span>
+        <span style="font-size:13px;font-weight:600;">交付项目状态</span>
+        <span style="font-size:11px;color:#86909c;">更新项目进度和宣传状态</span>
+      </button>
+      <button class="btn" style="padding:16px;display:flex;flex-direction:column;align-items:center;gap:6px;" onclick="closeModal('addModal');openModal('workModal')">
+        <span style="font-size:24px;">📝</span>
+        <span style="font-size:13px;font-weight:600;">工作状态更新</span>
+        <span style="font-size:11px;color:#86909c;">更新工作进度和效果评估</span>
+      </button>
+    </div>
+    <div style="margin-top:16px;padding:12px;background:#f4f5f7;border-radius:8px;">
+      <div style="font-size:12px;font-weight:600;margin-bottom:8px;">💡 数据说明</div>
+      <div style="font-size:11px;color:#646a73;line-height:1.8;">
+        · <strong>10w+案例</strong>：每完成一个案例，曝光量自动汇总至年度总览<br>
+        · <strong>行业影响力事件</strong>：记录后媒体曝光次数自动更新<br>
+        · <strong>交付项目</strong>：更新宣传状态和品牌亮点<br>
+        · <strong>工作状态</strong>：更新进度和效果评估，包含验收文件字段<br>
+        所有数据存储在本地浏览器中，刷新不丢失
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn" onclick="closeModal('addModal')">关闭</button>
+  </div>
+</div>
+</div>
+
+<script>
+// ===================== 数据模型 =====================
+// 工作事项原始数据
+const WORKS_DATA = [
+  {id:1,module:'可持续友好',name:'内部宣贯+系统策划',level:'一级一类',levelNum:1,q:'Q1',owner:'何晓婷',endDate:'2026/3/31',status:'已完成',progress:100,产出:'宣贯覆盖率+激励方案'},
+  {id:2,module:'可持续友好',name:'统一品牌物料推出',level:'一级一类',levelNum:1,q:'Q2',owner:'何晓婷',endDate:'2026/6/30',status:'进行中',progress:30,产出:'品牌物料体系'},
+  {id:3,module:'可持续友好',name:'"我家的友好刻度"事件',level:'一级一类',levelNum:1,q:'Q3',owner:'何晓婷',endDate:'2026/9/30',status:'待启动',progress:0,产出:'品牌出圈传播'},
+  {id:4,module:'可持续友好',name:'产学研课题认证',level:'一级二类',levelNum:2,q:'Q4',owner:'何晓婷',endDate:'2026/12/31',status:'待启动',progress:0,产出:'权威认证证书'},
+  {id:5,module:'产品品牌',name:'团队配置+系统规划',level:'一级一类',levelNum:1,q:'Q1',owner:'龙晶晶',endDate:'2026/3/31',status:'已完成',progress:100,产出:'全年宣传规划'},
+  {id:6,module:'产品品牌',name:'本地化标杆交付事件打造',level:'一级一类',levelNum:1,q:'Q2-Q3',owner:'龙晶晶',endDate:'2026/9/30',status:'进行中',progress:20,产出:'每个区域1个标杆'},
+  {id:7,module:'产品品牌',name:'产品品牌号起号',level:'二级',levelNum:3,q:'Q4',owner:'龙晶晶',endDate:'2026/12/31',status:'待启动',progress:0,产出:'账号起号+内容'},
+  {id:8,module:'社会化营销',name:'"锣马假日"新春推广',level:'一级二类',levelNum:2,q:'Q1',owner:'宋香回',endDate:'2026/3/31',status:'已完成',progress:100,产出:'爆款基因+执行指引'},
+  {id:9,module:'社会化营销',name:'节点性小事件营销跑通',level:'二级',levelNum:3,q:'Q2',owner:'宋香回',endDate:'2026/6/30',status:'进行中',progress:40,产出:'可复制模式'},
+  {id:10,module:'社会化营销',name:'应急事件（生命友好）推广',level:'一级一类',levelNum:1,q:'Q3',owner:'宋香回',endDate:'2026/9/30',status:'待启动',progress:0,产出:'业主自发传播爆款'},
+  {id:11,module:'社会化营销',name:'邦泰新职人计划',level:'一级二类',levelNum:2,q:'Q4',owner:'宋香回',endDate:'2026/12/31',status:'待启动',progress:0,产出:'纪实物料'},
+  {id:12,module:'新媒体',name:'新闻快报类爆款',level:'一级一类',levelNum:1,q:'全年',owner:'张樊若兰',endDate:'2026/12/31',status:'持续进行',progress:25,产出:'爆款内容'},
+  {id:13,module:'新媒体',name:'内容创客激励计划',level:'一级一类',levelNum:1,q:'Q2-Q3',owner:'张樊若兰',endDate:'2026/9/30',status:'进行中',progress:30,产出:'业主创作者≥50人'},
+  {id:14,module:'新媒体',name:'全年运营复盘优化',level:'二级',levelNum:3,q:'Q4',owner:'张樊若兰',endDate:'2026/12/31',status:'待启动',progress:0,产出:'复盘报告'},
+  {id:15,module:'临时专项',name:'延安锦天府儿童救援事件推广',level:'紧急',levelNum:0,q:'Q2',owner:'何晓婷+宋香回',endDate:'2026/4/30',status:'进行中',progress:60,产出:'≥10家媒体报道'},
+];
+
+// 交付项目原始数据
+const PROJECTS_INIT = [
+  {序号:1,城市:'西昌',名称:'西昌臻悦',产品系:'司雅',分公司:'川西',批次:'整体',分级:'B',首批:'是',内控日:'2026-01-15',合同日:'2026-01-28',交付状态:'已交付',宣传状态:'待复盘',亮点:'',项目负责人:'杨兴友',品牌对接人:'龙晶晶'},
+  {序号:2,城市:'绵阳',名称:'悦九章云邸',产品系:'司雅',分公司:'川东北',批次:'整体',分级:'B',首批:'是',内控日:'2026-04-30',合同日:'2026-04-30',交付状态:'筹备中',宣传状态:'未启动',亮点:'',项目负责人:'郑华',品牌对接人:'龙晶晶'},
+  {序号:3,城市:'玉溪',名称:'玉溪臻境',产品系:'司雅',分公司:'云广',批次:'1期1批',分级:'B',首批:'是',内控日:'2026-05-09',合同日:'2026-05-31',交付状态:'筹备中',宣传状态:'未启动',亮点:'',项目负责人:'莫娜',品牌对接人:'龙晶晶'},
+  {序号:4,城市:'昆明',名称:'昆明春华序',产品系:'司雅',分公司:'云广',批次:'整体',分级:'B',首批:'是',内控日:'2026-05-30',合同日:'2026-06-30',交付状态:'筹备中',宣传状态:'未启动',亮点:'',项目负责人:'槐蕊',品牌对接人:'龙晶晶'},
+  {序号:5,城市:'南宁',名称:'南宁璟和',产品系:'司和',分公司:'云广',批次:'1期',分级:'A',首批:'是',内控日:'2026-06-11',合同日:'2026-06-30',交付状态:'筹备中',宣传状态:'提前介入',亮点:'A类项目，司和标杆',项目负责人:'雷倩',品牌对接人:'龙晶晶'},
+  {序号:6,城市:'成都',名称:'成都悦九章名邸',产品系:'司和',分公司:'成都',批次:'整体',分级:'A',首批:'是',内控日:'2026-06-30',合同日:'2026-06-30',交付状态:'筹备中',宣传状态:'未启动',亮点:'',项目负责人:'李青',品牌对接人:'龙晶晶'},
+  {序号:7,城市:'长沙',名称:'长沙璟和府',产品系:'司和',分公司:'华中',批次:'整体',分级:'A',首批:'是',内控日:'2026-06-30',合同日:'2026-07-30',交付状态:'筹备中',宣传状态:'未启动',亮点:'',项目负责人:'代俊伟',品牌对接人:'龙晶晶'},
+  {序号:8,城市:'昆明',名称:'昆明璟和花园',产品系:'司和',分公司:'云广',批次:'整体',分级:'A',首批:'是',内控日:'2026-06-30',合同日:'2026-06-30',交付状态:'筹备中',宣传状态:'提前介入',亮点:'A类精装项目',项目负责人:'陈明淋',品牌对接人:'龙晶晶'},
+  {序号:9,城市:'延安',名称:'延安臻境',产品系:'司雅',分公司:'西北',批次:'1期',分级:'B',首批:'是',内控日:'2026-07-30',合同日:'2026-07-30',交付状态:'筹备中',宣传状态:'未启动',亮点:'结合红色文化',项目负责人:'邵天保',品牌对接人:'龙晶晶'},
+  {序号:10,城市:'昆明',名称:'昆明映悦',产品系:'司雅',分公司:'云广',批次:'1批',分级:'B',首批:'是',内控日:'2026-07-30',合同日:'2026-08-30',交付状态:'筹备中',宣传状态:'未启动',亮点:'',项目负责人:'李剑成',品牌对接人:'龙晶晶'},
+  {序号:11,城市:'长沙',名称:'长沙观宸悦府',产品系:'司和',分公司:'华中',批次:'整体',分级:'A',首批:'是',内控日:'2026-07-31',合同日:'2026-08-31',交付状态:'筹备中',宣传状态:'未启动',亮点:'',项目负责人:'代俊伟',品牌对接人:'龙晶晶'},
+  {序号:12,城市:'西昌',名称:'西昌映悦',产品系:'司雅',分公司:'川西',批次:'整体',分级:'B',首批:'是',内控日:'2026-07-30',合同日:'2026-09-30',交付状态:'筹备中',宣传状态:'未启动',亮点:'',项目负责人:'杨兴友',品牌对接人:'龙晶晶'},
+  {序号:13,城市:'成都',名称:'成都朗境花园',产品系:'司雅',分公司:'成都',批次:'整体',分级:'B',首批:'是',内控日:'2026-09-30',合同日:'2026-10-30',交付状态:'未开始',宣传状态:'未开始',亮点:'',项目负责人:'伊忠伟',品牌对接人:'龙晶晶'},
+  {序号:14,城市:'合肥',名称:'合肥和颂华章',产品系:'司雅',分公司:'华中',批次:'整体',分级:'A',首批:'是',内控日:'2026-09-30',合同日:'2026-12-30',交付状态:'未开始',宣传状态:'未开始',亮点:'',项目负责人:'李洪明',品牌对接人:'龙晶晶'},
+  {序号:15,城市:'合肥',名称:'合肥云玥映和轩',产品系:'司和',分公司:'华中',批次:'整体',分级:'A',首批:'是',内控日:'2026-10-30',合同日:'2026-11-30',交付状态:'未开始',宣传状态:'未开始',亮点:'',项目负责人:'黄在路',品牌对接人:'龙晶晶'},
+  {序号:16,城市:'南宁',名称:'南宁璟和2期',产品系:'司和',分公司:'云广',批次:'2期',分级:'A',首批:'否',内控日:'2026-10-31',合同日:'2026-11-30',交付状态:'未开始',宣传状态:'未开始',亮点:'',项目负责人:'雷倩',品牌对接人:'龙晶晶'},
+  {序号:17,城市:'德阳',名称:'德阳揽境',产品系:'司雅',分公司:'川东北',批次:'1-2期',分级:'B',首批:'是',内控日:'2026-11-30',合同日:'2027-01-30',交付状态:'未开始',宣传状态:'未开始',亮点:'',项目负责人:'-',品牌对接人:'龙晶晶'},
+  {序号:18,城市:'南宁',名称:'南宁揽境',产品系:'司雅',分公司:'云广',批次:'1期',分级:'B',首批:'是',内控日:'2026-12-31',合同日:'2027-01-15',交付状态:'未开始',宣传状态:'未开始',亮点:'',项目负责人:'-',品牌对接人:'龙晶晶'},
+];
+
+// 团队KPI
+const TEAM_KPI = [
+  {name:'何晓婷',title:'品牌条线经理',color:'#ff7a45',initials:'何',
+   kpis:[
+     {label:'打造区域10w+案例',target:20,current:0,unit:'个'},
+     {label:'全渠道曝光量',target:5000,current:0,unit:'万'},
+     {label:'行业影响力事件',target:2,current:0,unit:'个'},
+     {label:'媒体报道数量',target:20,current:0,unit:'家'},
+     {label:'业主自发内容',target:2100,current:0,unit:'条'},
+   ],
+   resp:['战略规划：可持续友好品牌战略','事件策划：社会化营销策略','资源拓展：政府/协会/媒体','重大攻坚：行业白皮书/战略合作','数据监测：品牌数据体系'],
+   urgent:'🚨 延安锦天府事件收尾（4月30日截止）'
+  },
+  {name:'龙晶晶',title:'品牌宣传副经理',color:'#165dff',initials:'龙',
+   kpis:[
+     {label:'交付项目品牌对接',target:18,current:18,unit:'个'},
+     {label:'产品品牌号起号',target:1,current:0,unit:'个'},
+     {label:'标杆交付事件',target:6,current:0,unit:'个'},
+     {label:'司雅/司和传播规划',target:4,current:2,unit:'版'},
+   ],
+   resp:['产品品牌：司事润物体系传播落地','高端品牌：改善型客群形象建设','交付品牌：质爱交付品牌推广','官号运营：公众号+小红书','业务BP：会所/养老/案场'],
+   urgent:'📦 Q2重点：南宁璟和、昆明璟和花园提前介入（6月30日）'
+  },
+  {name:'宋香回',title:'品牌宣传专员',color:'#00c9a7',initials:'宋',
+   kpis:[
+     {label:'小事件营销次数',target:12,current:0,unit:'次'},
+     {label:'应急事件（生命友好）',target:1,current:0,unit:'个'},
+     {label:'邦泰新职人计划',target:1,current:0,unit:'个'},
+     {label:'执行指引文件',target:1,current:0,unit:'份'},
+   ],
+   resp:['品牌体系：可持续友好标签管理','整合营销：事件营销策划+复盘','官号运营：视频号','业务BP：社区文化品牌'],
+   urgent:'📣 Q2重点：小事件营销模式跑通（6月30日）'
+  },
+  {name:'张樊若兰',title:'品牌宣传专员',color:'#a371f7',initials:'张',
+   kpis:[
+     {label:'新媒体总曝光量',target:1000,current:0,unit:'万'},
+     {label:'生活有好报增粉',target:10000,current:0,unit:'人'},
+     {label:'10w+案例打造',target:20,current:0,unit:'个'},
+     {label:'孵化业主创作者',target:50,current:0,unit:'人'},
+   ],
+   resp:['自有阵地：生活有好报核心账号','爆款内容：20个10w+案例','内容生态：内容创客激励计划','业主IP孵化：邦邻共筑'],
+   urgent:'📱 重点：内容创客激励计划启动（持续至9月30日）'
+  },
+];
+
+// ===================== 本地存储 =====================
+const LS_KEY = 'bt_brand_2026';
+
+function loadData() {
+  const raw = localStorage.getItem(LS_KEY);
+  if (raw) return JSON.parse(raw);
+  return {
+    works: JSON.parse(JSON.stringify(WORKS_DATA)),
+    projects: JSON.parse(JSON.stringify(PROJECTS_INIT)),
+    cases: [],
+    events: [],
+    teamKPI: JSON.parse(JSON.stringify(TEAM_KPI)),
+    // 手动填入的补充数据
+    manual: {
+      业主内容: 0,
+      创作者: 0,
+      增粉: 0,
+    }
+  };
+}
+
+function saveData(data) {
+  localStorage.setItem(LS_KEY, JSON.stringify(data));
+}
+
+let appData = loadData();
+
+// ===================== 工具函数 =====================
+function $ (id) { return document.getElementById(id); }
+function pct(a,b) { if(!b) return 0; return Math.min(100,Math.round(a/b*100)); }
+function fmt(n) { return n.toLocaleString(); }
+
+function statusBadge(s) {
+  const m = {'已完成':'status-done','进行中':'status-progress','待启动':'status-pending','持续进行':'status-progress'};
+  return `<span class="card-status ${m[s]||'status-pending'}">${s}</span>`;
+}
+
+function levelBadge(level) {
+  if(level==='一级一类'||level==='紧急') return `<span class="priority-tag priority-1">${level}</span>`;
+  if(level==='一级二类') return `<span class="priority-tag priority-2">${level}</span>`;
+  return `<span class="priority-tag priority-3">${level}</span>`;
+}
+
+function qBadge(q) {
+  const m = {'Q1':'q2','Q2':'q2','Q3':'q3','Q4':'q4','Q2-Q3':'q2','Q1-Q4':'q2','Q2-Q4':'q2','全年':'q2','Q1-Q3':'q2'};
+  return `<span class="quarter-tag ${m[q]||''}">${q}</span>`;
+}
+
+function ownerColor(name) {
+  const m = {'何晓婷':'#ff7a45','龙晶晶':'#165dff','宋香回':'#00c9a7','张樊若兰':'#a371f7','何晓婷+宋香回':'#ff7a45'};
+  return m[name]||'#86909c';
+}
+
+function ownerInitials(name) {
+  return name.split(/[+，、]/)[0].charAt(0);
+}
+
+function trafficLight(status, endDate) {
+  if(status==='已完成') return '<span class="traffic-dot traffic-green"></span>';
+  const now = new Date('2026-04-13');
+  const end = new Date(endDate);
+  const days = (end - now)/(1000*86400);
+  if(days < 0) return '<span class="traffic-dot traffic-red" title="已逾期"></span>';
+  if(days < 30) return '<span class="traffic-dot traffic-yellow" title="30天内到期"></span>';
+  return '<span class="traffic-dot traffic-green" title="进展正常"></span>';
+}
+
+// ===================== 初始化 =====================
+function init() {
+  // 日期
+  $('today').textContent = new Date().toLocaleDateString('zh-CN',{year:'numeric',month:'long',day:'numeric',weekday:'long'});
+
+  // 初始化工作works数据（补充效果评估字段）
+  appData.works.forEach(w => {
+    if(!w.效果评估) w.效果评估 = '';
+    if(!w.验收) w.验收 = '';
+    if(!w.完成日期) w.完成日期 = '';
+    if(!w.备注) w.备注 = '';
+  });
+
+  renderAll();
+}
+
+function renderAll() {
+  renderOverview();
+  renderKanban();
+  renderKanbanQ3();
+  renderKanbanQ4();
+  renderCases();
+  renderEvents();
+  renderProjects();
+  renderTeam();
+  renderWorks();
+  renderWorkSelect();
+}
+
+// ===================== 年度总览 =====================
+function renderOverview() {
+  // 从案例汇总曝光
+  const 曝光_社媒 = appData.cases.filter(c=>c.模块==='社会营销'||c.模块==='可持续友好').reduce((s,c)=>s+(parseFloat(c.曝光量)||0),0);
+  const 曝光_交付 = appData.cases.filter(c=>c.模块==='交付事件'||c.关联项目).reduce((s,c)=>s+(parseFloat(c.曝光量)||0),0);
+  const 曝光_新媒 = appData.cases.filter(c=>c.模块==='新媒体矩阵').reduce((s,c)=>s+(parseFloat(c.曝光量)||0),0);
+  const 曝光_总计 = 曝光_社媒 + 曝光_交付 + 曝光_新媒;
+
+  // 案例数
+  const 案例数 = appData.cases.filter(c=>c.状态==='已完成'||parseFloat(c.阅读量)>=100000).length;
+
+  // 事件数
+  const 事件数 = appData.events.filter(e=>e.状态==='已完成').length;
+
+  // 业主内容
+  const 业主内容 = appData.manual.业主内容;
+  const 创作者 = appData.manual.创作者;
+  const 增粉 = appData.manual.增粉;
+
+  // 媒体报道
+  const 媒体报道 = appData.events.reduce((s,e)=>s+(parseInt(e.曝光次数)||0),0);
+
+  // 更新统计卡片
+  $('val_曝光_完成').textContent = 曝光_总计.toFixed(1);
+  $('bar_曝光').style.width = pct(曝光_总计,5000) + '%';
+  $('txt_曝光').textContent = pct(曝光_总计,5000) + '%';
+  $('val_社媒').textContent = 曝光_社媒.toFixed(1);
+
+  $('val_案例').textContent = appData.cases.length;
+  $('bar_案例').style.width = pct(appData.cases.length,20) + '%';
+  $('txt_案例').textContent = pct(appData.cases.length,20) + '%';
+
+  $('val_事件').textContent = appData.events.filter(e=>e.状态==='已完成').length;
+  $('bar_事件').style.width = pct(appData.events.filter(e=>e.状态==='已完成').length,2) + '%';
+  $('txt_事件').textContent = pct(appData.events.filter(e=>e.状态==='已完成').length,2) + '%';
+
+  $('val_业主内容').textContent = 业主内容;
+  $('bar_业主内容').style.width = pct(业主内容,2100) + '%';
+  $('txt_业主内容').textContent = pct(业主内容,2100) + '%';
+  $('val_创作者').textContent = 创作者;
+
+  $('val_增粉').textContent = 增粉.toLocaleString();
+  $('bar_增粉').style.width = pct(增粉,10000) + '%';
+  $('txt_增粉').textContent = pct(增粉,10000) + '%';
+
+  $('val_媒体').textContent = 媒体报道;
+  $('bar_媒体').style.width = pct(媒体报道,20) + '%';
+  $('txt_媒体').textContent = pct(媒体报道,20) + '%';
+
+  // 工作完成率
+  const 完成数 = appData.works.filter(w=>w.status==='已完成').length;
+  const 总数 = appData.works.length;
+  const 完成率 = Math.round(完成数/总数*100);
+  $('val_完成率').textContent = 完成率;
+  $('bar_完成率').style.width = 完成率 + '%';
+  $('txt_完成率').textContent = `${完成数}/${总数}项已完成`;
+}
+
+// ===================== 看板 =====================
+function renderKanban() {
+  const board = $('kanbanBoard');
+  const works = appData.works.filter(w=>w.q==='Q2'||w.q==='Q2-Q3');
+
+  const cols = {
+    '一级一类（紧急）': works.filter(w=>w.levelNum===1),
+    '一级二类': works.filter(w=>w.levelNum===2),
+    '二级（常规）': works.filter(w=>w.levelNum===3),
+    '临时专项': works.filter(w=>w.level==='紧急'),
+  };
+
+  let html = '';
+  Object.entries(cols).forEach(([title, items]) => {
+    const countClass = title.includes('一级一类')||title.includes('临时') ? 'urgent' : title.includes('常规') ? 'ok' : 'normal';
+    html += `<div class="kanban-col">
+      <div class="kanban-col-header">
+        <div class="kanban-col-title">${title}</div>
+        <span class="kanban-col-count count-${countClass}">${items.length}</span>
+      </div>`;
+    items.forEach(w => {
+      html += `<div class="card" onclick="openWorkEdit(${w.id})">
+        <div class="card-top">${levelBadge(w.level)} ${qBadge(w.q)}</div>
+        <div class="card-title">${w.name}</div>
+        <div class="card-footer">
+          <div class="card-owner-dot" style="background:${ownerColor(w.owner)}">${ownerInitials(w.owner)}</div>
+          <span class="card-owner">${w.owner}</span>
+          ${trafficLight(w.status, w.endDate)}
+          ${statusBadge(w.status)}
+        </div>
+      </div>`;
+    });
+    html += '</div>';
+  });
+  board.innerHTML = html;
+
+  // Q2统计
+  const q2完成 = appData.works.filter(w=>(w.q==='Q2'||w.q==='Q2-Q3')&&w.status==='已完成').length;
+  const q2总数 = appData.works.filter(w=>w.q==='Q2'||w.q==='Q2-Q3').length;
+  const q2完成率 = Math.round(q2完成/q2总数*100);
+  $('q2_一级一类_待完成').textContent = appData.works.filter(w=>(w.q==='Q2'||w.q==='Q2-Q3')&&w.levelNum===1&&w.status!=='已完成').length;
+  $('q2_到期数').textContent = appData.works.filter(w=>w.q==='Q2'&&w.status!=='已完成').length;
+  $('q2_完成率').textContent = q2完成率;
+  $('bar_q2').style.width = q2完成率 + '%';
+}
+
+function renderKanbanQ3() {
+  const board = $('kanbanQ3');
+  const works = appData.works.filter(w=>w.q==='Q3'||w.q==='Q2-Q3'||w.q==='Q1-Q3');
+
+  const cols = {
+    'Q3一级一类': works.filter(w=>w.levelNum===1),
+    'Q3一级二类': works.filter(w=>w.levelNum===2),
+    'Q3交付项目': works.filter(w=>w.levelNum===3),
+    'Q3品牌运营': [],
+  };
+
+  let html = '';
+  Object.entries(cols).forEach(([title, items]) => {
+    const countClass = title.includes('一级一类') ? 'urgent' : title.includes('常规') ? 'ok' : 'normal';
+    html += `<div class="kanban-col">
+      <div class="kanban-col-header">
+        <div class="kanban-col-title">${title}</div>
+        <span class="kanban-col-count count-${countClass}">${items.length}</span>
+      </div>`;
+    if(items.length===0 && title==='Q3交付项目') {
+      // 显示Q3相关项目
+      appData.projects.filter(p=>{
+        const m = parseInt(p.内控日.split('-')[1]);
+        return m>=7&&m<=9;
+      }).forEach(p=>{
+        html += `<div class="card">
+          <div class="card-top">${p.产品系==='司雅'?'<span class="quarter-tag q3" style="background:#fff3e8;color:#ff7a45;">司雅</span>':'<span class="quarter-tag q3">司和</span>'}</div>
+          <div class="card-title">${p.名称}</div>
+          <div class="card-footer">
+            <div class="card-owner-dot" style="background:#165dff;">龙</div>
+            <span class="card-owner">${p.城市} · ${p.品牌对接人}</span>
+            ${trafficLight(p.交付状态, p.合同日)}
+            ${statusBadge(p.宣传状态==='提前介入'?'进行中':p.宣传状态==='未开始'?'待启动':'进行中')}
+          </div>
+        </div>`;
+      });
+    } else {
+      items.forEach(w => {
+        html += `<div class="card" onclick="openWorkEdit(${w.id})">
+          <div class="card-top">${levelBadge(w.level)} ${qBadge(w.q)}</div>
+          <div class="card-title">${w.name}</div>
+          <div class="card-footer">
+            <div class="card-owner-dot" style="background:${ownerColor(w.owner)}">${ownerInitials(w.owner)}</div>
+            <span class="card-owner">${w.owner}</span>
+            ${trafficLight(w.status, w.endDate)}
+            ${statusBadge(w.status)}
+          </div>
+        </div>`;
+      });
+    }
+    html += '</div>';
+  });
+  board.innerHTML = html;
+
+  const q3完成 = appData.works.filter(w=>(w.q==='Q3'||w.q==='Q2-Q3'||w.q==='Q1-Q3')&&w.status==='已完成').length;
+  const q3总数 = appData.works.filter(w=>w.q==='Q3'||w.q==='Q2-Q3'||w.q==='Q1-Q3').length;
+  const q3完成率 = q3总数 ? Math.round(q3完成/q3总数*100) : 0;
+  $('q3_完成率').textContent = q3完成率;
+  $('bar_q3').style.width = q3完成率 + '%';
+}
+
+function renderKanbanQ4() {
+  const board = $('kanbanQ4');
+  const works = appData.works.filter(w=>w.q==='Q4');
+
+  let html = '';
+  const cols = [
+    {title:'Q4一级一类',items:works.filter(w=>w.levelNum===1),urgent:false},
+    {title:'Q4一级二类',items:works.filter(w=>w.levelNum===2),urgent:false},
+    {title:'Q4二级（常规）',items:works.filter(w=>w.levelNum===3),urgent:false},
+    {title:'Q4交付收尾',items:[],urgent:false},
+  ];
+
+  cols.forEach(col=>{
+    const countClass = col.title.includes('一级一类') ? 'urgent' : 'ok';
+    html += `<div class="kanban-col">
+      <div class="kanban-col-header">
+        <div class="kanban-col-title">${col.title}</div>
+        <span class="kanban-col-count count-${countClass}">${col.items.length}</span>
+      </div>`;
+    if(col.title==='Q4交付收尾') {
+      appData.projects.filter(p=>{
+        const m = parseInt(p.内控日.split('-')[1]);
+        return m>=9;
+      }).forEach(p=>{
+        html += `<div class="card">
+          <div class="card-top">${p.产品系==='司雅'?'<span class="quarter-tag q4" style="background:#fff3e8;color:#ff7a45;">司雅</span>':'<span class="quarter-tag q4">司和</span>'}</div>
+          <div class="card-title">${p.名称}</div>
+          <div class="card-footer">
+            <div class="card-owner-dot" style="background:#165dff;">龙</div>
+            <span class="card-owner">${p.城市}</span>
+            ${trafficLight(p.交付状态, p.合同日)}
+            ${statusBadge(p.宣传状态==='提前介入'?'进行中':'待启动')}
+          </div>
+        </div>`;
+      });
+    } else {
+      col.items.forEach(w => {
+        html += `<div class="card" onclick="openWorkEdit(${w.id})">
+          <div class="card-top">${levelBadge(w.level)} ${qBadge(w.q)}</div>
+          <div class="card-title">${w.name}</div>
+          <div class="card-footer">
+            <div class="card-owner-dot" style="background:${ownerColor(w.owner)}">${ownerInitials(w.owner)}</div>
+            <span class="card-owner">${w.owner}</span>
+            ${trafficLight(w.status, w.endDate)}
+            ${statusBadge(w.status)}
+          </div>
+        </div>`;
+      });
+    }
+    html += '</div>';
+  });
+  board.innerHTML = html;
+
+  const q4完成 = appData.works.filter(w=>w.q==='Q4'&&w.status==='已完成').length;
+  const q4总数 = appData.works.filter(w=>w.q==='Q4').length;
+  const q4完成率 = q4总数 ? Math.round(q4完成/q4总数*100) : 0;
+  $('q4_完成率').textContent = q4完成率;
+  $('bar_q4').style.width = q4完成率 + '%';
+}
+
+// ===================== 案例库 =====================
+function renderCases() {
+  const tbody = $('casesBody');
+  const empty = $('casesEmpty');
+
+  if(appData.cases.length===0) {
+    tbody.innerHTML = '';
+    empty.style.display = 'block';
+    $('casesCount').textContent = '0';
+  } else {
+    empty.style.display = 'none';
+    $('casesCount').textContent = appData.cases.length;
+    tbody.innerHTML = appData.cases.map((c,i)=>`
+      <tr>
+        <td>${i+1}</td>
+        <td>${c.分公司||'-'}</td>
+        <td>${c.城市||'-'}</td>
+        <td style="max-width:150px;">${c.主题||'-'}</td>
+        <td style="max-width:200px;font-size:11px;color:#646a73;">${(c.摘要||'-').substring(0,50)}</td>
+        <td>${c.形式||'-'}</td>
+        <td>${c.日期||'-'}</td>
+        <td style="font-weight:600;">${parseInt(c.阅读量||0).toLocaleString()}</td>
+        <td style="color:#165dff;font-weight:600;">${parseFloat(c.曝光量||0)}万</td>
+        <td>${c.模块||'-'}</td>
+        <td>${c.负责人||'-'}</td>
+        <td>${statusBadge(c.状态)}</td>
+        <td><button class="btn" style="padding:3px 8px;font-size:10px;" onclick="deleteCase(${i})">删除</button></td>
+      </tr>
+    `).join('');
+  }
+
+  // 统计汇总
+  const sum社媒 = appData.cases.filter(c=>c.模块==='社会营销'||c.模块==='可持续友好').reduce((s,c)=>s+(parseFloat(c.曝光量)||0),0);
+  const sum交付 = appData.cases.filter(c=>c.模块==='交付事件'||(c.关联项目&&c.模块!=='社会营销'&&c.模块!=='新媒体矩阵')).reduce((s,c)=>s+(parseFloat(c.曝光量)||0),0);
+  const sum新媒 = appData.cases.filter(c=>c.模块==='新媒体矩阵').reduce((s,c)=>s+(parseFloat(c.曝光量)||0),0);
+  const sum总计 = sum社媒 + sum交付 + sum新媒;
+  $('sum_社媒').innerHTML = `${sum社媒.toFixed(1)}<span> 万</span>`;
+  $('sum_交付').innerHTML = `${sum交付.toFixed(1)}<span> 万</span>`;
+  $('sum_新媒').innerHTML = `${sum新媒.toFixed(1)}<span> 万</span>`;
+  $('sum_总计').innerHTML = `${sum总计.toFixed(1)}<span> 万</span>`;
+  $('cnt_已完成').textContent = appData.cases.filter(c=>c.状态==='已完成').length;
+  $('cnt_进行中').textContent = appData.cases.filter(c=>c.状态==='进行中').length;
+  $('cnt_司雅').textContent = 0; // 需要通过projects关联
+  $('cnt_司和').textContent = 0;
+  $('cnt_友好').textContent = appData.cases.filter(c=>c.模块==='可持续友好').length;
+}
+
+function saveCase() {
+  const required = ['分公司','主题','形式','模块','日期','阅读量','曝光量','状态'];
+  const form = {
+    分公司: $('caseForm_分公司').value,
+    城市: $('caseForm_城市').value,
+    主题: $('caseForm_主题').value,
+    摘要: $('caseForm_摘要').value,
+    形式: $('caseForm_形式').value,
+    模块: $('caseForm_模块').value,
+    日期: $('caseForm_日期').value,
+    阅读量: $('caseForm_阅读量').value,
+    曝光量: $('caseForm_曝光量').value,
+    负责人: $('caseForm_负责人').value,
+    状态: $('caseForm_状态').value,
+    关联项目: $('caseForm_关联项目').value,
+    备注: $('caseForm_备注').value,
+  };
+
+  if(!form.分公司 || !form.主题 || !form.形式 || !form.模块 || !form.日期 || !form.阅读量 || !form.曝光量) {
+    alert('请填写必填项（*号）');
+    return;
+  }
+
+  appData.cases.push(form);
+  saveData(appData);
+  closeModal('caseModal');
+  clearCaseForm();
+  renderCases();
+  renderOverview();
+}
+
+function clearCaseForm() {
+  ['caseForm_分公司','caseForm_城市','caseForm_主题','caseForm_摘要','caseForm_形式','caseForm_模块','caseForm_日期','caseForm_阅读量','caseForm_曝光量','caseForm_负责人','caseForm_关联项目','caseForm_备注'].forEach(id=>{
+    const el = $(id);
+    if(el.tagName==='SELECT') el.selectedIndex=0;
+    else el.value = '';
+  });
+  $('caseForm_状态').value = '已完成';
+}
+
+function deleteCase(idx) {
+  if(confirm('确认删除该案例？')) {
+    appData.cases.splice(idx,1);
+    saveData(appData);
+    renderCases();
+    renderOverview();
+  }
+}
+
+function exportCases() {
+  if(appData.cases.length===0) { alert('暂无数据'); return; }
+  const headers = ['分公司','城市','案例主题','内容摘要','内容形式','发布时间','阅读量','曝光量(万)','所属模块','负责人','状态','关联项目','备注'];
+  const rows = appData.cases.map(c=>[c.分公司,c.城市,c.主题,c.摘要,c.形式,c.日期,c.阅读量,c.曝光量,c.模块,c.负责人,c.状态,c.关联项目,c.备注]);
+  downloadCSV([headers,...rows],'10w+标杆案例库.csv');
+}
+
+// ===================== 影响力事件 =====================
+function renderEvents() {
+  const tbody = $('eventsBody');
+  const empty = $('eventsEmpty');
+
+  if(appData.events.length===0) {
+    tbody.innerHTML = '';
+    empty.style.display = 'block';
+    $('eventsCount').textContent = '0';
+  } else {
+    empty.style.display = 'none';
+    $('eventsCount').textContent = appData.events.length;
+    tbody.innerHTML = appData.events.map((e,i)=>`
+      <tr>
+        <td>${i+1}</td>
+        <td style="font-weight:600;">${e.名称||'-'}</td>
+        <td>${e.类型||'-'}</td>
+        <td>${e.日期||'-'}</td>
+        <td>${e.涉及||'-'}</td>
+        <td style="font-weight:600;color:#165dff;">${e.曝光次数||0}</td>
+        <td style="max-width:200px;font-size:11px;">${(e.媒体明细||'-').substring(0,60)}</td>
+        <td>${e.转载量||'-'}</td>
+        <td>${e.认证||'-'}</td>
+        <td>${e.负责人||'-'}</td>
+        <td>${statusBadge(e.状态)}</td>
+        <td><button class="btn" style="padding:3px 8px;font-size:10px;" onclick="deleteEvent(${i})">删除</button></td>
+      </tr>
+    `).join('');
+  }
+
+  // 统计
+  const 总曝光 = appData.events.reduce((s,e)=>s+(parseInt(e.曝光次数)||0),0);
+  const 事件数 = appData.events.filter(e=>e.状态==='已完成').length;
+  $('sum_媒体').textContent = 总曝光;
+  $('txt_媒体进度').textContent = `${总曝光}/20`;
+  $('sum_事件数').innerHTML = `${事件数}<span> / 2个</span>`;
+  $('cnt_国家级').textContent = appData.events.filter(e=>e.认证级别==='国家级').length;
+  $('cnt_省级').textContent = appData.events.filter(e=>e.认证级别==='省级').length;
+  $('cnt_市级').textContent = appData.events.filter(e=>e.认证级别==='市级').length;
+  $('cnt_县级').textContent = appData.events.filter(e=>e.认证级别==='县域级').length;
+}
+
+function saveEvent() {
+  const form = {
+    名称: $('eventForm_名称').value,
+    类型: $('eventForm_类型').value,
+    日期: $('eventForm_日期').value,
+    涉及: $('eventForm_涉及').value,
+    曝光次数: $('eventForm_曝光次数').value,
+    转载量: $('eventForm_转载量').value,
+    媒体明细: $('eventForm_媒体明细').value,
+    认证: $('eventForm_认证').value,
+    认证级别: $('eventForm_认证级别').value,
+    负责人: $('eventForm_负责人').value,
+    状态: $('eventForm_状态').value,
+    备注: $('eventForm_备注').value,
+  };
+  if(!form.名称||!form.类型||!form.日期||!form.曝光次数) {
+    alert('请填写必填项');
+    return;
+  }
+  appData.events.push(form);
+  saveData(appData);
+  closeModal('eventModal');
+  clearEventForm();
+  renderEvents();
+  renderOverview();
+}
+
+function clearEventForm() {
+  ['eventForm_名称','eventForm_类型','eventForm_日期','eventForm_涉及','eventForm_曝光次数','eventForm_转载量','eventForm_媒体明细','eventForm_认证','eventForm_认证级别','eventForm_负责人','eventForm_备注'].forEach(id=>{
+    const el=$(id);
+    if(el.tagName==='SELECT') el.selectedIndex=0;
+    else el.value='';
+  });
+  $('eventForm_状态').value='已完成';
+}
+
+function deleteEvent(idx) {
+  if(confirm('确认删除？')) {
+    appData.events.splice(idx,1);
+    saveData(appData);
+    renderEvents();
+    renderOverview();
+  }
+}
+
+function exportEvents() {
+  if(appData.events.length===0){alert('暂无数据');return;}
+  const headers=['事件名称','类型','日期','涉及项目/城市','媒体曝光次数','转载量','媒体报道明细','认证/奖项','认证级别','负责人','状态','备注'];
+  const rows=appData.events.map(e=>[e.名称,e.类型,e.日期,e.涉及,e.曝光次数,e.转载量,e.媒体明细,e.认证,e.认证级别,e.负责人,e.状态,e.备注]);
+  downloadCSV([headers,...rows],'行业影响力事件.csv');
+}
+
+// ===================== 交付项目 =====================
+function renderProjects() {
+  const tbody = $('projectsBody');
+  tbody.innerHTML = appData.projects.map(p=>`
+    <tr>
+      <td>${p.序号}</td>
+      <td>${p.城市}</td>
+      <td style="font-weight:600;">${p.名称}</td>
+      <td>${p.产品系==='司雅'?'<span class="card-tag" style="background:#fff3e8;color:#ff7a45;">司雅</span>':'<span class="card-tag" style="background:#e8f2ff;color:#165dff;">司和</span>'}</td>
+      <td>${p.批次||'-'}</td>
+      <td>${p.分级||'-'}</td>
+      <td>${p.首批||'-'}</td>
+      <td>${p.内控日||'-'}</td>
+      <td>${p.合同日||'-'}</td>
+      <td>${statusBadge(p.交付状态)}</td>
+      <td>${statusBadge(p.宣传状态)}</td>
+      <td style="max-width:150px;font-size:11px;color:#646a73;">${(p.亮点||'-').substring(0,40)}</td>
+      <td>${p.项目负责人||'-'}</td>
+      <td>${p.品牌对接人||'-'}</td>
+    </tr>
+  `).join('');
+}
+
+function saveProject() {
+  const 序号 = parseInt($('projForm_序号').value);
+  if(!序号) { alert('请填写序号'); return; }
+  const idx = appData.projects.findIndex(p=>p.序号===序号);
+  const form = {
+    序号: 序号,
+    名称: $('projForm_名称').value,
+    城市: $('projForm_城市').value,
+    产品系: $('projForm_产品系').value,
+    分公司: $('projForm_分公司').value,
+    批次: $('projForm_批次').value,
+    分级: $('projForm_分级').value,
+    首批: $('projForm_首批').value,
+    内控日: $('projForm_内控日').value,
+    合同日: $('projForm_合同日').value,
+    交付状态: $('projForm_交付状态').value,
+    宣传状态: $('projForm_宣传状态').value,
+    亮点: $('projForm_亮点').value,
+    项目负责人: $('projForm_项目负责人').value,
+    品牌对接人: $('projForm_品牌对接人').value,
+  };
+  if(idx>=0) appData.projects[idx]=form;
+  else appData.projects.push(form);
+  appData.projects.sort((a,b)=>a.序号-b.序号);
+  saveData(appData);
+  closeModal('projectModal');
+  renderProjects();
+  renderKanbanQ3();
+  renderKanbanQ4();
+}
+
+function exportProjects() {
+  if(appData.projects.length===0){alert('暂无数据');return;}
+  const headers=['序号','城市','项目名称','产品系','批次','分级','首批次交付','内控交付日','合同交付日','交付状态','宣传状态','品牌亮点','项目负责人','品牌对接人'];
+  const rows=appData.projects.map(p=>[p.序号,p.城市,p.名称,p.产品系,p.批次,p.分级,p.首批,p.内控日,p.合同日,p.交付状态,p.宣传状态,p.亮点,p.项目负责人,p.品牌对接人]);
+  downloadCSV([headers,...rows],'交付项目追踪.csv');
+}
+
+// ===================== 团队 =====================
+function renderTeam() {
+  const grid = $('teamGrid');
+  grid.innerHTML = TEAM_KPI.map(t=>`
+    <div class="team-card">
+      <div class="team-card-top">
+        <div class="team-avatar" style="background:${t.color};">${t.initials}</div>
+        <div>
+          <div class="team-info-name">${t.name}</div>
+          <div class="team-info-title">${t.title}</div>
+        </div>
+      </div>
+      <div class="team-kpi">
+        ${t.kpis.map(k=>`
+          <div class="team-kpi-row">
+            <span class="team-kpi-label">${k.label}</span>
+            <span class="team-kpi-value" style="color:${k.current>=k.target?'#52c41a':k.current>=k.target*0.5?'#fa8c16':'#1f2329'}">${k.current>=1000?k.current.toLocaleString():k.current}${k.unit}</span>
+          </div>
+        `).join('')}
+      </div>
+      <div class="team-urgent">${t.urgent}</div>
+      <ul class="team-resp">
+        ${t.resp.map(r=>`<li>${r}</li>`).join('')}
+      </ul>
+    </div>
+  `).join('');
+}
+
+// ===================== 工作明细 =====================
+function renderWorks() {
+  const tbody = $('worksBody');
+  tbody.innerHTML = appData.works.map(w=>`
+    <tr class="${w.status==='已完成'?'tr-done':w.status==='待启动'&&new Date(w.endDate)<new Date()?'tr-highlight':''}">
+      <td>${w.id}</td>
+      <td>${w.module}</td>
+      <td style="font-weight:600;max-width:180px;">${w.name}</td>
+      <td>${levelBadge(w.level)}</td>
+      <td>${qBadge(w.q)}</td>
+      <td>${w.owner}</td>
+      <td>${w.endDate}</td>
+      <td>${statusBadge(w.status)}</td>
+      <td>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <div style="flex:1;height:4px;background:#f2f3f5;border-radius:2px;"><div style="width:${w.progress}%;height:100%;background:${w.status==='已完成'?'#52c41a':w.progress>50?'#165dff':'#ff7a45'"></div></div>
+          <span style="font-size:10px;color:#86909c;min-width:30px;">${w.progress}%</span>
+        </div>
+      </td>
+      <td style="max-width:150px;font-size:11px;color:#646a73;">${(w.产出||'-').substring(0,40)}</td>
+      <td style="max-width:150px;font-size:11px;color:#646a73;">${(w.效果评估||'-').substring(0,40)}</td>
+      <td style="font-size:11px;color:#165dff;">${(w.验收||'-').substring(0,30)}</td>
+      <td><button class="btn" style="padding:3px 8px;font-size:10px;" onclick="openWorkEdit(${w.id})">编辑</button></td>
+    </tr>
+  `).join('');
+}
+
+function renderWorkSelect() {
+  const sel = $('workForm_选择');
+  sel.innerHTML = '<option value="">请选择要编辑的工作项</option>' +
+    appData.works.map(w=>`<option value="${w.id}">[${w.q}] ${w.name}（${w.owner}）</option>`).join('');
+}
+
+function loadWorkItem() {
+  const id = parseInt($('workForm_选择').value);
+  if(!id) return;
+  const w = appData.works.find(w=>w.id===id);
+  if(!w) return;
+  $('workForm_状态').value = w.status;
+  $('workForm_进度').value = w.progress;
+  $('workForm_完成日期').value = w.完成日期||'';
+  $('workForm_效果').value = w.效果评估||'';
+  $('workForm_验收').value = w.验收||'';
+  $('workForm_备注').value = w.备注||'';
+}
+
+function openWorkEdit(id) {
+  openModal('workModal');
+  $('workForm_选择').value = id;
+  loadWorkItem();
+}
+
+function saveWork() {
+  const id = parseInt($('workForm_选择').value);
+  if(!id) { alert('请选择要编辑的工作项'); return; }
+  const idx = appData.works.findIndex(w=>w.id===id);
+  if(idx<0) return;
+  appData.works[idx].status = $('workForm_状态').value;
+  appData.works[idx].progress = parseInt($('workForm_进度').value)||0;
+  appData.works[idx].完成日期 = $('workForm_完成日期').value;
+  appData.works[idx].效果评估 = $('workForm_效果').value;
+  appData.works[idx].验收 = $('workForm_验收').value;
+  appData.works[idx].备注 = $('workForm_备注').value;
+  saveData(appData);
+  closeModal('workModal');
+  renderWorks();
+  renderKanban();
+  renderKanbanQ3();
+  renderKanbanQ4();
+  renderOverview();
+}
+
+function exportWorks() {
+  const headers=['序号','所属模块','工作事项','级别','季度','负责人','截止日期','当前状态','完成进度','关键产出','效果评估','验收文件','备注'];
+  const rows=appData.works.map(w=>[w.id,w.module,w.name,w.level,w.q,w.owner,w.endDate,w.status,w.progress+'%',w.产出,w.效果评估,w.验收,w.备注]);
+  downloadCSV([headers,...rows],'年度工作明细.csv');
+}
+
+// ===================== 通用 =====================
+function openModal(id) { $(id).classList.add('show'); }
+function closeModal(id) { $(id).classList.remove('show'); }
+
+function openAddModal() {
+  openModal('addModal');
+}
+
+function downloadCSV(data, filename) {
+  const csv = data.map(row=>row.map(v=>`"${(v||'').toString().replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href=url; a.download=filename; a.click();
+  URL.revokeObjectURL(url);
+}
+
+function exportAllData() {
+  downloadCSV([['导出说明:本数据从看板自动导出']],'邦泰物业品牌条线2026完整数据.csv');
+  alert('数据已导出。\n注意：完整数据建议使用浏览器的"打印>另存为PDF"功能保存看板截图。\n如需飞书导入，请分别导出各模块CSV。');
+}
+
+// ===================== 标签切换 =====================
+document.querySelectorAll('.tab').forEach(tab=>{
+  tab.addEventListener('click',()=>{
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+    tab.classList.add('active');
+    const panelId = 'panel-'+tab.dataset.tab;
+    const panel = $(panelId);
+    if(panel) panel.classList.add('active');
+  });
+});
+
+// ===================== 筛选（看板） =====================
+document.querySelectorAll('.filter-chip[data-owner],.filter-chip[data-level],.filter-chip[data-status]').forEach(chip=>{
+  chip.addEventListener('click',function(){
+    const parent = this.parentElement;
+    parent.querySelectorAll('.filter-chip').forEach(c=>c.classList.remove('active'));
+    this.classList.add('active');
+    applyKanbanFilters();
+  });
+});
+
+function applyKanbanFilters() {
+  const owner = document.querySelector('.filter-chip[data-owner].active')?.dataset.owner||'all';
+  const level = document.querySelector('.filter-chip[data-level].active')?.dataset.level||'all';
+  const status = document.querySelector('.filter-chip[data-status].active')?.dataset.status||'all';
+
+  document.querySelectorAll('#kanbanBoard .card').forEach(card=>{
+    const cardOwner = card.querySelector('.card-owner')?.textContent||'';
+    const ownerMatch = owner==='all' || cardOwner.includes(owner);
+    // Level/status matching via data attributes if needed, simplified here
+    card.style.display = ownerMatch ? 'block' : 'none';
+  });
+}
+
+// ===================== 启动 =====================
+init();
+</script>
+
+</body>
+</html>

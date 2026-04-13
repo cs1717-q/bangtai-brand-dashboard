@@ -1,0 +1,1605 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>邦泰物业品牌条线2026工作管理看板</title>
+<style>
+/* ==================== 设计系统 ==================== */
+:root {
+  --bg: #f0f2f7;
+  --surface: #ffffff;
+  --border: #e5e7eb;
+  --border-light: #f0f0f0;
+  --primary: #5b7fff;
+  --primary-dark: #4a6ae5;
+  --primary-light: #eef1fd;
+  --green: #10b981;
+  --green-light: #d1fae5;
+  --amber: #f59e0b;
+  --amber-light: #fef3c7;
+  --purple: #8b5cf6;
+  --purple-light: #ede9fe;
+  --red: #ef4444;
+  --red-light: #fee2e2;
+  --text: #111827;
+  --text-muted: #6b7280;
+  --text-light: #9ca3af;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+  --shadow: 0 4px 12px rgba(0,0,0,.08);
+  --shadow-lg: 0 10px 30px rgba(0,0,0,.12);
+  --radius: 12px;
+  --radius-sm: 8px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;background:var(--bg);color:var(--text);font-size:13px;line-height:1.5}
+a{color:inherit;text-decoration:none}
+
+/* Header */
+.header{background:var(--surface);height:58px;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:14px;position:sticky;top:0;z-index:100;box-shadow:var(--shadow-sm)}
+.header-logo{width:32px;height:32px;background:linear-gradient(135deg,#5b7fff,#7c9fff);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:11px;letter-spacing:-.5px;box-shadow:0 2px 8px rgba(91,127,255,.35)}
+.header-title{font-size:15px;font-weight:700;color:var(--text);letter-spacing:-.2px}
+.header-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.header-date{font-size:11px;color:var(--text-muted);background:var(--bg);padding:5px 12px;border-radius:20px;font-weight:500}
+.btn{padding:7px 16px;border-radius:var(--radius-sm);font-size:12px;cursor:pointer;border:1px solid var(--border);background:var(--surface);color:var(--text-muted);transition:all .18s;font-family:inherit;font-weight:500}
+.btn:hover{background:var(--bg);border-color:#d1d5db;transform:translateY(-1px);box-shadow:var(--shadow-sm)}
+.btn.primary{background:var(--primary);color:#fff;border-color:var(--primary);box-shadow:0 2px 8px rgba(91,127,255,.3)}
+.btn.primary:hover{background:var(--primary-dark);border-color:var(--primary-dark);transform:translateY(-1px);box-shadow:0 4px 14px rgba(91,127,255,.4)}
+.btn.success{background:var(--green);color:#fff;border-color:var(--green);box-shadow:0 2px 8px rgba(16,185,129,.3)}
+
+/* Tabs */
+.tabs{background:var(--surface);border-bottom:1px solid var(--border);display:flex;padding:0 24px;overflow-x:auto;flex-wrap:nowrap;gap:0}
+.tab{padding:14px 20px;font-size:13px;color:var(--text-muted);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:all .18s;flex-shrink:0;margin-bottom:-1px;font-weight:500}
+.tab:hover{color:var(--primary)}
+.tab.active{color:var(--primary);border-bottom-color:var(--primary);font-weight:600}
+
+.content{padding:20px 24px;max-width:1600px;margin:0 auto}
+.panel{display:none}
+.panel.active{display:block}
+
+/* Tip */
+.tip{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--primary);border-radius:var(--radius);padding:12px 16px;font-size:12px;color:var(--text-muted);line-height:1.7;margin-bottom:18px;display:flex;gap:10px;align-items:flex-start;box-shadow:var(--shadow-sm)}
+.tip-icon{flex-shrink:0}
+
+/* 统计行 */
+.stats-row{display:grid;gap:14px;margin-bottom:16px}
+.stats-4{grid-template-columns:repeat(4,1fr)}
+.stats-3{grid-template-columns:repeat(3,1fr)}
+.stats-2{grid-template-columns:repeat(2,1fr)}
+
+.stat-card{background:var(--surface);border-radius:var(--radius);padding:20px;border:1px solid var(--border);position:relative;overflow:visible;transition:all .22s;box-shadow:var(--shadow-sm)}
+.stat-card:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+.stat-card::before{content:'';position:absolute;top:0;left:0;width:4px;height:100%;border-radius:4px 0 0 4px}
+.stat-card.blue::before{background:var(--primary)}.stat-card.green::before{background:var(--green)}.stat-card.orange::before{background:var(--amber)}.stat-card.purple::before{background:var(--purple)}.stat-card.red::before{background:var(--red)}
+.stat-label{font-size:10px;font-weight:700;color:var(--text-muted);letter-spacing:.8px;text-transform:uppercase;margin-bottom:10px;white-space:nowrap}
+.stat-value{font-size:26px;font-weight:800;color:var(--text);line-height:1.1;margin-bottom:10px;letter-spacing:-.5px;word-break:break-all}
+.stat-value span{font-size:13px;font-weight:500;color:var(--text-light)}
+.stat-bar{height:4px;background:var(--bg);border-radius:4px;overflow:hidden;margin-bottom:8px}
+.bar-fill{height:100%;border-radius:4px;transition:width .8s cubic-bezier(.22,.68,0,1.2)}
+.blue-b{background:linear-gradient(90deg,#5b7fff,#7c9fff)}.green-b{background:linear-gradient(90deg,#10b981,#34d399)}.orange-b{background:linear-gradient(90deg,#f59e0b,#fbbf24)}.purple-b{background:linear-gradient(90deg,#8b5cf6,#a78bfa)}.red-b{background:linear-gradient(90deg,#ef4444,#f87171)}
+.stat-meta{display:flex;justify-content:space-between;font-size:11px;color:var(--text-muted);flex-wrap:wrap;gap:4px}
+
+/* Section */
+.section{background:var(--surface);border-radius:var(--radius);padding:20px;border:1px solid var(--border);margin-bottom:16px;box-shadow:var(--shadow-sm)}
+.section:hover{box-shadow:var(--shadow)}
+.section-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:16px;display:flex;align-items:center;gap:8px;padding-bottom:12px;border-bottom:1px solid var(--border-light)}
+.data-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border-light);font-size:12px}
+.data-row:last-child{border-bottom:none}
+.data-row-label{color:var(--text-muted);font-weight:500}
+.data-row-value{font-weight:700;color:var(--text)}
+.data-row-value input{width:80px;text-align:right;font-weight:700;font-size:12px}
+.highlight-row{background:var(--primary-light);border-radius:var(--radius-sm);padding:10px 14px;border:none!important;margin-top:4px;border-left:3px solid var(--primary)!important}
+.highlight-row .data-row-label{font-weight:700;color:var(--primary)}
+
+/* 看板 */
+.kanban-board{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.kanban-col{background:#f8f9fb;border-radius:var(--radius);padding:12px;border:1px solid var(--border)}
+.kanban-col-header{display:flex;align-items:center;justify-content:space-between;padding:8px 4px 12px;border-bottom:2px solid var(--border);margin-bottom:8px}
+.kanban-col-title{font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px}
+.count-badge{font-size:10px;padding:3px 8px;border-radius:20px;font-weight:700}
+.count-urgent{background:var(--red-light);color:var(--red)}.count-normal{background:#e5e7eb;color:#6b7280}.count-ok{background:var(--green-light);color:var(--green)}
+.card{background:var(--surface);border-radius:var(--radius-sm);padding:13px;margin-bottom:8px;border:1px solid var(--border);cursor:pointer;transition:all .18s;box-shadow:var(--shadow-sm)}
+.card:hover{border-color:var(--primary);box-shadow:0 4px 14px rgba(91,127,255,.14);transform:translateY(-1px)}
+.card-top{display:flex;align-items:center;gap:6px;margin-bottom:8px}
+.tag{font-size:9px;font-weight:700;padding:2px 7px;border-radius:4px;display:inline-block;letter-spacing:.3px}
+.tag-r{background:var(--red);color:#fff}.tag-o{background:var(--amber);color:#fff}.tag-g{background:var(--bg);color:var(--text-muted)}
+.tag-q2{background:#fff7ed;color:#d97706;border:1px solid #fed7aa}.tag-q3{background:#ecfdf5;color:#059669;border:1px solid #a7f3d0}.tag-q4{background:#f5f3ff;color:#7c3aed;border:1px solid #ddd6fe}
+.card-title{font-size:12px;font-weight:600;color:var(--text);line-height:1.4;margin-bottom:8px}
+.card-footer{display:flex;align-items:center;gap:6px}
+.owner-dot{width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;flex-shrink:0}
+.owner-name{font-size:11px;color:var(--text-light);flex:1}
+.badge{display:inline-flex;align-items:center;padding:3px 8px;border-radius:20px;font-size:10px;font-weight:600;letter-spacing:.2px}
+.bg-green{background:var(--green-light);color:#059669}.bg-blue{background:var(--primary-light);color:var(--primary)}.bg-orange{background:var(--amber-light);color:#d97706}.bg-red{background:var(--red-light);color:var(--red)}.bg-gray{background:#f3f4f6;color:#6b7280}
+.dot{width:7px;height:7px;border-radius:50%;display:inline-block;flex-shrink:0}
+.dot-g{background:var(--green)}.dot-y{background:var(--amber)}.dot-r{background:var(--red)}
+
+/* 表格 */
+.table-card{background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);overflow:hidden;margin-bottom:16px;box-shadow:var(--shadow-sm)}
+.table-header{display:flex;justify-content:space-between;align-items:center;padding:14px 20px;border-bottom:1px solid var(--border);background:#fafafa}
+.table-title{font-size:13px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px}
+.table-count{font-size:10px;background:var(--bg);color:var(--text-muted);padding:3px 9px;border-radius:20px;font-weight:600}
+.table-actions{display:flex;gap:8px}
+.tbl{width:100%;border-collapse:collapse}
+.tbl thead{background:#f8f9fb}
+.tbl th{padding:10px 14px;text-align:left;font-size:10px;font-weight:700;color:var(--text-muted);border-bottom:1px solid var(--border);white-space:nowrap;text-transform:uppercase;letter-spacing:.5px}
+.tbl td{padding:11px 14px;font-size:12px;color:var(--text);border-bottom:1px solid var(--border-light);vertical-align:middle}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tbody tr{transition:all .12s}
+.tbl tbody tr:hover td{background:#f8f9ff}
+.proj-tag{font-size:9px;padding:2px 7px;border-radius:4px;font-weight:700;letter-spacing:.3px}
+.proj-tag-siya{background:#fff7ed;color:#d97706;border:1px solid #fed7aa}.proj-tag-sihe{background:var(--primary-light);color:var(--primary);border:1px solid #c7d2fe}
+.tr-done td{opacity:.5}
+
+/* 大圈数字 */
+.big-circles{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:16px}
+.big-circle{background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);padding:24px 18px;text-align:center;position:relative;overflow:hidden;transition:all .22s;box-shadow:var(--shadow-sm)}
+.big-circle:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+.big-circle::before{content:'';position:absolute;top:0;left:0;width:100%;height:4px}
+.big-circle.blue::before{background:var(--primary)}.big-circle.green::before{background:var(--green)}.big-circle.orange::before{background:var(--amber)}.big-circle.purple::before{background:var(--purple)}.big-circle.red::before{background:var(--red)}
+.big-circle-num{font-size:34px;font-weight:800;color:var(--text);line-height:1;letter-spacing:-1px}
+.big-circle-unit{font-size:14px;color:var(--text-light);font-weight:500}
+.big-circle-label{font-size:12px;color:var(--text-muted);margin-top:8px;font-weight:600}
+.big-circle-sub{font-size:11px;color:var(--text-light);margin-top:3px}
+
+/* 看板摘要 */
+.kanban-summary{display:flex;gap:14px;margin-bottom:16px}
+.kanban-summary-item{flex:1;background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);padding:16px 18px;display:flex;align-items:center;gap:16px;transition:all .18s;box-shadow:var(--shadow-sm)}
+.kanban-summary-item:hover{transform:translateY(-1px);box-shadow:var(--shadow)}
+.kanban-summary-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.kanban-summary-icon.red{background:var(--red-light)}.kanban-summary-icon.green{background:var(--green-light)}.kanban-summary-icon.blue{background:var(--primary-light)}
+.kanban-summary-text{flex:1}
+.kanban-summary-label{font-size:10px;color:var(--text-muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+.kanban-summary-value{font-size:24px;font-weight:800;color:var(--text);line-height:1.2}
+.kanban-summary-sub{font-size:11px;color:var(--text-light);margin-top:2px}
+
+/* 表单 */
+input,select,textarea{font-family:inherit;font-size:12px;border:1px solid var(--border);border-radius:var(--radius-sm);padding:7px 10px;background:var(--surface);color:var(--text);outline:none;transition:all .15s}
+input:focus,select:focus,textarea:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(91,127,255,.1)}
+select{cursor:pointer;min-width:80px}
+textarea{resize:vertical;min-height:60px}
+.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:12px}
+.form-group{display:flex;flex-direction:column;gap:5px}
+.form-label{font-size:11px;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+.form-label.required::after{content:' *';color:var(--red)}
+
+/* 弹窗 */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(17,24,39,.45);z-index:500;align-items:center;justify-content:center;backdrop-filter:blur(3px)}
+.modal-overlay.show{display:flex}
+.modal{background:var(--surface);border-radius:var(--radius);width:92%;max-width:700px;max-height:88vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:var(--shadow-lg)}
+.modal.large{max-width:900px}
+.modal-header{padding:18px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:#fafafa}
+.modal-title{font-size:14px;font-weight:700;color:var(--text)}
+.modal-close{width:30px;height:30px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-muted);font-size:18px;transition:all .15s}
+.modal-close:hover{background:var(--bg);color:var(--text)}
+.modal-body{padding:24px;overflow-y:auto;flex:1}
+.modal-footer{padding:14px 24px;border-top:1px solid var(--border);display:flex;gap:10px;justify-content:flex-end}
+
+/* 团队 */
+.team-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}
+.team-card{background:var(--surface);border-radius:var(--radius);padding:20px;border:1px solid var(--border);transition:all .2s;box-shadow:var(--shadow-sm)}
+.team-card:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+.team-top{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.team-avatar{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;color:#fff;flex-shrink:0}
+.team-name{font-size:14px;font-weight:800;color:var(--text)}
+.team-title{font-size:11px;color:var(--text-light);margin-top:2px;font-weight:500}
+.team-kpi-block{background:var(--bg);border-radius:var(--radius-sm);padding:12px;margin-bottom:12px}
+.team-kpi-title{font-size:10px;font-weight:700;color:var(--text-muted);margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px}
+.team-kpi-row{display:flex;justify-content:space-between;font-size:12px;padding:5px 0;border-bottom:1px solid var(--border-light)}
+.team-kpi-row:last-child{border-bottom:none}
+.team-kpi-label{color:var(--text-muted);font-weight:500}
+.team-kpi-value{font-weight:700}
+.team-kpi-value .input-sm{width:60px;text-align:right;font-weight:700;font-size:11px;padding:2px 5px}
+.team-resp{font-size:11px;color:var(--text-muted);line-height:1.8;padding-left:16px}
+.team-resp li{margin-bottom:3px}
+.team-urgent{background:var(--red-light);border-radius:var(--radius-sm);padding:10px 12px;font-size:11px;color:var(--red);display:flex;align-items:center;gap:6px;margin-bottom:10px;border-left:3px solid var(--red);font-weight:600}
+.empty{padding:50px 20px;text-align:center;color:var(--text-light)}
+.empty-icon{font-size:40px;margin-bottom:10px}.empty-text{font-size:13px;font-weight:500}
+
+@media(max-width:1200px){.kanban-board{grid-template-columns:repeat(2,1fr)}.stats-4{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:768px){.kanban-board{grid-template-columns:1fr}.stats-4,.stats-3{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-logo">BT</div>
+  <div class="header-title">邦泰物业品牌条线2026工作管理看板</div>
+  <div class="header-right">
+    <div class="header-date" id="todayDate"></div>
+    <button class="btn" onclick="doExportAll()">导出数据</button>
+    <button class="btn primary" onclick="openAddModal()">+ 新增记录</button>
+  </div>
+</div>
+
+<div class="tabs">
+  <div class="tab active" data-tab="overview">年度总览</div>
+  <div class="tab" data-tab="allwork">全部工作明细</div>
+  <div class="tab" data-tab="kanban">Q2工作看板</div>
+  <div class="tab" data-tab="q3">Q3重点工作</div>
+  <div class="tab" data-tab="q4">Q4重点工作</div>
+  <div class="tab" data-tab="media">新媒体矩阵运营</div>
+  <div class="tab" data-tab="cases">10W+标杆案例库</div>
+  <div class="tab" data-tab="events">影响力事件营销</div>
+  <div class="tab" data-tab="projects">交付项目追踪</div>
+  <div class="tab" data-tab="team">团队分工</div>
+</div>
+
+<div class="content">
+
+<!-- ==================== 年度总览 ==================== -->
+<div class="panel active" id="panel-overview">
+  <div class="tip"><span class="tip-icon">💡</span><div>数据自动汇总：填写「新媒体矩阵运营」「10W+标杆案例库」「影响力事件营销」后，各项目标数据自动更新。所有数据存储在浏览器本地，刷新不丢失。</div></div>
+
+  <!-- KPI大卡 -->
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:16px" id="overviewMain"></div>
+
+  <!-- 补充KPI -->
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:16px" id="overviewSub"></div>
+
+  <!-- 目标拆解（深色背景） -->
+  <div style="background:linear-gradient(135deg,#111827,#1e2a4a);border-radius:16px;padding:24px;margin-bottom:16px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+      <div>
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;margin-bottom:6px;background:linear-gradient(90deg,#7c9fff,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">2026 全渠道曝光目标</div>
+        <div style="font-size:30px;font-weight:800;line-height:1;letter-spacing:-.5px"><span style="background:linear-gradient(90deg,#fff,#c7d2fe);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">5000</span><span style="font-size:14px;font-weight:500;color:rgba(255,255,255,.3);margin-left:6px">万曝光目标</span></div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:10px;color:rgba(255,255,255,.3);font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px">当前合计</div>
+        <div style="font-size:36px;font-weight:800;color:#34d399;line-height:1;letter-spacing:-.5px" id="actualTotal">0<span style="font-size:14px;font-weight:500;color:rgba(255,255,255,.3);margin-left:4px">万</span></div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
+      <!-- 社会化营销 -->
+      <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:18px;transition:all .2s" onmouseover="this.style.background='rgba(255,255,255,.08)';this.style.borderColor='rgba(245,158,11,.3)'" onmouseout="this.style.background='rgba(255,255,255,.04)';this.style.borderColor='rgba(255,255,255,.08)'">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
+          <div style="width:6px;height:6px;border-radius:50%;background:#f59e0b;box-shadow:0 0 8px rgba(245,158,11,.5)"></div>
+          <div style="font-size:10px;color:rgba(255,255,255,.4);font-weight:700;text-transform:uppercase;letter-spacing:.8px">社会化营销</div>
+        </div>
+        <div style="display:flex;align-items:baseline;gap:4px;margin-bottom:6px">
+          <div style="display:flex;align-items:baseline;gap:2px;overflow:visible">
+            <input type="number" id="t-social" value="3000" min="0" style="width:80px;font-size:22px;font-weight:800;text-align:left;border:none;background:transparent;color:#f59e0b;padding:0;letter-spacing:-.5px" onchange="saveTarget('social')">
+          </div>
+          <span style="font-size:13px;color:rgba(255,255,255,.35)">万</span>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.2);margin-bottom:12px">锣马假日 · 极端天气 · 民呼我为</div>
+        <div style="border-top:1px solid rgba(255,255,255,.06);padding-top:12px">
+          <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+            <span style="font-size:11px;color:rgba(255,255,255,.3)">已汇总</span>
+            <span id="sum-social" style="font-size:16px;font-weight:800;color:#f59e0b">—万</span>
+          </div>
+          <div style="height:4px;background:rgba(255,255,255,.06);border-radius:4px;overflow:hidden"><div id="bar-social" style="height:100%;width:0%;background:linear-gradient(90deg,#f59e0b,#fbbf24);border-radius:4px;transition:width .8s"></div></div>
+          <div style="font-size:10px;color:rgba(255,255,255,.2);margin-top:6px;text-align:right">达成 <span id="pct-social" style="color:#f59e0b">0</span>%</div>
+        </div>
+      </div>
+      <!-- 交付事件品牌化 -->
+      <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:18px;transition:all .2s" onmouseover="this.style.background='rgba(255,255,255,.08)';this.style.borderColor='rgba(91,127,255,.3)'" onmouseout="this.style.background='rgba(255,255,255,.04)';this.style.borderColor='rgba(255,255,255,.08)'">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
+          <div style="width:6px;height:6px;border-radius:50%;background:#5b7fff;box-shadow:0 0 8px rgba(91,127,255,.5)"></div>
+          <div style="font-size:10px;color:rgba(255,255,255,.4);font-weight:700;text-transform:uppercase;letter-spacing:.8px">交付事件品牌化</div>
+        </div>
+        <div style="display:flex;align-items:baseline;gap:4px;margin-bottom:6px">
+          <input type="number" id="t-deliver" value="1000" min="0" style="width:80px;font-size:22px;font-weight:800;text-align:left;border:none;background:transparent;color:#5b7fff;padding:0;letter-spacing:-.5px" onchange="saveTarget('deliver')">
+          <span style="font-size:13px;color:rgba(255,255,255,.35)">万</span>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.2);margin-bottom:12px">18个交付项目品牌事件</div>
+        <div style="border-top:1px solid rgba(255,255,255,.06);padding-top:12px">
+          <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+            <span style="font-size:11px;color:rgba(255,255,255,.3)">已汇总</span>
+            <span id="sum-deliver" style="font-size:16px;font-weight:800;color:#5b7fff">—万</span>
+          </div>
+          <div style="height:4px;background:rgba(255,255,255,.06);border-radius:4px;overflow:hidden"><div id="bar-deliver" style="height:100%;width:0%;background:linear-gradient(90deg,#5b7fff,#7c9fff);border-radius:4px;transition:width .8s"></div></div>
+          <div style="font-size:10px;color:rgba(255,255,255,.2);margin-top:6px;text-align:right">达成 <span id="pct-deliver" style="color:#5b7fff">0</span>%</div>
+        </div>
+      </div>
+      <!-- 新媒体矩阵运营 -->
+      <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:18px;transition:all .2s" onmouseover="this.style.background='rgba(255,255,255,.08)';this.style.borderColor='rgba(139,92,246,.3)'" onmouseout="this.style.background='rgba(255,255,255,.04)';this.style.borderColor='rgba(255,255,255,.08)'">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
+          <div style="width:6px;height:6px;border-radius:50%;background:#8b5cf6;box-shadow:0 0 8px rgba(139,92,246,.5)"></div>
+          <div style="font-size:10px;color:rgba(255,255,255,.4);font-weight:700;text-transform:uppercase;letter-spacing:.8px">新媒体矩阵运营</div>
+        </div>
+        <div style="display:flex;align-items:baseline;gap:4px;margin-bottom:6px">
+          <input type="number" id="t-newmedia" value="1000" min="0" style="width:80px;font-size:22px;font-weight:800;text-align:left;border:none;background:transparent;color:#8b5cf6;padding:0;letter-spacing:-.5px" onchange="saveTarget('newmedia')">
+          <span style="font-size:13px;color:rgba(255,255,255,.35)">万</span>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.2);margin-bottom:12px">6大渠道矩阵运营</div>
+        <div style="border-top:1px solid rgba(255,255,255,.06);padding-top:12px">
+          <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+            <span style="font-size:11px;color:rgba(255,255,255,.3)">已汇总</span>
+            <span id="sum-newmedia" style="font-size:16px;font-weight:800;color:#8b5cf6">—万</span>
+          </div>
+          <div style="height:4px;background:rgba(255,255,255,.06);border-radius:4px;overflow:hidden"><div id="bar-newmedia" style="height:100%;width:0%;background:linear-gradient(90deg,#8b5cf6,#a78bfa);border-radius:4px;transition:width .8s"></div></div>
+          <div style="font-size:10px;color:rgba(255,255,255,.2);margin-top:6px;text-align:right">达成 <span id="pct-newmedia" style="color:#8b5cf6">0</span>%</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 四大模块进度 -->
+  <div class="section">
+    <div class="section-title">🎯 四大核心模块进度</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px" id="modulesProgress"></div>
+  </div>
+
+  <div class="tip" style="margin-top:16px"><span class="tip-icon">💡</span><div>数据自动汇总：填写「新媒体矩阵运营」「10W+标杆案例库」「影响力事件营销」后，各项目标数据自动更新。所有数据存储在浏览器本地，刷新不丢失。</div></div>
+</div>
+
+<!-- ==================== 全部工作明细 ==================== -->
+<div class="panel" id="panel-allwork">
+  <div class="table-card">
+    <div class="table-header">
+      <div class="table-title">2026年度工作明细总表 <span class="table-count" id="worksCount">15项</span></div>
+      <div class="table-actions">
+        <button class="btn" onclick="exportWorks()">导出</button>
+        <button class="btn primary" onclick="openWorkModal()">+ 编辑状态</button>
+      </div>
+    </div>
+    <!-- 筛选栏 -->
+    <div style="padding:12px 18px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;border-bottom:1px solid var(--border);background:#fafafa">
+      <span style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;flex-shrink:0">筛选</span>
+      <select id="f-module" onchange="renderWorks()" style="font-size:12px;padding:5px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);cursor:pointer"><option value="">全部模块</option><option>可持续友好</option><option>产品品牌</option><option>社会化营销</option><option>新媒体</option><option>临时专项</option></select>
+      <select id="f-owner" onchange="renderWorks()" style="font-size:12px;padding:5px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);cursor:pointer"><option value="">全部负责人</option><option>何晓婷</option><option>龙晶晶</option><option>宋香回</option><option>张樊若兰</option></select>
+      <select id="f-status" onchange="renderWorks()" style="font-size:12px;padding:5px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);cursor:pointer"><option value="">全部状态</option><option>已完成</option><option>进行中</option><option>待启动</option><option>持续进行</option><option>需求分析/立项</option><option>资料调研</option><option>方案策划</option><option>方案提报</option><option>流程审批</option><option>资源协调</option><option>正式执行</option><option>过程跟进/督导</option><option>阶段性汇报</option><option>宣传推广</option><option>复盘沉淀</option></select>
+      <select id="f-level" onchange="renderWorks()" style="font-size:12px;padding:5px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);cursor:pointer"><option value="">全部级别</option><option>一级一类</option><option>一级二类</option><option>二级</option><option>紧急</option></select>
+      <select id="f-q" onchange="renderWorks()" style="font-size:12px;padding:5px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);cursor:pointer"><option value="">全部季度</option><option>Q1</option><option>Q2</option><option>Q3</option><option>Q4</option><option>Q1-Q3</option><option>Q2-Q3</option><option>Q2-Q4</option><option>全年</option></select>
+      <button class="btn" onclick="clearWorkFilter()" style="padding:5px 12px;font-size:11px">重置</button>
+      <span id="worksFiltered" style="font-size:11px;color:var(--text-muted);margin-left:auto"></span>
+    </div>
+    <div style="overflow-x:auto">
+      <table class="tbl">
+        <thead><tr><th>#</th><th>模块</th><th>事项</th><th>级别</th><th>Q</th><th>负责人</th><th>截止</th><th>状态</th><th>进度</th><th>产出</th><th>效果评估</th><th>领导评价</th><th>验收文件</th><th>操作</th></tr></thead>
+        <tbody id="worksBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== Q2工作看板 ==================== -->
+<div class="panel" id="panel-kanban">
+  <div id="q2Summary"></div>
+  <div class="kanban-board" id="q2Board"></div>
+</div>
+
+<!-- ==================== Q3重点工作 ==================== -->
+<div class="panel" id="panel-q3">
+  <div id="q3Summary"></div>
+  <div class="kanban-board" id="q3Board"></div>
+</div>
+
+<!-- ==================== Q4重点工作 ==================== -->
+<div class="panel" id="panel-q4">
+  <div id="q4Summary"></div>
+  <div class="kanban-board" id="q4Board"></div>
+</div>
+
+<!-- ==================== 新媒体矩阵运营 ==================== -->
+<div class="panel" id="panel-media">
+  <div class="tip"><span class="tip-icon">📱</span><div>6大渠道数据更新入口。每周更新数据后自动汇总至「新媒体矩阵」曝光目标（1000万）。数据存储本地，刷新不丢失。</div></div>
+  <div class="table-card">
+    <div class="table-header">
+      <div class="table-title">新媒体矩阵运营数据 <span class="table-count" id="mediaCount">6个渠道</span></div>
+      <div class="table-actions">
+        <button class="btn" onclick="exportMediaAll()">导出全部历史</button>
+        <button class="btn primary" onclick="openMediaModal()">+ 更新数据</button>
+      </div>
+    </div>
+    <div style="overflow-x:auto">
+      <table class="tbl">
+        <thead><tr><th>渠道名称</th><th>主责人</th><th>本周粉丝净增</th><th>累计粉丝总量</th><th>本周曝光(万)</th><th>累计曝光(万)</th><th>本周阅读/播放量</th><th>累计阅读/播放量</th><th>更新时间</th><th>历史记录</th><th>操作</th></tr></thead>
+        <tbody id="mediaBody"></tbody>
+      </table>
+    </div>
+    <div id="mediaEmpty" class="empty"><div class="empty-icon">📱</div><div class="empty-text">暂无数据，点击右上角「更新数据」添加第一条记录</div></div>
+  </div>
+  <!-- 渠道汇总 -->
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin-top:4px" id="mediaSummary"></div>
+</div>
+
+<!-- ==================== 10W+标杆案例库 ==================== -->
+<div class="panel" id="panel-cases">
+  <div class="table-card">
+    <div class="table-header">
+      <div class="table-title">10W+标杆案例库 <span class="table-count" id="casesCount">0</span></div>
+      <div class="table-actions">
+        <button class="btn" onclick="exportCases()">导出</button>
+        <button class="btn primary" onclick="openCaseModal()">+ 新增案例</button>
+      </div>
+    </div>
+    <div style="overflow-x:auto">
+      <table class="tbl">
+        <thead><tr><th>#</th><th>分公司</th><th>城市</th><th>主题</th><th>摘要</th><th>形式</th><th>日期</th><th>阅读量</th><th>曝光(万)</th><th>所属模块</th><th>负责人</th><th>关联渠道</th><th>状态</th><th>操作</th></tr></thead>
+        <tbody id="casesBody"></tbody>
+      </table>
+    </div>
+    <div id="casesEmpty" class="empty"><div class="empty-icon">📝</div><div class="empty-text">暂无案例数据，点击右上角「新增案例」添加</div></div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px" id="casesSummary"></div>
+</div>
+
+<!-- ==================== 影响力事件营销 ==================== -->
+<div class="panel" id="panel-events">
+  <div class="table-card">
+    <div class="table-header">
+      <div class="table-title">影响力事件营销 <span class="table-count" id="eventsCount">0</span></div>
+      <div class="table-actions">
+        <button class="btn" onclick="exportEvents()">导出</button>
+        <button class="btn primary" onclick="openEventModal()">+ 新增事件</button>
+      </div>
+    </div>
+    <div style="overflow-x:auto">
+      <table class="tbl">
+        <thead><tr><th>#</th><th>主体</th><th>类型</th><th>日期</th><th>涉及项目/城市</th><th>自有渠道曝光</th><th>媒体渠道曝光</th><th>话题曝光</th><th>其余渠道</th><th>总曝光(万)</th><th>媒体报道次数</th><th>负责人</th><th>状态</th><th>操作</th></tr></thead>
+        <tbody id="eventsBody"></tbody>
+      </table>
+    </div>
+    <div id="eventsEmpty" class="empty"><div class="empty-icon">🏆</div><div class="empty-text">暂无事件数据，点击右上角「新增事件」添加</div></div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px" id="eventsSummary"></div>
+</div>
+
+<!-- ==================== 交付项目追踪 ==================== -->
+<div class="panel" id="panel-projects">
+  <div id="projectsSummary"></div>
+  <div class="table-card">
+    <div class="table-header">
+      <div class="table-title">2026年待交付新项目一览 <span class="table-count">18个项目</span></div>
+      <div class="table-actions">
+        <button class="btn" onclick="exportProjects()">导出CSV</button>
+        <button class="btn primary" onclick="openProjectModal()">+ 新增项目</button>
+      </div>
+    </div>
+    <div style="overflow-x:auto">
+      <table class="tbl">
+        <thead><tr><th style="width:36px">#</th><th style="width:60px">城市</th><th style="width:120px">名称</th><th style="width:64px">产品系</th><th style="width:64px">批次</th><th style="width:48px">分级</th><th style="width:48px">首批</th><th style="width:96px">内控日</th><th style="width:96px">合同日</th><th style="width:72px">交付状态</th><th style="width:72px">宣传状态</th><th style="width:160px">品牌亮点</th><th style="width:72px">项目负责人</th><th style="width:72px">品牌对接</th></tr></thead>
+        <tbody id="projectsBody"></tbody>
+      </table>
+    </div>
+    <div style="padding:12px 16px;border-top:1px solid #f0f0f0;display:flex;align-items:center;gap:10px;background:#fafbfc">
+      <span style="font-size:11px;color:#999">💡 直接点击单元格即可编辑，编辑后自动保存</span>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== 团队分工 ==================== -->
+<div class="panel" id="panel-team">
+  <div class="tip"><span class="tip-icon">👥</span><div>团队成员核心KPI实时追踪。点击各成员卡片下方的「更新KPI」，填入最新数据，自动同步至年度总览。</div></div>
+  <div class="team-grid" id="teamGrid"></div>
+</div>
+
+</div>
+
+<!-- ===== 弹窗 ===== -->
+
+<!-- 新增案例 -->
+<div class="modal-overlay" id="caseModal">
+<div class="modal large">
+  <div class="modal-header"><div class="modal-title">+ 新增10W+标杆案例</div><div class="modal-close" onclick="closeModal('caseModal')">×</div></div>
+  <div class="modal-body">
+    <div class="form-grid">
+      <div class="form-group"><div class="form-label required">分公司</div><select id="cf-branch"><option value="">请选择</option><option>川西</option><option>川东北</option><option>云广</option><option>华中</option><option>西北</option><option>成都</option><option>总部</option></select></div>
+      <div class="form-group"><div class="form-label">城市</div><input id="cf-city" placeholder="如：西昌"></div>
+      <div class="form-group"><div class="form-label required">案例主题</div><input id="cf-theme" placeholder="简要概括"></div></div>
+    <div class="form-grid">
+      <div class="form-group" style="grid-column:1/-1"><div class="form-label">内容摘要</div><textarea id="cf-summary" placeholder="简述内容核心、传播亮点"></textarea></div></div>
+    <div class="form-grid">
+      <div class="form-group"><div class="form-label required">内容形式</div><select id="cf-format"><option value="">请选择</option><option>短视频</option><option>图文</option><option>长图</option><option>直播</option><option>朋友圈</option><option>小红书笔记</option><option>抖音/视频号</option><option>新闻稿</option><option>其他</option></select></div>
+      <div class="form-group"><div class="form-label required">所属模块</div><select id="cf-module"><option value="">请选择</option><option>社会营销</option><option>交付事件</option><option>新媒体矩阵</option><option>可持续友好</option><option>产品品牌</option></select></div>
+      <div class="form-group"><div class="form-label">关联渠道</div><select id="cf-channel"><option value="">请选择</option><option>邦泰智汇生活公众号</option><option>邦泰智汇生活视频号</option><option>生活有好报视频号</option><option>邦泰智汇生活抖音号</option><option>邦泰智汇生活小红书</option><option>片区新媒体矩阵</option><option>其他</option></select></div>
+      <div class="form-group"><div class="form-label required">发布日期</div><input type="date" id="cf-date"></div></div>
+    <div class="form-grid">
+      <div class="form-group"><div class="form-label required">阅读/播放量</div><input id="cf-reads" type="number" placeholder="如：120000" min="0"></div>
+      <div class="form-group"><div class="form-label required">曝光量(万)</div><input id="cf-expose" type="number" placeholder="如：15" min="0" step="0.1"></div>
+      <div class="form-group"><div class="form-label required">负责人</div><select id="cf-owner"><option value="">请选择</option><option>何晓婷</option><option>龙晶晶</option><option>宋香回</option><option>张樊若兰</option></select></div>
+      <div class="form-group"><div class="form-label required">状态</div><select id="cf-status"><option value="已完成">已完成</option><option value="进行中">进行中</option><option value="待启动">待启动</option><option value="方案策划">方案策划</option><option value="正式执行">正式执行</option><option value="宣传推广">宣传推广</option><option value="复盘沉淀">复盘沉淀</option></select></div></div>
+    <div class="form-grid">
+      <div class="form-group"><div class="form-label">关联项目</div><input id="cf-project" placeholder="如：南宁璟和"></div>
+      <div class="form-group"><div class="form-label">备注</div><input id="cf-note" placeholder="补充说明"></div></div>
+  </div>
+  <div class="modal-footer"><button class="btn" onclick="closeModal('caseModal')">取消</button><button class="btn primary" onclick="saveCase()">保存</button></div>
+</div>
+</div>
+
+<!-- 新增事件 -->
+<div class="modal-overlay" id="eventModal">
+<div class="modal large">
+  <div class="modal-header"><div class="modal-title">+ 新增影响力事件营销</div><div class="modal-close" onclick="closeModal('eventModal')">×</div></div>
+  <div class="modal-body">
+    <div class="form-grid">
+      <div class="form-group"><div class="form-label required">事件主体</div><input id="ef-subject" placeholder="如：延安锦天府儿童救援事件"></div>
+      <div class="form-group"><div class="form-label required">事件类型</div><select id="ef-type"><option value="">请选择</option><option>救援/应急</option><option>公益/社会责任</option><option>创新服务</option><option>社区共建</option><option>品牌传播</option><option>极端天气响应</option><option>政府合作</option><option>其他</option></select></div>
+      <div class="form-group"><div class="form-label required">发生日期</div><input type="date" id="ef-date"></div></div>
+    <div class="form-grid">
+      <div class="form-group"><div class="form-label">涉及项目/城市</div><input id="ef-city" placeholder="如：延安锦天府"></div>
+      <div class="form-group"><div class="form-label">关联项目</div><input id="ef-project" placeholder="关联项目名称"></div>
+      <div class="form-group"><div class="form-label required">负责人</div><select id="ef-owner"><option value="">请选择</option><option>何晓婷</option><option>龙晶晶</option><option>宋香回</option><option>张樊若兰</option></select></div>
+      <div class="form-group"><div class="form-label required">状态</div><select id="ef-status"><option value="已完成">已完成</option><option value="进行中">进行中</option><option value="待启动">待启动</option><option value="方案策划">方案策划</option><option value="方案提报">方案提报</option><option value="正式执行">正式执行</option><option value="过程跟进/督导">过程跟进/督导</option><option value="宣传推广">宣传推广</option><option value="复盘沉淀">复盘沉淀</option></select></div></div>
+    <div class="form-grid">
+      <div class="form-group"><div class="form-label required">自有渠道曝光(万)</div><input id="ef-own" type="number" placeholder="如：5" min="0" step="0.1"></div>
+      <div class="form-group"><div class="form-label">媒体渠道曝光(万)</div><input id="ef-media-exp" type="number" placeholder="如：3" min="0" step="0.1"></div>
+      <div class="form-group"><div class="form-label">事件话题曝光(万)</div><input id="ef-topic" type="number" placeholder="如：10" min="0" step="0.1"></div>
+      <div class="form-group"><div class="form-label">其余渠道曝光(万)</div><input id="ef-other" type="number" placeholder="如：2" min="0" step="0.1"></div></div>
+    <div class="form-grid">
+      <div class="form-group"><div class="form-label">媒体报道次数</div><input id="ef-mcount" type="number" placeholder="如：5" min="0"></div>
+      <div class="form-group"><div class="form-label">转载量</div><input id="ef-reprint" type="number" placeholder="如：1000" min="0"></div>
+      <div class="form-group"><div class="form-label">获得认证/奖项</div><input id="ef-award" placeholder="如：物业协会优秀案例"></div>
+      <div class="form-group"><div class="form-label">认证级别</div><select id="ef-level"><option value="">请选择</option><option>国家级</option><option>省级</option><option>市级</option><option>县域级</option><option>无</option></select></div></div>
+    <div class="form-grid">
+      <div class="form-group" style="grid-column:1/-1"><div class="form-label">媒体报道明细</div><textarea id="ef-media" placeholder="媒体名称，每行一个"></textarea></div></div>
+    <div class="form-grid">
+      <div class="form-group" style="grid-column:1/-1"><div class="form-label">领导评价</div><textarea id="ef-leader" placeholder="领导对该事件的评价或批示"></textarea></div></div>
+    <div class="form-grid">
+      <div class="form-group" style="grid-column:1/-1"><div class="form-label">备注</div><textarea id="ef-note" placeholder="补充说明"></textarea></div></div>
+  </div>
+  <div class="modal-footer"><button class="btn" onclick="closeModal('eventModal')">取消</button><button class="btn primary" onclick="saveEvent()">保存</button></div>
+</div>
+</div>
+
+<!-- 新媒体数据 -->
+<div class="modal-overlay" id="mediaModal">
+<div class="modal large">
+  <div class="modal-header"><div class="modal-title">+ 更新新媒体渠道数据</div><div class="modal-close" onclick="closeModal('mediaModal')">×</div></div>
+  <div class="modal-body">
+    <div class="form-grid">
+      <div class="form-group"><div class="form-label required">选择渠道</div>
+        <select id="mf-channel"><option value="">请选择渠道</option><option>邦泰智汇生活公众号</option><option>邦泰智汇生活视频号</option><option>生活有好报视频号</option><option>邦泰智汇生活抖音号</option><option>邦泰智汇生活小红书</option><option>片区新媒体矩阵</option></select></div>
+      <div class="form-group"><div class="form-label required">更新时间</div><input type="date" id="mf-date"></div></div>
+    <div class="form-grid">
+      <div class="form-group"><div class="form-label">本周粉丝净增</div><input id="mf-fan-add" type="number" placeholder="如：200" min="0"></div>
+      <div class="form-group"><div class="form-label">累计粉丝总量</div><input id="mf-fan-total" type="number" placeholder="如：50000" min="0"></div>
+      <div class="form-group"><div class="form-label required">本周曝光(万)</div><input id="mf-expose-week" type="number" placeholder="如：15" min="0" step="0.1"></div>
+      <div class="form-group"><div class="form-label">本周阅读/播放量</div><input id="mf-read-week" type="number" placeholder="如：10000" min="0"></div></div>
+    <div class="form-grid">
+      <div class="form-group"><div class="form-label">累计曝光(万)</div><input id="mf-expose-total" type="number" placeholder="如：200" min="0" step="0.1"></div>
+      <div class="form-group"><div class="form-label">累计阅读/播放量</div><input id="mf-read-total" type="number" placeholder="如：50000" min="0"></div>
+      <div class="form-group"><div class="form-label">备注</div><input id="mf-note" placeholder="补充说明"></div></div>
+  </div>
+  <div class="modal-footer"><button class="btn" onclick="closeModal('mediaModal')">取消</button><button class="btn primary" onclick="saveMedia()">保存</button></div>
+</div>
+</div>
+
+<!-- 编辑项目 -->
+<div class="modal-overlay" id="projectModal">
+<div class="modal large">
+  <div class="modal-header"><div class="modal-title">编辑交付项目信息</div><div class="modal-close" onclick="closeModal('projectModal')">×</div></div>
+  <div class="modal-body">
+    <div class="form-grid">
+      <div class="form-group"><div class="form-label required">项目序号</div><input id="pf-seq" type="number" placeholder="1-18" min="1"></div>
+      <div class="form-group"><div class="form-label required">项目名称</div><input id="pf-name" placeholder="如：南宁璟和"></div>
+      <div class="form-group"><div class="form-label required">城市</div><input id="pf-city" placeholder="如：南宁"></div>
+      <div class="form-group"><div class="form-label required">产品系</div><select id="pf-line"><option value="">请选择</option><option>司雅</option><option>司和</option><option>司典</option><option>司嘉</option></select></div></div>
+    <div class="form-grid">
+      <div class="form-group"><div class="form-label">分公司</div><select id="pf-branch"><option value="">请选择</option><option>川西</option><option>川东北</option><option>云广</option><option>华中</option><option>西北</option><option>成都</option></select></div>
+      <div class="form-group"><div class="form-label">批次</div><input id="pf-batch" placeholder="如：1期、整体"></div>
+      <div class="form-group"><div class="form-label">项目分级</div><select id="pf-grade"><option value="">请选择</option><option>A</option><option>B</option></select></div>
+      <div class="form-group"><div class="form-label">首批次交付</div><select id="pf-first"><option value="">请选择</option><option>是</option><option>否</option></select></div></div>
+    <div class="form-grid">
+      <div class="form-group"><div class="form-label required">内控交付日</div><input type="date" id="pf-inner"></div>
+      <div class="form-group"><div class="form-label required">合同交付日</div><input type="date" id="pf-contract"></div>
+      <div class="form-group"><div class="form-label required">交付状态</div><select id="pf-deliver"><option value="">请选择</option><option>已交付</option><option>筹备中</option><option>未开始</option></select></div>
+      <div class="form-group"><div class="form-label required">宣传状态</div><select id="pf-promote"><option value="">请选择</option><option>提前介入</option><option>已启动</option><option>未启动</option><option>待复盘</option><option>已完成</option></select></div></div>
+    <div class="form-grid">
+      <div class="form-group" style="grid-column:1/-1"><div class="form-label">品牌亮点</div><textarea id="pf-highlight" placeholder="该项目的核心服务亮点、品牌宣传切入点"></textarea></div></div>
+    <div class="form-grid">
+      <div class="form-group"><div class="form-label">项目负责人</div><input id="pf-pm" placeholder="项目负责人"></div>
+      <div class="form-group"><div class="form-label">品牌对接人</div><input id="pf-brand" value="龙晶晶"></div></div>
+  </div>
+  <div class="modal-footer"><button class="btn" onclick="closeModal('projectModal')">取消</button><button class="btn success" onclick="saveProject()">保存</button></div>
+</div>
+</div>
+
+<!-- 编辑工作 -->
+<div class="modal-overlay" id="workModal">
+<div class="modal large">
+  <div class="modal-header"><div class="modal-title">编辑工作状态与效果评估</div><div class="modal-close" onclick="closeModal('workModal')">×</div></div>
+  <div class="modal-body">
+    <div class="form-grid">
+      <div class="form-group" style="grid-column:1/-1"><div class="form-label required">选择工作项</div>
+        <select id="wf-select" onchange="wfLoad()"><option value="">请选择</option></select></div></div>
+    <div class="form-grid">
+      <div class="form-group"><div class="form-label required">当前状态</div><select id="wf-status"><option value="">请选择</option><option>已完成</option><option>进行中</option><option>待启动</option></select></div>
+      <div class="form-group"><div class="form-label">完成进度</div><input id="wf-progress" type="number" min="0" max="100"> %</div>
+      <div class="form-group"><div class="form-label">完成日期</div><input type="date" id="wf-date"></div></div>
+    <div class="form-grid">
+      <div class="form-group"><div class="form-label">效果评估</div><textarea id="wf-effect" placeholder="描述该工作项的实际效果、亮点与不足"></textarea></div></div>
+    <div class="form-grid">
+      <div class="form-group"><div class="form-label">领导评价</div><textarea id="wf-leader" placeholder="领导对该工作项的评价或批示"></textarea></div></div>
+    <div class="form-grid">
+      <div class="form-group"><div class="form-label">验收文件/产出</div><textarea id="wf-verify" placeholder="如：品牌物料体系_v1.pdf"></textarea></div>
+      <div class="form-group"><div class="form-label">备注</div><textarea id="wf-note" placeholder="补充说明"></textarea></div></div>
+  </div>
+  <div class="modal-footer"><button class="btn" onclick="closeModal('workModal')">取消</button><button class="btn primary" onclick="saveWork()">保存</button></div>
+</div>
+</div>
+
+<!-- 更新团队KPI -->
+<div class="modal-overlay" id="teamKpiModal">
+<div class="modal">
+  <div class="modal-header"><div class="modal-title" id="tkTitle">更新团队KPI</div><div class="modal-close" onclick="closeModal('teamKpiModal')">×</div></div>
+  <div class="modal-body">
+    <div id="tkFormContent"></div>
+  </div>
+  <div class="modal-footer"><button class="btn" onclick="closeModal('teamKpiModal')">取消</button><button class="btn primary" onclick="saveTeamKpi()">保存</button></div>
+</div>
+</div>
+
+<!-- 新媒体历史记录 -->
+<div class="modal-overlay" id="mediaHistoryModal">
+<div class="modal large">
+  <div class="modal-header"><div class="modal-title" id="mhTitle">历史记录</div><div class="modal-close" onclick="closeModal('mediaHistoryModal')">×</div></div>
+  <div class="modal-body">
+    <div id="mhContent"></div>
+  </div>
+  <div class="modal-footer"><button class="btn" onclick="closeModal('mediaHistoryModal')">关闭</button><button class="btn primary" onclick="exportMediaHistory()">导出全部历史</button></div>
+</div>
+</div>
+
+<!-- 新增汇总入口 -->
+<div class="modal-overlay" id="addModal">
+<div class="modal">
+  <div class="modal-header"><div class="modal-title">+ 新增记录</div><div class="modal-close" onclick="closeModal('addModal')">×</div></div>
+  <div class="modal-body">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+      <button class="btn primary" style="padding:20px 16px;flex-direction:column;align-items:center;gap:8px;height:100%;min-height:100px" onclick="closeModal('addModal');openMediaModal()"><span style="font-size:32px;margin-bottom:4px">📱</span><span style="font-size:14px;font-weight:700">新媒体渠道数据</span><span style="font-size:11px;color:rgba(255,255,255,.75);font-weight:400">更新6大渠道曝光和粉丝</span></button>
+      <button class="btn primary" style="padding:20px 16px;flex-direction:column;align-items:center;gap:8px;height:100%;min-height:100px;background:linear-gradient(135deg,#52c41a,#73c55a)" onclick="closeModal('addModal');openCaseModal()"><span style="font-size:32px;margin-bottom:4px">📝</span><span style="font-size:14px;font-weight:700">10W+标杆案例</span><span style="font-size:11px;color:rgba(255,255,255,.75);font-weight:400">记录案例，自动汇总曝光量</span></button>
+      <button class="btn primary" style="padding:20px 16px;flex-direction:column;align-items:center;gap:8px;height:100%;min-height:100px;background:linear-gradient(135deg,#fa8c16,#f5b44c)" onclick="closeModal('addModal');openEventModal()"><span style="font-size:32px;margin-bottom:4px">🏆</span><span style="font-size:14px;font-weight:700">影响力事件营销</span><span style="font-size:11px;color:rgba(255,255,255,.75);font-weight:400">记录事件，关联媒体和KPI</span></button>
+      <button class="btn primary" style="padding:20px 16px;flex-direction:column;align-items:center;gap:8px;height:100%;min-height:100px;background:linear-gradient(135deg,#722ed1,#9254de)" onclick="closeModal('addModal');openProjectModal()"><span style="font-size:32px;margin-bottom:4px">🏗️</span><span style="font-size:14px;font-weight:700">交付项目状态</span><span style="font-size:11px;color:rgba(255,255,255,.75);font-weight:400">更新项目进度和宣传状态</span></button>
+    </div>
+  </div>
+  <div class="modal-footer"><button class="btn" onclick="closeModal('addModal')">关闭</button></div>
+</div>
+</div>
+
+<script>
+// ==================== 数据定义 ====================
+var LS = 'bt_brand_v3';
+
+// 工作明细
+var WORKS = [
+  {id:1,module:'可持续友好',name:'内部宣贯+系统策划',level:'一级一类',ln:1,q:'Q1',owner:'何晓婷',end:'2026/3/31',status:'已完成',progress:100,产出:'宣贯覆盖率+激励方案',effect:'',leaderReview:'',verify:'',note:''},
+  {id:2,module:'可持续友好',name:'统一品牌物料推出',level:'一级一类',ln:1,q:'Q2',owner:'何晓婷',end:'2026/6/30',status:'进行中',progress:30,产出:'品牌物料体系',effect:'',leaderReview:'',verify:'',note:''},
+  {id:3,module:'可持续友好',name:'"我家的友好刻度"事件',level:'一级一类',ln:1,q:'Q3',owner:'何晓婷',end:'2026/9/30',status:'待启动',progress:0,产出:'品牌出圈传播',effect:'',leaderReview:'',verify:'',note:''},
+  {id:4,module:'可持续友好',name:'产学研课题认证',level:'一级二类',ln:2,q:'Q4',owner:'何晓婷',end:'2026/12/31',status:'待启动',progress:0,产出:'权威认证证书',effect:'',leaderReview:'',verify:'',note:''},
+  {id:5,module:'产品品牌',name:'团队配置+系统规划',level:'一级一类',ln:1,q:'Q1',owner:'龙晶晶',end:'2026/3/31',status:'已完成',progress:100,产出:'全年宣传规划',effect:'',leaderReview:'',verify:'',note:''},
+  {id:6,module:'产品品牌',name:'本地化标杆交付事件打造',level:'一级一类',ln:1,q:'Q2-Q3',owner:'龙晶晶',end:'2026/9/30',status:'进行中',progress:20,产出:'每个区域1个标杆',effect:'',leaderReview:'',verify:'',note:''},
+  {id:7,module:'产品品牌',name:'产品品牌号起号',level:'二级',ln:3,q:'Q4',owner:'龙晶晶',end:'2026/12/31',status:'待启动',progress:0,产出:'账号起号+内容',effect:'',leaderReview:'',verify:'',note:''},
+  {id:8,module:'社会化营销',name:'"锣马假日"新春推广',level:'一级二类',ln:2,q:'Q1',owner:'宋香回',end:'2026/3/31',status:'已完成',progress:100,产出:'爆款基因+执行指引',effect:'',leaderReview:'',verify:'',note:''},
+  {id:9,module:'社会化营销',name:'节点性小事件营销跑通',level:'二级',ln:3,q:'Q2',owner:'宋香回',end:'2026/6/30',status:'进行中',progress:40,产出:'可复制模式',effect:'',leaderReview:'',verify:'',note:''},
+  {id:10,module:'社会化营销',name:'应急事件（生命友好）推广',level:'一级一类',ln:1,q:'Q3',owner:'宋香回',end:'2026/9/30',status:'待启动',progress:0,产出:'业主自发传播爆款',effect:'',leaderReview:'',verify:'',note:''},
+  {id:11,module:'社会化营销',name:'邦泰新职人计划',level:'一级二类',ln:2,q:'Q4',owner:'宋香回',end:'2026/12/31',status:'待启动',progress:0,产出:'纪实物料',effect:'',leaderReview:'',verify:'',note:''},
+  {id:12,module:'新媒体',name:'新闻快报类爆款',level:'一级一类',ln:1,q:'全年',owner:'张樊若兰',end:'2026/12/31',status:'持续进行',progress:25,产出:'爆款内容',effect:'',leaderReview:'',verify:'',note:''},
+  {id:13,module:'新媒体',name:'内容创客激励计划',level:'一级一类',ln:1,q:'Q2-Q3',owner:'张樊若兰',end:'2026/9/30',status:'进行中',progress:30,产出:'业主创作者≥50人',effect:'',leaderReview:'',verify:'',note:''},
+  {id:14,module:'新媒体',name:'全年运营复盘优化',level:'二级',ln:3,q:'Q4',owner:'张樊若兰',end:'2026/12/31',status:'待启动',progress:0,产出:'复盘报告',effect:'',leaderReview:'',verify:'',note:''},
+  {id:15,module:'临时专项',name:'延安锦天府儿童救援事件推广',level:'紧急',ln:0,q:'Q2',owner:'何晓婷',end:'2026/4/30',status:'进行中',progress:60,产出:'≥10家媒体报道',effect:'',leaderReview:'',verify:'',note:''}
+];
+
+// 交付项目
+var PROJECTS = [
+  {seq:1,city:'西昌',name:'西昌臻悦',line:'司雅',branch:'川西',batch:'整体',grade:'B',first:'是',inner:'2026-01-15',contract:'2026-01-28',deliver:'已交付',promote:'待复盘',highlight:'',pm:'杨兴友',brand:'龙晶晶'},
+  {seq:2,city:'绵阳',name:'悦九章云邸',line:'司雅',branch:'川东北',batch:'整体',grade:'B',first:'是',inner:'2026-04-30',contract:'2026-04-30',deliver:'筹备中',promote:'未启动',highlight:'',pm:'郑华',brand:'龙晶晶'},
+  {seq:3,city:'玉溪',name:'玉溪臻境',line:'司雅',branch:'云广',batch:'1期1批',grade:'B',first:'是',inner:'2026-05-09',contract:'2026-05-31',deliver:'筹备中',promote:'未启动',highlight:'',pm:'莫娜',brand:'龙晶晶'},
+  {seq:4,city:'昆明',name:'昆明春华序',line:'司雅',branch:'云广',batch:'整体',grade:'B',first:'是',inner:'2026-05-30',contract:'2026-06-30',deliver:'筹备中',promote:'未启动',highlight:'',pm:'槐蕊',brand:'龙晶晶'},
+  {seq:5,city:'南宁',name:'南宁璟和',line:'司和',branch:'云广',batch:'1期',grade:'A',first:'是',inner:'2026-06-11',contract:'2026-06-30',deliver:'筹备中',promote:'提前介入',highlight:'A类项目，司和标杆',pm:'雷倩',brand:'龙晶晶'},
+  {seq:6,city:'成都',name:'成都悦九章名邸',line:'司和',branch:'成都',batch:'整体',grade:'A',first:'是',inner:'2026-06-30',contract:'2026-06-30',deliver:'筹备中',promote:'未启动',highlight:'',pm:'李青',brand:'龙晶晶'},
+  {seq:7,city:'长沙',name:'长沙璟和府',line:'司和',branch:'华中',batch:'整体',grade:'A',first:'是',inner:'2026-06-30',contract:'2026-07-30',deliver:'筹备中',promote:'未启动',highlight:'',pm:'代俊伟',brand:'龙晶晶'},
+  {seq:8,city:'昆明',name:'昆明璟和花园',line:'司和',branch:'云广',batch:'整体',grade:'A',first:'是',inner:'2026-06-30',contract:'2026-06-30',deliver:'筹备中',promote:'提前介入',highlight:'A类精装项目',pm:'陈明淋',brand:'龙晶晶'},
+  {seq:9,city:'延安',name:'延安臻境',line:'司雅',branch:'西北',batch:'1期',grade:'B',first:'是',inner:'2026-07-30',contract:'2026-07-30',deliver:'筹备中',promote:'未启动',highlight:'结合红色文化',pm:'邵天保',brand:'龙晶晶'},
+  {seq:10,city:'昆明',name:'昆明映悦',line:'司雅',branch:'云广',batch:'1批',grade:'B',first:'是',inner:'2026-07-30',contract:'2026-08-30',deliver:'筹备中',promote:'未启动',highlight:'',pm:'李剑成',brand:'龙晶晶'},
+  {seq:11,city:'长沙',name:'长沙观宸悦府',line:'司和',branch:'华中',batch:'整体',grade:'A',first:'是',inner:'2026-07-31',contract:'2026-08-31',deliver:'筹备中',promote:'未启动',highlight:'',pm:'代俊伟',brand:'龙晶晶'},
+  {seq:12,city:'西昌',name:'西昌映悦',line:'司雅',branch:'川西',batch:'整体',grade:'B',first:'是',inner:'2026-07-30',contract:'2026-09-30',deliver:'筹备中',promote:'未启动',highlight:'',pm:'杨兴友',brand:'龙晶晶'},
+  {seq:13,city:'成都',name:'成都朗境花园',line:'司雅',branch:'成都',batch:'整体',grade:'B',first:'是',inner:'2026-09-30',contract:'2026-10-30',deliver:'未开始',promote:'未开始',highlight:'',pm:'伊忠伟',brand:'龙晶晶'},
+  {seq:14,city:'合肥',name:'合肥和颂华章',line:'司雅',branch:'华中',batch:'整体',grade:'A',first:'是',inner:'2026-09-30',contract:'2026-12-30',deliver:'未开始',promote:'未开始',highlight:'',pm:'李洪明',brand:'龙晶晶'},
+  {seq:15,city:'合肥',name:'合肥云玥映和轩',line:'司和',branch:'华中',batch:'整体',grade:'A',first:'是',inner:'2026-10-30',contract:'2026-11-30',deliver:'未开始',promote:'未开始',highlight:'',pm:'黄在路',brand:'龙晶晶'},
+  {seq:16,city:'南宁',name:'南宁璟和2期',line:'司和',branch:'云广',batch:'2期',grade:'A',first:'否',inner:'2026-10-31',contract:'2026-11-30',deliver:'未开始',promote:'未开始',highlight:'',pm:'雷倩',brand:'龙晶晶'},
+  {seq:17,city:'德阳',name:'德阳揽境',line:'司雅',branch:'川东北',batch:'1-2期',grade:'B',first:'是',inner:'2026-11-30',contract:'2027-01-30',deliver:'未开始',promote:'未开始',highlight:'',pm:'-',brand:'龙晶晶'},
+  {seq:18,city:'南宁',name:'南宁揽境',line:'司雅',branch:'云广',batch:'1期',grade:'B',first:'是',inner:'2026-12-31',contract:'2027-01-15',deliver:'未开始',promote:'未开始',highlight:'',pm:'-',brand:'龙晶晶'}
+];
+
+// 新媒体渠道
+var MEDIA_CHANNELS = [
+  {name:'邦泰智汇生活公众号',owner:'龙晶晶+宋香回',fanTotal:0,exposeTotal:0,readTotal:0},
+  {name:'邦泰智汇生活视频号',owner:'龙晶晶+宋香回',fanTotal:0,exposeTotal:0,readTotal:0},
+  {name:'生活有好报视频号',owner:'张樊若兰',fanTotal:0,exposeTotal:0,readTotal:0},
+  {name:'邦泰智汇生活抖音号',owner:'张樊若兰',fanTotal:0,exposeTotal:0,readTotal:0},
+  {name:'邦泰智汇生活小红书',owner:'龙晶晶',fanTotal:0,exposeTotal:0,readTotal:0},
+  {name:'片区新媒体矩阵',owner:'张樊若兰',fanTotal:0,exposeTotal:0,readTotal:0}
+];
+
+// 团队
+var TEAM = [
+  {name:'何晓婷',title:'品牌条线经理',color:'#ff7a45',initials:'何',
+   kpis:[
+     {label:'打造区域10w+案例',target:20,current:0,unit:'个'},
+     {label:'影响力事件营销',target:2,current:0,unit:'个'},
+     {label:'媒体报道数量',target:20,current:0,unit:'家'},
+     {label:'业主自发内容发布',target:2100,current:0,unit:'条'},
+     {label:'孵化业主创作者',target:50,current:0,unit:'人'}
+   ],
+   resp:['战略规划：可持续友好品牌战略','事件策划：社会化营销（大+小）','资源拓展：政府/协会/媒体','重大攻坚：行业白皮书/战略合作','数据监测：品牌数据体系'],
+   urgent:'🚨 延安锦天府事件收尾（4月30日截止）'},
+  {name:'龙晶晶',title:'品牌宣传副经理',color:'#165dff',initials:'龙',
+   kpis:[
+     {label:'全渠道曝光（社+交+新媒）',target:500,current:0,unit:'万'},
+     {label:'交付项目品牌对接',target:18,current:0,unit:'个'},
+     {label:'产品品牌号起号',target:1,current:0,unit:'个'},
+     {label:'标杆交付事件',target:3,current:0,unit:'个'},
+     {label:'司事润物品牌物料',target:1,current:0,unit:'套'}
+   ],
+   resp:['产品品牌：司事润物体系（司嘉/司雅/司和/司典）传播落地','高端品牌：改善型客群形象建设','交付品牌：质爱交付品牌推广','官号运营：公众号+小红书（主责）','业务BP：会所/养老/案场'],
+   urgent:'📦 Q2重点：南宁璟和、昆明璟和花园提前介入（6月30日）'},
+  {name:'宋香回',title:'品牌宣传专员',color:'#00c9a7',initials:'宋',
+   kpis:[
+     {label:'社会化营销曝光',target:3000,current:0,unit:'万'},
+     {label:'小事件营销次数',target:12,current:0,unit:'次'},
+     {label:'应急事件（生命友好）',target:1,current:0,unit:'个'},
+     {label:'邦泰新职人计划',target:1,current:0,unit:'个'},
+     {label:'执行指引文件',target:1,current:0,unit:'份'}
+   ],
+   resp:['品牌体系：可持续友好标签管理','整合营销：事件营销策划+指引下发+落地复盘','官号运营：视频号（主责）','业务BP：社区文化品牌'],
+   urgent:'📣 Q2重点：小事件营销模式跑通（6月30日）'},
+  {name:'张樊若兰',title:'品牌宣传专员',color:'#a371f7',initials:'张',
+   kpis:[
+     {label:'新媒体矩阵曝光（1000万目标）',target:1000,current:0,unit:'万'},
+     {label:'生活有好报增粉',target:10000,current:0,unit:'人'},
+     {label:'10w+案例打造',target:20,current:0,unit:'个'},
+     {label:'孵化业主创作者',target:50,current:0,unit:'人'}
+   ],
+   resp:['自有阵地：生活有好报核心账号运营','爆款内容：20个10w+案例打造','内容生态：内容创客激励计划','渠道运营：抖音号+片区矩阵','业务BP：邦邻共筑/环境绿化'],
+   urgent:'📱 重点：内容创客激励计划（持续至9月30日）'}
+];
+
+// ==================== 本地存储 ====================
+var CASES = [], EVENTS = [], MEDIA_RECORDS = [], TARGETS = {social:3000,deliver:1000,newmedia:1000};
+
+function loadAll() {
+  var raw = localStorage.getItem(LS);
+  if (raw) {
+    var d = JSON.parse(raw);
+    CASES = d.cases || [];
+    EVENTS = d.events || [];
+    MEDIA_RECORDS = d.mediaRecords || [];
+    TARGETS = d.targets || {social:3000,deliver:1000,newmedia:1000};
+    // team KPI
+    if (d.teamKpi) {
+      TEAM.forEach(function(t,i) {
+        if (d.teamKpi[i]) {
+          t.kpis.forEach(function(k,j) {
+            if (d.teamKpi[i][j]) k.current = d.teamKpi[i][j].current || 0;
+          });
+        }
+      });
+    }
+    // media channels
+    if (d.mediaChannels) {
+      d.mediaChannels.forEach(function(mc,i) {
+        if (MEDIA_CHANNELS[i]) {
+          MEDIA_CHANNELS[i].fanTotal = mc.fanTotal || 0;
+          MEDIA_CHANNELS[i].exposeTotal = mc.exposeTotal || 0;
+          MEDIA_CHANNELS[i].readTotal = mc.readTotal || 0;
+        }
+      });
+    }
+  }
+  document.getElementById('t-social').value = TARGETS.social;
+  document.getElementById('t-deliver').value = TARGETS.deliver;
+  document.getElementById('t-newmedia').value = TARGETS.newmedia;
+}
+
+function saveAll() {
+  var teamKpiData = TEAM.map(function(t) {
+    return t.kpis.map(function(k) { return {current: k.current||0}; });
+  });
+  var mediaChannelsData = MEDIA_CHANNELS.map(function(m) {
+    return {fanTotal:m.fanTotal,exposeTotal:m.exposeTotal,readTotal:m.readTotal};
+  });
+  localStorage.setItem(LS, JSON.stringify({
+    cases:CASES, events:EVENTS, mediaRecords:MEDIA_RECORDS,
+    targets:TARGETS, teamKpi:teamKpiData, mediaChannels:mediaChannelsData
+  }));
+}
+
+// ==================== 工具 ====================
+function el(id) { return document.getElementById(id); }
+function pct(a,b) { if(!b) return 0; return Math.min(100,Math.round(a/b*100)); }
+function fmt(n) { return (n||0).toLocaleString(); }
+
+function badge(s) {
+  var m={
+    '已完成':'bg-green','复盘沉淀':'bg-green','宣传推广':'bg-green',
+    '进行中':'bg-blue','正式执行':'bg-blue','过程跟进/督导':'bg-blue','阶段性汇报':'bg-blue',
+    '待启动':'bg-orange','方案提报':'bg-orange','流程审批':'bg-orange','资源协调':'bg-orange',
+    '需求分析/立项':'bg-gray','资料调研':'bg-gray','方案策划':'bg-gray'
+  };
+  return '<span class="badge '+(m[s]||'bg-gray')+'">'+s+'</span>';
+}
+function dotLight(s) {
+  if(s==='已完成'||s==='复盘沉淀'||s==='宣传推广') return '<span class="dot dot-g"></span>';
+  if(s==='进行中'||s==='正式执行'||s==='过程跟进/督导'||s==='阶段性汇报'||s==='方案提报'||s==='流程审批'||s==='资源协调') return '<span class="dot dot-y"></span>';
+  return '<span class="dot dot-r"></span>';
+}
+function getProgress(s) {
+  var p={'已完成':100,'复盘沉淀':100,'宣传推广':95,'正式执行':75,'过程跟进/督导':65,'阶段性汇报':55,'资源协调':45,'流程审批':35,'方案提报':25,'待启动':5,'需求分析/立项':15,'资料调研':20,'方案策划':30,'进行中':50};
+  return p[s]!==undefined?p[s]:0;
+}
+function progressBar(pct,color) {
+  return '<div style="flex:1;height:5px;background:rgba(0,0,0,.06);border-radius:3px;margin-right:8px"><div style="width:'+pct+'%;height:100%;background:'+color+';border-radius:3px;box-shadow:0 0 6px '+color+'66"></div></div><span style="font-size:10px;font-weight:700;color:'+color+'">'+pct+'%</span>';
+}
+function levelTag(level) {
+  if(level==='一级一类'||level==='紧急') return '<span class="tag tag-r">'+level+'</span>';
+  if(level==='一级二类') return '<span class="tag tag-o">'+level+'</span>';
+  return '<span class="tag tag-g">'+level+'</span>';
+}
+function qTag(q) {
+  var cls='tag-g';
+  if(q==='Q2'||q==='Q2-Q3') cls='tag-q2';
+  else if(q==='Q3'||q==='Q1-Q3') cls='tag-q3';
+  else if(q==='Q4'||q==='Q2-Q4') cls='tag-q4';
+  return '<span class="tag '+cls+'">'+q+'</span>';
+}
+function ownerColor(name) {
+  var m={'何晓婷':'#f59e0b','龙晶晶':'#5b7fff','宋香回':'#10b981','张樊若兰':'#8b5cf6','何晓婷+宋香回':'#f59e0b'};
+  return m[name]||'#9ca3af';
+}
+function ownerInitial(name) { return name.split(/[+，、]/)[0].charAt(0); }
+function dotLight(s) {
+  if(s==='已完成') return '<span class="dot dot-g"></span>';
+  if(s==='进行中') return '<span class="dot dot-y"></span>';
+  return '<span class="dot dot-r"></span>';
+}
+function progressBar(pct,color) {
+  return '<div style="flex:1;height:5px;background:rgba(0,0,0,.06);border-radius:3px;margin-right:8px"><div style="width:'+pct+'%;height:100%;background:'+color+';border-radius:3px;box-shadow:0 0 6px '+color+'66"></div></div><span style="font-size:10px;font-weight:700;color:'+color+'">'+pct+'%</span>';
+}
+function statCard(color,label,val,target,barPct,barColor,sub) {
+  return '<div class="stat-card '+color+'"><div class="stat-label">'+label+'</div><div class="stat-value">'+val+' <span>/ '+target+'</span></div><div class="stat-bar"><div class="bar-fill '+barColor+'" style="width:'+barPct+'%"></div></div><div class="stat-meta"><span>'+(sub||'')+'</span><span>'+barPct+'%</span></div></div>';
+}
+
+// ==================== 初始化 ====================
+loadAll();
+el('todayDate').textContent = new Date().toLocaleDateString('zh-CN',{year:'numeric',month:'long',day:'numeric',weekday:'long'});
+
+// 标签切换
+document.querySelectorAll('.tab').forEach(function(tab) {
+  tab.addEventListener('click', function() {
+    document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});
+    this.classList.add('active');
+    document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active');});
+    el('panel-'+this.dataset.tab).classList.add('active');
+  });
+});
+
+// ==================== 渲染函数 ====================
+
+function renderOverview() {
+  // 曝光汇总
+  var sumSocial = 0, sumDeliver = 0, sumNewmedia = 0;
+  CASES.forEach(function(c) {
+    var v = parseFloat(c.expose)||0;
+    if (c.module==='社会营销'||c.module==='可持续友好') sumSocial += v;
+    else if (c.module==='交付事件') sumDeliver += v;
+    else if (c.module==='新媒体矩阵') sumNewmedia += v;
+  });
+  EVENTS.forEach(function(e) {
+    // 影响力事件全渠道曝光归入社会营销
+    var own=parseFloat(e.own)||0, me=parseFloat(e['media-exp'])||0, topic=parseFloat(e.topic)||0, other=parseFloat(e.other)||0;
+    sumSocial += own + me + topic + other;
+  });
+  // 新媒体矩阵渠道汇总
+  MEDIA_CHANNELS.forEach(function(m) { sumNewmedia += m.exposeTotal||0; });
+
+  var total = sumSocial + sumNewmedia;
+  el('sum-social').textContent = sumSocial.toFixed(1)+'万';
+  el('bar-social').style.width = pct(sumSocial,TARGETS.social)+'%';
+  el('pct-social').textContent = pct(sumSocial,TARGETS.social);
+  el('sum-deliver').textContent = sumDeliver.toFixed(1)+'万';
+  el('bar-deliver').style.width = pct(sumDeliver,TARGETS.deliver)+'%';
+  el('pct-deliver').textContent = pct(sumDeliver,TARGETS.deliver);
+  el('sum-newmedia').textContent = sumNewmedia.toFixed(1)+'万';
+  el('bar-newmedia').style.width = pct(sumNewmedia,TARGETS.newmedia)+'%';
+  el('pct-newmedia').textContent = pct(sumNewmedia,TARGETS.newmedia);
+  el('actualTotal').textContent = total.toFixed(1);
+
+  // 主KPI卡片
+  var casesCnt = CASES.filter(function(c){return c.status==='已完成'||parseFloat(c.reads)>=100000;}).length;
+  var eventDone = EVENTS.filter(function(e){return e.status==='已完成';}).length;
+  var mediaTotal = MEDIA_CHANNELS.reduce(function(s,m){return s+(m.exposeTotal||0);},0);
+  var fanTotal = MEDIA_CHANNELS.reduce(function(s,m){return s+(m.fanTotal||0);},0);
+
+  el('overviewMain').innerHTML =
+    statCard('blue','全渠道总曝光',total.toFixed(1)+'万',(TARGETS.social+TARGETS.newmedia)+'万',pct(total,TARGETS.social+TARGETS.newmedia),'blue-b',
+      '事件:'+sumSocial.toFixed(1)+'万 + 矩阵:'+sumNewmedia.toFixed(1)+'万') +
+    statCard('green','10W+标杆案例',CASES.length+'个','20个',pct(CASES.length,20),'green-b',
+      '累计阅读量:'+fmt(CASES.reduce(function(s,c){return s+(parseInt(c.reads)||0);},0))) +
+    statCard('orange','影响力事件营销',EVENTS.length+'个','2个',pct(eventDone,2),'orange-b',
+      '已完成:'+eventDone+' | 媒体报道:'+fmt(EVENTS.reduce(function(s,e){return s+(parseInt(e.mcount)||0);},0))+'次') +
+    statCard('purple','业主自发内容','待更新','2100条',0,'purple-b',
+      '孵化创作者:待更新 | 粉丝总量:'+fmt(fanTotal));
+
+  el('overviewSub').innerHTML =
+    statCard('blue','媒体报道数量',fmt(EVENTS.reduce(function(s,e){return s+(parseInt(e.mcount)||0);},0)),'20家',pct(EVENTS.reduce(function(s,e){return s+(parseInt(e.mcount)||0);},0),20),'blue-b','国/省/市/县域四级') +
+    statCard('green','工作完成率',Math.round(WORKS.filter(function(w){return w.status==='已完成'||w.status==='宣传推广'||w.status==='复盘沉淀';}).length/WORKS.length*100)+'%','100%',pct(WORKS.filter(function(w){return w.status==='已完成'||w.status==='宣传推广'||w.status==='复盘沉淀';}).length,WORKS.length),'green-b',
+      WORKS.filter(function(w){return w.status==='已完成'||w.status==='宣传推广'||w.status==='复盘沉淀';}).length+'/'+WORKS.length+'项已完成') +
+    statCard('orange','生活有好报增粉','待更新','1万人',0,'orange-b','张樊若兰主责') +
+    statCard('purple','孵化业主创作者','待更新','50人',0,'purple-b','张樊若兰主责');
+
+  // 四大模块
+  var mods = [
+    {name:'可持续友好',icon:'🌿',owner:'何晓婷',color:'#10b981',bg:'#ecfdf5',border:'#a7f3d0',items:[{n:'Q1 内部宣贯',s:'已完成'},{n:'Q2 品牌物料推出',s:'进行中'},{n:'Q3 "我家的友好刻度"事件',s:'待启动'},{n:'Q4 产学研课题认证',s:'待启动'}]},
+    {name:'产品品牌（司雅+司和）',icon:'🏢',owner:'龙晶晶',color:'#5b7fff',bg:'#eef1fd',border:'#c7d2fe',items:[{n:'Q1 团队配置+系统规划',s:'已完成'},{n:'Q2-Q3 标杆交付事件',s:'进行中'},{n:'Q4 产品品牌号起号',s:'待启动'}]},
+    {name:'社会化营销',icon:'📣',owner:'宋香回',color:'#f59e0b',bg:'#fffbeb',border:'#fde68a',items:[{n:'Q1 锣马假日新春推广',s:'已完成'},{n:'Q2 小事件营销模式',s:'进行中'},{n:'Q3 应急事件（生命友好）',s:'待启动'},{n:'Q4 邦泰新职人计划',s:'待启动'}]},
+    {name:'新媒体精耕',icon:'📱',owner:'张樊若兰',color:'#8b5cf6',bg:'#f5f3ff',border:'#ddd6fe',items:[{n:'Q1-Q4 新闻快报爆款',s:'持续进行'},{n:'Q2-Q3 内容创客激励',s:'进行中'},{n:'Q4 全年运营复盘',s:'待启动'}]}
+  ];
+  el('modulesProgress').innerHTML = mods.map(function(m) {
+    var html = '<div style="background:'+m.bg+';border:1px solid '+m.border+';border-radius:12px;padding:16px;transition:all .2s" onmouseover="this.style.transform=\'translateY(-2px)\';this.style.boxShadow=\'0 4px 14px rgba(0,0,0,.08)\'" onmouseout="this.style.transform=\'\';this.style.boxShadow=\'\'"><div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid '+m.border+'"><div style="width:32px;height:32px;background:'+m.color+';border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;opacity:.9">'+m.icon+'</div><div><div style="font-size:13px;font-weight:700;color:#111827">'+m.name+'</div><div style="font-size:11px;color:#6b7280;margin-top:1px">负责人：'+m.owner+'</div></div></div>';
+    m.items.forEach(function(item) {
+      var cls = item.s==='已完成'?'bg-green':item.s==='进行中'||item.s==='持续进行'?'bg-blue':'bg-orange';
+      var dotColor = item.s==='已完成'?'#10b981':item.s==='进行中'||item.s==='持续进行'?'#5b7fff':'#f59e0b';
+      var dot = '<span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:'+dotColor+';margin-right:6px;flex-shrink:0"></span>';
+      html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid rgba(0,0,0,.04);font-size:12px"><span style="display:flex;align-items:center;color:#374151;font-weight:500">'+dot+item.n+'</span><span class="badge '+cls+'" style="font-size:10px">'+item.s+'</span></div>';
+    });
+    return html+'</div>';
+  }).join('');
+}
+
+function renderWorks() {
+  var STATUS_OPTIONS = ['需求分析/立项','资料调研','方案策划','方案提报','流程审批','资源协调','正式执行','过程跟进/督导','阶段性汇报','宣传推广','复盘沉淀','待启动','进行中','已完成'];
+  var fm = el('f-module').value, fo = el('f-owner').value, fs = el('f-status').value, fl = el('f-level').value, fq = el('f-q').value;
+  var filtered = WORKS.filter(function(w) {
+    return (!fm || w.module === fm) && (!fo || w.owner === fo) && (!fs || w.status === fs) && (!fl || w.level === fl) && (!fq || w.q === fq);
+  });
+  el('worksCount').textContent = filtered.length + '项';
+  el('worksFiltered').textContent = filtered.length !== WORKS.length ? '（共' + WORKS.length + '项，已筛选' + filtered.length + '项）' : '';
+  var html = '';
+  filtered.forEach(function(w) {
+    var prog = getProgress(w.status);
+    var barColor = w.status==='已完成'||w.status==='复盘沉淀'?'#10b981':prog>=60?'#5b7fff':'#f59e0b';
+    html += '<tr>'+
+      '<td>'+w.id+'</td><td>'+w.module+'</td><td style="font-weight:600;max-width:180px">'+w.name+'</td>'+
+      '<td>'+levelTag(w.level)+'</td><td>'+qTag(w.q)+'</td>'+
+      '<td><div class="owner-dot" style="background:'+ownerColor(w.owner)+';display:inline-flex;width:18px;height:18px;border-radius:50%;align-items:center;justify-content:center;font-size:9px;color:#fff">'+ownerInitial(w.owner)+'</div> '+w.owner+'</td>'+
+      '<td>'+w.end+'</td>'+
+      '<td><select onchange="saveWorkStatus('+w.id+',this)" style="font-size:11px;padding:3px 6px;border-radius:6px;border:1px solid var(--border);background:var(--surface);color:var(--text);cursor:pointer">'+STATUS_OPTIONS.map(function(o){return '<option value="'+o+'"'+(w.status===o?' selected':'')+'>'+o+'</option>';}).join('')+'</select></td>'+
+      '<td>'+progressBar(prog,barColor)+'</td>'+
+      '<td style="max-width:120px;font-size:11px;color:#646a73">'+(w.产出||'-')+'</td>'+
+      '<td style="max-width:120px;font-size:11px;color:#646a73">'+(w.effect||'-')+'</td>'+
+      '<td style="max-width:120px;font-size:11px;color:#165dff">'+(w.leaderReview||'-')+'</td>'+
+      '<td style="font-size:11px;color:#646a73">'+(w.verify||'-')+'</td>'+
+      '<td><button class="btn" style="padding:3px 8px;font-size:10px" onclick="openWorkEdit('+w.id+')">编辑</button></td></tr>';
+  });
+  el('worksBody').innerHTML = html;
+}
+function saveWorkStatus(id,sel) {
+  var w = WORKS.find(function(x){return x.id===id;});
+  if (w) { w.status = sel.value; saveAll(); renderWorks(); renderOverview(); }
+}
+function clearWorkFilter() {
+  el('f-module').value=''; el('f-owner').value=''; el('f-status').value=''; el('f-level').value=''; el('f-q').value='';
+  renderWorks();
+}
+
+function renderKanban(boardId,summaryId,filterWorks,projFilter) {
+  var done = filterWorks.filter(function(w){return w.status==='已完成';}).length;
+  var pctVal = filterWorks.length ? Math.round(done/filterWorks.length*100) : 0;
+  var urgent = filterWorks.filter(function(w){return (w.ln===1||w.ln===0)&&w.status!=='已完成';}).length;
+
+  if (summaryId) {
+    el(summaryId).innerHTML = '<div class="kanban-summary">'+
+      '<div class="kanban-summary-item"><div class="kanban-summary-icon red">🚨</div><div class="kanban-summary-text"><div class="kanban-summary-label">紧急/一级一类事项</div><div class="kanban-summary-value">'+urgent+' <span style="font-size:13px;font-weight:400">项</span></div><div class="kanban-summary-sub">需优先处理</div></div></div>'+
+      '<div class="kanban-summary-item"><div class="kanban-summary-icon green">✅</div><div class="kanban-summary-text"><div class="kanban-summary-label">完成率</div><div class="kanban-summary-value">'+pctVal+'<span style="font-size:13px;font-weight:400">%</span></div><div class="kanban-summary-sub">'+done+'/'+filterWorks.length+'项已完成</div></div></div>'+
+      '<div class="kanban-summary-item" style="background:#f4f5f7;border-color:#d5d7db"><div class="kanban-summary-text"><div class="kanban-summary-label">本季度工作项</div><div class="kanban-summary-value" style="color:#646a73">'+filterWorks.length+' <span style="font-size:13px;font-weight:400">项</span></div></div></div>'+
+      '</div>';
+  }
+
+  var cols = [
+    {title:'一级一类（紧急）',items:filterWorks.filter(function(w){return w.ln===1||w.ln===0;})},
+    {title:'一级二类',items:filterWorks.filter(function(w){return w.ln===2;})},
+    {title:'二级（常规）',items:filterWorks.filter(function(w){return w.ln===3;})},
+    {title:'临时专项',items:filterWorks.filter(function(w){return w.level==='紧急';})}
+  ];
+
+  var board = el(boardId);
+  var html = '';
+  cols.forEach(function(col) {
+    html += '<div class="kanban-col"><div class="kanban-col-header">'+
+      '<div class="kanban-col-title">'+col.title+'</div>'+
+      '<span class="count-badge '+(col.title.includes('一级一类')||col.title.includes('临时')?'count-urgent':'count-normal')+'">'+col.items.length+'</span></div>';
+    col.items.forEach(function(w) {
+      html += '<div class="card" onclick="openWorkEdit('+w.id+')">'+
+        '<div class="card-top">'+levelTag(w.level)+' '+qTag(w.q)+'</div>'+
+        '<div class="card-title">'+w.name+'</div>'+
+        '<div class="card-footer">'+
+          '<div class="owner-dot" style="background:'+ownerColor(w.owner)+'">'+ownerInitial(w.owner)+'</div>'+
+          '<span class="owner-name">'+w.owner+'</span>'+
+          dotLight(w.status)+badge(w.status)+
+        '</div></div>';
+    });
+    html += '</div>';
+  });
+  board.innerHTML = html;
+}
+
+function renderMedia() {
+  var html = '';
+  var colors = ['#165dff','#00c9a7','#a371f7','#ff7a45','#165dff','#a371f7'];
+  MEDIA_CHANNELS.forEach(function(m,i) {
+    var latest = null;
+    for(var j=MEDIA_RECORDS.length-1;j>=0;j--) {
+      if(MEDIA_RECORDS[j].channel===m.name){latest=MEDIA_RECORDS[j];break;}
+    }
+    var histCount = MEDIA_RECORDS.filter(function(r){return r.channel===m.name;}).length;
+    html += '<tr>'+
+      '<td><div style="display:flex;align-items:center;gap:6px"><div class="owner-dot" style="background:'+colors[i]+'">'+m.name.charAt(0)+'</div><span style="font-weight:600">'+m.name+'</span></div></td>'+
+      '<td><span style="font-size:11px;color:#646a73">'+m.owner+'</span></td>'+
+      '<td style="color:#00c9a7;font-weight:600">'+(latest&&latest.fanAdd?latest.fanAdd:'-')+'</td>'+
+      '<td style="font-weight:600">'+fmt(m.fanTotal)+'</td>'+
+      '<td style="color:#ff7a45;font-weight:600">'+(latest&&latest.exposeWeek?latest.exposeWeek:'-')+'</td>'+
+      '<td style="color:#165dff;font-weight:600">'+(m.exposeTotal||0).toFixed(1)+'</td>'+
+      '<td style="color:#a371f7;font-weight:600">'+(latest&&latest.readWeek?latest.readWeek:'-')+'</td>'+
+      '<td style="font-weight:600">'+fmt(m.readTotal)+'</td>'+
+      '<td>'+(latest&&latest.date?latest.date:'-')+'</td>'+
+      '<td><button class="btn" style="padding:2px 7px;font-size:10px" onclick="openMediaHistory(\''+m.name+'\')">'+histCount+'条记录</button></td>'+
+      '<td><button class="btn" style="padding:3px 8px;font-size:10px" onclick="openMediaEdit(\''+m.name+'\')">更新</button></td></tr>';
+  });
+  el('mediaBody').innerHTML = html;
+  el('mediaEmpty').style.display = 'none';
+
+  // 汇总
+  var totalExpose = MEDIA_CHANNELS.reduce(function(s,m){return s+(m.exposeTotal||0);},0);
+  var totalFan = MEDIA_CHANNELS.reduce(function(s,m){return s+(m.fanTotal||0);},0);
+  var totalRead = MEDIA_CHANNELS.reduce(function(s,m){return s+(m.readTotal||0);},0);
+  var perOwner = {
+    '何晓婷':{expose:0,fan:0,read:0},
+    '龙晶晶':{expose:0,fan:0,read:0},
+    '宋香回':{expose:0,fan:0,read:0},
+    '张樊若兰':{expose:0,fan:0,read:0}
+  };
+  MEDIA_CHANNELS.forEach(function(m) {
+    var owners = m.owner.split('+');
+    owners.forEach(function(o) {
+      if (perOwner[o]) {
+        perOwner[o].expose += (m.exposeTotal||0)/owners.length;
+        perOwner[o].fan += (m.fanTotal||0)/owners.length;
+        perOwner[o].read += (m.readTotal||0)/owners.length;
+      }
+    });
+  });
+
+  el('mediaSummary').innerHTML =
+    '<div class="big-circles">'+
+    '<div class="big-circle blue"><div class="big-circle-num">'+totalExpose.toFixed(0)+'<span class="big-circle-unit">万</span></div><div class="big-circle-label">总曝光</div><div class="big-circle-sub">6大渠道合计</div></div>'+
+    '<div class="big-circle green"><div class="big-circle-num">'+fmt(totalFan)+'<span class="big-circle-unit">人</span></div><div class="big-circle-label">粉丝总量</div><div class="big-circle-sub">全渠道累计</div></div>'+
+    '<div class="big-circle purple"><div class="big-circle-num">'+fmt(totalRead)+'<span class="big-circle-unit">次</span></div><div class="big-circle-label">阅读/播放量</div><div class="big-circle-sub">全渠道累计</div></div>'+
+    '</div>'+
+    '<div class="section"><div class="section-title">按主责人汇总</div>'+
+    Object.keys(perOwner).filter(function(n){return n!=='何晓婷';}).map(function(name) {
+      var d = perOwner[name];
+      return '<div class="data-row"><span class="data-row-label">'+name+'</span><span class="data-row-value">曝光 '+d.expose.toFixed(1)+'万 | 粉丝 '+fmt(Math.round(d.fan))+'</span></div>';
+    }).join('')+'</div>';
+}
+
+function renderCases() {
+  el('casesCount').textContent = CASES.length;
+  if (!CASES.length) {
+    el('casesBody').innerHTML='';
+    el('casesEmpty').style.display='block';
+  } else {
+    el('casesEmpty').style.display='none';
+    var html='';
+    var CASE_STATUS=['已完成','进行中','待启动','方案策划','正式执行','宣传推广','复盘沉淀'];
+    CASES.forEach(function(c,i) {
+      html += '<tr>'+
+        '<td>'+(i+1)+'</td><td>'+(c.branch||'-')+'</td><td>'+(c.city||'-')+'</td>'+
+        '<td style="max-width:130px">'+(c.theme||'-')+'</td>'+
+        '<td style="max-width:180px;font-size:11px;color:#646a73">'+((c.summary||'-').substring(0,50))+'</td>'+
+        '<td>'+(c.format||'-')+'</td><td>'+(c.date||'-')+'</td>'+
+        '<td style="font-weight:600">'+fmt(parseInt(c.reads)||0)+'</td>'+
+        '<td style="color:#5b7fff;font-weight:600">'+(parseFloat(c.expose)||0)+'</td>'+
+        '<td>'+(c.module||'-')+'</td><td>'+(c.owner||'-')+'</td>'+
+        '<td>'+(c.channel||'-')+'</td>'+
+        '<td><select onchange="saveCaseStatus('+i+',this)" style="font-size:11px;padding:3px 6px;border-radius:6px;border:1px solid var(--border);background:var(--surface);color:var(--text);cursor:pointer">'+CASE_STATUS.map(function(o){return '<option value="'+o+'"'+(c.status===o?' selected':'')+'>'+o+'</option>';}).join('')+'</select></td>'+
+        '<td><button class="btn" style="padding:3px 6px;font-size:10px" onclick="openCaseEdit('+i+')">编辑</button> <button class="btn" style="padding:3px 6px;font-size:10px" onclick="deleteCase('+i+')">删除</button></td></tr>';
+    });
+    el('casesBody').innerHTML = html;
+  }
+
+  var sumSocial=CASES.filter(function(c){return c.module==='社会营销'||c.module==='可持续友好';}).reduce(function(s,c){return s+(parseFloat(c.expose)||0);},0);
+  var sumDeliver=CASES.filter(function(c){return c.module==='交付事件';}).reduce(function(s,c){return s+(parseFloat(c.expose)||0);},0);
+  var sumNewmedia=CASES.filter(function(c){return c.module==='新媒体矩阵';}).reduce(function(s,c){return s+(parseFloat(c.expose)||0);},0);
+  var total=sumSocial+sumDeliver+sumNewmedia;
+
+  el('casesSummary').innerHTML =
+    '<div class="big-circles">'+
+    '<div class="big-circle orange"><div class="big-circle-num">'+sumSocial.toFixed(0)+'<span class="big-circle-unit">万</span></div><div class="big-circle-label">社会化营销+可持续友好</div><div class="big-circle-sub">'+CASES.filter(function(c){return c.module==='社会营销'||c.module==='可持续友好';}).length+'个案例</div></div>'+
+    '<div class="big-circle blue"><div class="big-circle-num">'+sumDeliver.toFixed(0)+'<span class="big-circle-unit">万</span></div><div class="big-circle-label">交付事件品牌化</div><div class="big-circle-sub">'+CASES.filter(function(c){return c.module==='交付事件';}).length+'个案例</div></div>'+
+    '<div class="big-circle purple"><div class="big-circle-num">'+sumNewmedia.toFixed(0)+'<span class="big-circle-unit">万</span></div><div class="big-circle-label">新媒体矩阵运营</div><div class="big-circle-sub">'+CASES.filter(function(c){return c.module==='新媒体矩阵';}).length+'个案例</div></div>'+
+    '</div>'+
+    '<div class="section"><div class="section-title">案例分布</div>'+
+    '<div class="data-row"><span class="data-row-label">已完成</span><span class="data-row-value">'+CASES.filter(function(c){return c.status==='已完成';}).length+' <span>个</span></span></div>'+
+    '<div class="data-row"><span class="data-row-label">进行中</span><span class="data-row-value">'+CASES.filter(function(c){return c.status==='进行中';}).length+' <span>个</span></span></div>'+
+    '<div class="data-row"><span class="data-row-label">待启动</span><span class="data-row-value">'+CASES.filter(function(c){return c.status==='待启动';}).length+' <span>个</span></span></div>'+
+    '<div class="data-row highlight-row"><span class="data-row-label">合计</span><span class="data-row-value">'+total.toFixed(1)+' <span>万</span></span></div></div>';
+}
+
+function renderEvents() {
+  el('eventsCount').textContent = EVENTS.length;
+  if (!EVENTS.length) {
+    el('eventsBody').innerHTML='';
+    el('eventsEmpty').style.display='block';
+  } else {
+    el('eventsEmpty').style.display='none';
+    var html='';
+    EVENTS.forEach(function(e,i) {
+      var own=parseFloat(e.own)||0, me=parseFloat(e['media-exp'])||0, topic=parseFloat(e.topic)||0, other=parseFloat(e.other)||0;
+      var total=own+me+topic+other;
+      var inv=(e.city||'')+(e.project?' / '+e.project:'');
+      var STATUS_OPTIONS=['已完成','进行中','待启动','方案策划','方案提报','正式执行','过程跟进/督导','宣传推广','复盘沉淀'];
+      html += '<tr>'+
+        '<td style="font-weight:600">'+(i+1)+'</td>'+
+        '<td style="font-weight:600">'+(e.subject||'-')+'</td><td>'+(e.type||'-')+'</td><td>'+(e.date||'-')+'</td>'+
+        '<td style="max-width:120px">'+(inv||'-')+'</td>'+
+        '<td style="color:#5b7fff;font-weight:600">'+(own>0?own.toFixed(1):'-')+'</td>'+
+        '<td>'+(me>0?me.toFixed(1):'-')+'</td>'+
+        '<td>'+(topic>0?topic.toFixed(1):'-')+'</td>'+
+        '<td>'+(other>0?other.toFixed(1):'-')+'</td>'+
+        '<td style="font-weight:700">'+(total>0?total.toFixed(1)+'万':'-')+'</td>'+
+        '<td style="font-weight:600">'+(parseInt(e.mcount)||0)+'</td>'+
+        '<td>'+(e.owner||'-')+'</td>'+
+        '<td><select onchange="saveEventStatus('+i+',this)" style="font-size:11px;padding:3px 6px;border-radius:6px;border:1px solid var(--border);background:var(--surface);color:var(--text);cursor:pointer">'+STATUS_OPTIONS.map(function(o){return '<option value="'+o+'"'+(e.status===o?' selected':'')+'>'+o+'</option>';}).join('')+'</select></td>'+
+        '<td><button class="btn" style="padding:3px 6px;font-size:10px" onclick="openEventEdit('+i+')">编辑</button> <button class="btn" style="padding:3px 6px;font-size:10px" onclick="deleteEvent('+i+')">删除</button></td></tr>';
+    });
+    el('eventsBody').innerHTML = html;
+  }
+
+  var eventDone=EVENTS.filter(function(e){return e.status==='已完成';}).length;
+  var totalMedia=EVENTS.reduce(function(s,e){return s+(parseInt(e.mcount)||0);},0);
+  var totalExpose=EVENTS.reduce(function(s,e){var t=(parseFloat(e.own)||0)+(parseFloat(e['media-exp'])||0)+(parseFloat(e.topic)||0)+(parseFloat(e.other)||0);return s+t;},0);
+
+  el('eventsSummary').innerHTML =
+    '<div class="big-circles">'+
+    '<div class="big-circle green"><div class="big-circle-num">'+EVENTS.length+'<span class="big-circle-unit">个</span></div><div class="big-circle-label">事件总数</div><div class="big-circle-sub">已完成:'+eventDone+'</div></div>'+
+    '<div class="big-circle blue"><div class="big-circle-num">'+totalMedia+'<span class="big-circle-unit">次</span></div><div class="big-circle-label">媒体报道次数</div><div class="big-circle-sub">国/省/市/县域四级</div></div>'+
+    '<div class="big-circle purple"><div class="big-circle-num">'+totalExpose.toFixed(0)+'<span class="big-circle-unit">万</span></div><div class="big-circle-label">事件总曝光</div><div class="big-circle-sub">全渠道合计</div></div>'+
+    '</div>'+
+    '<div class="section"><div class="section-title">认证/奖项分布</div>'+
+    '<div class="data-row"><span class="data-row-label">国家级</span><span class="data-row-value">'+EVENTS.filter(function(e){return e.level==='国家级';}).length+' <span>个</span></span></div>'+
+    '<div class="data-row"><span class="data-row-label">省级</span><span class="data-row-value">'+EVENTS.filter(function(e){return e.level==='省级';}).length+' <span>个</span></span></div>'+
+    '<div class="data-row"><span class="data-row-label">市级</span><span class="data-row-value">'+EVENTS.filter(function(e){return e.level==='市级';}).length+' <span>个</span></span></div>'+
+    '<div class="data-row"><span class="data-row-label">县域级</span><span class="data-row-value">'+EVENTS.filter(function(e){return e.level==='县域级';}).length+' <span>个</span></span></div></div>';
+}
+
+function renderProjects() {
+  // 项目总览
+  var total=PROJECTS.length;
+  var siya=PROJECTS.filter(function(p){return p.line==='司雅';}).length;
+  var sihe=PROJECTS.filter(function(p){return p.line==='司和';}).length;
+  var delivered=PROJECTS.filter(function(p){return p.deliver==='已交付';}).length;
+  var preparing=PROJECTS.filter(function(p){return p.deliver==='筹备中';}).length;
+  var upcoming=PROJECTS.filter(function(p){return p.deliver==='未开始';}).length;
+  var promoted=PROJECTS.filter(function(p){return p.promote==='提前介入'||p.promote==='已启动';}).length;
+  var notStarted=PROJECTS.filter(function(p){return p.promote==='未启动'||p.promote==='未开始';}).length;
+  var q2=PROJECTS.filter(function(p){return p.inner>='2026-04-01'&&p.inner<='2026-06-30';}).length;
+  var q3=PROJECTS.filter(function(p){return p.inner>='2026-07-01'&&p.inner<='2026-09-30';}).length;
+  var q4=PROJECTS.filter(function(p){return p.inner>='2026-10-01'||p.inner>='2026-10-01';}).length;
+
+  el('projectsSummary').innerHTML =
+    '<div class="big-circles">'+
+    '<div class="big-circle blue"><div class="big-circle-num">'+total+'<span class="big-circle-unit">个</span></div><div class="big-circle-label">项目总数</div><div class="big-circle-sub">司雅'+siya+' + 司和'+sihe+'</div></div>'+
+    '<div class="big-circle orange"><div class="big-circle-num">'+(q2+q3+q4)+'<span class="big-circle-unit">个</span></div><div class="big-circle-label">年内交付项目</div><div class="big-circle-sub">Q2:'+q2+' Q3:'+q3+' Q4:'+q4+'</div></div>'+
+    '<div class="big-circle green"><div class="big-circle-num">'+delivered+'<span class="big-circle-unit">个</span></div><div class="big-circle-label">已交付</div><div class="big-circle-sub">筹备中:'+preparing+' | 未开始:'+upcoming+'</div></div>'+
+    '</div>'+
+    '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:4px;margin-bottom:4px">'+
+    '<div class="section" style="margin-bottom:0"><div class="section-title">宣传状态分布</div>'+
+    '<div class="data-row"><span class="data-row-label">提前介入</span><span class="data-row-value">'+PROJECTS.filter(function(p){return p.promote==='提前介入';}).length+'</span></div>'+
+    '<div class="data-row"><span class="data-row-label">已启动</span><span class="data-row-value">'+PROJECTS.filter(function(p){return p.promote==='已启动';}).length+'</span></div>'+
+    '<div class="data-row"><span class="data-row-label">未启动</span><span class="data-row-value">'+PROJECTS.filter(function(p){return p.promote==='未启动';}).length+'</span></div>'+
+    '<div class="data-row"><span class="data-row-label">待复盘</span><span class="data-row-value">'+PROJECTS.filter(function(p){return p.promote==='待复盘';}).length+'</span></div></div>'+
+    '<div class="section" style="margin-bottom:0"><div class="section-title">批次分布</div>'+
+    '<div class="data-row"><span class="data-row-label">整体交付</span><span class="data-row-value">'+PROJECTS.filter(function(p){return p.batch==='整体';}).length+'</span></div>'+
+    '<div class="data-row"><span class="data-row-label">分期首批</span><span class="data-row-value">'+PROJECTS.filter(function(p){return p.batch!=='整体'&&p.first==='是';}).length+'</span></div>'+
+    '<div class="data-row"><span class="data-row-label">分期非首批</span><span class="data-row-value">'+PROJECTS.filter(function(p){return p.batch!=='整体'&&p.first==='否';}).length+'</span></div></div>'+
+    '<div class="section" style="margin-bottom:0"><div class="section-title">品牌对接统计</div>'+
+    '<div class="data-row"><span class="data-row-label">龙晶晶对接</span><span class="data-row-value">'+PROJECTS.filter(function(p){return p.brand==='龙晶晶';}).length+' <span>个</span></span></div>'+
+    '<div class="data-row"><span class="data-row-label">A类项目（司和）</span><span class="data-row-value">'+PROJECTS.filter(function(p){return p.grade==='A';}).length+' <span>个</span></span></div>'+
+    '<div class="data-row"><span class="data-row-label">B类项目（司雅）</span><span class="data-row-value">'+PROJECTS.filter(function(p){return p.grade==='B';}).length+' <span>个</span></span></div></div>'+
+    '</div>';
+
+  var html='';
+  PROJECTS.forEach(function(p,i) {
+    var lineCls=p.line==='司雅'?'proj-tag-siya':'proj-tag-sihe';
+    var rowId='prj-'+i;
+    html += '<tr id="'+rowId+'" style="transition:background .15s">';
+    // 序号
+    html += '<td style="font-weight:700;color:#165dff;font-size:13px">'+p.seq+'</td>';
+    // 城市
+    html += '<td><span class="ed-cell" id="'+rowId+'-city" contenteditable="true" onblur="saveProj('+i+',\'city\',this)" onmouseover="this.style.boxShadow=\'0 0 0 2px #165dff\'" onmouseout="this.style.boxShadow=\'\'" style="display:block;padding:3px 5px;border-radius:4px;outline:none;cursor:text;font-size:12px">'+p.city+'</span></td>';
+    // 名称
+    html += '<td><span class="ed-cell" id="'+rowId+'-name" contenteditable="true" onblur="saveProj('+i+',\'name\',this)" onmouseover="this.style.boxShadow=\'0 0 0 2px #165dff\'" onmouseout="this.style.boxShadow=\'\'" style="display:block;padding:3px 5px;border-radius:4px;outline:none;cursor:text;font-weight:600;font-size:12px">'+p.name+'</span></td>';
+    // 产品系
+    html += '<td><select id="'+rowId+'-line" onchange="saveProj('+i+',\'line\',this)" style="width:100%;font-size:11px;padding:3px 5px;border-radius:4px;background:transparent;border:1px solid transparent;cursor:pointer"><option '+(p.line==='司雅'?'selected':'')+'>司雅</option><option '+(p.line==='司和'?'selected':'')+'>司和</option><option '+(p.line==='司典'?'selected':'')+'>司典</option><option '+(p.line==='司嘉'?'selected':'')+'>司嘉</option></select></td>';
+    // 批次
+    html += '<td><span class="ed-cell" id="'+rowId+'-batch" contenteditable="true" onblur="saveProj('+i+',\'batch\',this)" onmouseover="this.style.boxShadow=\'0 0 0 2px #165dff\'" onmouseout="this.style.boxShadow=\'\'" style="display:block;padding:3px 5px;border-radius:4px;outline:none;cursor:text;font-size:11px">'+(p.batch||'')+'</span></td>';
+    // 分级
+    html += '<td><select id="'+rowId+'-grade" onchange="saveProj('+i+',\'grade\',this)" style="width:100%;font-size:11px;padding:3px 5px;border-radius:4px;background:transparent;border:1px solid transparent;cursor:pointer"><option '+(p.grade==='A'?'selected':'')+'>A</option><option '+(p.grade==='B'?'selected':'')+'>B</option></select></td>';
+    // 首批
+    html += '<td><select id="'+rowId+'-first" onchange="saveProj('+i+',\'first\',this)" style="width:100%;font-size:11px;padding:3px 5px;border-radius:4px;background:transparent;border:1px solid transparent;cursor:pointer"><option '+(p.first==='是'?'selected':'')+'>是</option><option '+(p.first==='否'?'selected':'')+'>否</option></select></td>';
+    // 内控日
+    html += '<td><input type="date" id="'+rowId+'-inner" value="'+p.inner+'" onchange="saveProj('+i+',\'inner\',this)" style="width:100%;font-size:11px;padding:3px 4px;border-radius:4px;background:transparent;border:1px solid transparent;cursor:pointer"></td>';
+    // 合同日
+    html += '<td><input type="date" id="'+rowId+'-contract" value="'+p.contract+'" onchange="saveProj('+i+',\'contract\',this)" style="width:100%;font-size:11px;padding:3px 4px;border-radius:4px;background:transparent;border:1px solid transparent;cursor:pointer"></td>';
+    // 交付状态
+    html += '<td><select id="'+rowId+'-deliver" onchange="saveProj('+i+',\'deliver\',this)" style="width:100%;font-size:10px;padding:3px 4px;border-radius:4px;cursor:pointer"><option '+(p.deliver==='已交付'?'selected':'')+'>已交付</option><option '+(p.deliver==='筹备中'?'selected':'')+'>筹备中</option><option '+(p.deliver==='未开始'?'selected':'')+'>未开始</option></select></td>';
+    // 宣传状态
+    html += '<td><select id="'+rowId+'-promote" onchange="saveProj('+i+',\'promote\',this)" style="width:100%;font-size:10px;padding:3px 4px;border-radius:4px;cursor:pointer"><option '+(p.promote==='提前介入'?'selected':'')+'>提前介入</option><option '+(p.promote==='已启动'?'selected':'')+'>已启动</option><option '+(p.promote==='未启动'?'selected':'')+'>未启动</option><option '+(p.promote==='待复盘'?'selected':'')+'>待复盘</option><option '+(p.promote==='已完成'?'selected':'')+'>已完成</option><option '+(p.promote==='未开始'?'selected':'')+'>未开始</option></select></td>';
+    // 品牌亮点
+    html += '<td><span class="ed-cell" id="'+rowId+'-highlight" contenteditable="true" onblur="saveProj('+i+',\'highlight\',this)" onmouseover="this.style.boxShadow=\'0 0 0 2px #165dff\'" onmouseout="this.style.boxShadow=\'\'" style="display:block;padding:3px 5px;border-radius:4px;outline:none;cursor:text;font-size:11px;color:#646a73;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+(p.highlight||'')+'</span></td>';
+    // 项目负责人
+    html += '<td><span class="ed-cell" id="'+rowId+'-pm" contenteditable="true" onblur="saveProj('+i+',\'pm\',this)" onmouseover="this.style.boxShadow=\'0 0 0 2px #165dff\'" onmouseout="this.style.boxShadow=\'\'" style="display:block;padding:3px 5px;border-radius:4px;outline:none;cursor:text;font-size:11px">'+(p.pm||'')+'</span></td>';
+    // 品牌对接
+    html += '<td><select id="'+rowId+'-brand" onchange="saveProj('+i+',\'brand\',this)" style="width:100%;font-size:10px;padding:3px 4px;border-radius:4px;cursor:pointer"><option>龙晶晶</option></select></td>';
+    html += '</tr>';
+  });
+  el('projectsBody').innerHTML = html;
+}
+
+function saveProj(idx, field, el_) {
+  var val = el_.value !== undefined ? el_.value : el_.textContent.trim();
+  PROJECTS[idx][field] = val;
+  if (field === 'highlight') {
+    el_.title = val;
+  }
+  saveAll();
+  renderProjects();
+}
+
+function renderTeam() {
+  var html='';
+  TEAM.forEach(function(t,i) {
+    var kpiHtml = '<div class="team-kpi-title">核心KPI（点击更新）</div>';
+    t.kpis.forEach(function(k,j) {
+      var pctVal = pct(k.current||0, k.target);
+      var col = pctVal>=100?'#52c41a':pctVal>=50?'#fa8c16':'#1f2329';
+      kpiHtml += '<div class="team-kpi-row"><span class="team-kpi-label">'+k.label+'</span><span class="team-kpi-value" style="color:'+col+'">'+(k.current||0)+k.unit+' / '+k.target+k.unit+'</span></div>';
+    });
+    html += '<div class="team-card">'+
+      '<div class="team-top"><div class="team-avatar" style="background:'+t.color+'">'+t.initials+'</div><div><div class="team-name">'+t.name+'</div><div class="team-title">'+t.title+'</div></div></div>'+
+      '<div class="team-kpi-block">'+kpiHtml+'</div>'+
+      '<div class="team-urgent">⚠ '+t.urgent+'</div>'+
+      '<ul class="team-resp">'+t.resp.map(function(r){return '<li>'+r+'</li>';}).join('')+'</ul>'+
+      '<div style="margin-top:10px"><button class="btn primary" style="width:100%" onclick="openTeamKpi('+i+')">更新KPI</button></div></div>';
+  });
+  el('teamGrid').innerHTML = html;
+}
+
+function renderAll() {
+  renderOverview();
+  renderWorks();
+  renderKanban('q2Board','q2Summary',WORKS.filter(function(w){return w.q==='Q2'||w.q==='Q2-Q3';}));
+  renderKanban('q3Board','q3Summary',WORKS.filter(function(w){return w.q==='Q3'||w.q==='Q2-Q3'||w.q==='Q1-Q3';}));
+  renderKanban('q4Board','q4Summary',WORKS.filter(function(w){return w.q==='Q4';}));
+  renderMedia();
+  renderCases();
+  renderEvents();
+  renderProjects();
+  renderTeam();
+  fillWorkSelect();
+}
+
+// ==================== 弹窗 ====================
+function openModal(id) { el(id).classList.add('show'); }
+function closeModal(id) { el(id).classList.remove('show'); }
+function openAddModal() { openModal('addModal'); }
+function openMediaModal() { el('mf-channel').selectedIndex=0; ['mf-date','mf-fan-add','mf-fan-total','mf-expose-week','mf-expose-total','mf-read-week','mf-read-total','mf-note'].forEach(function(id){el(id).value='';}); openModal('mediaModal'); }
+function openProjectModal() { openModal('projectModal'); }
+function openWorkModal() { openModal('workModal'); fillWorkSelect(); }
+function openWorkEdit(id) { openWorkModal(); el('wf-select').value=id; wfLoad(); }
+
+function fillWorkSelect() {
+  el('wf-select').innerHTML='<option value="">请选择</option>'+WORKS.map(function(w){return '<option value="'+w.id+'">['+w.q+'] '+w.name+'（'+w.owner+'）</option>';}).join('');
+}
+
+function wfLoad() {
+  var id=parseInt(el('wf-select').value); if(!id) return;
+  var w=null; for(var i=0;i<WORKS.length;i++) if(WORKS[i].id===id){w=WORKS[i];break;}
+  if(!w) return;
+  el('wf-status').value=w.status;
+  el('wf-progress').value=w.progress;
+  el('wf-date').value=w.wfdate||'';
+  el('wf-effect').value=w.effect||'';
+  el('wf-leader').value=w.leaderReview||'';
+  el('wf-verify').value=w.verify||'';
+  el('wf-note').value=w.note||'';
+}
+
+function saveWork() {
+  var id=parseInt(el('wf-select').value); if(!id){alert('请选择工作项');return;}
+  var w=null; for(var i=0;i<WORKS.length;i++) if(WORKS[i].id===id){w=WORKS[i];break;}
+  if(!w) return;
+  w.status=el('wf-status').value;
+  w.progress=parseInt(el('wf-progress').value)||0;
+  w.wfdate=el('wf-date').value;
+  w.effect=el('wf-effect').value;
+  w.leaderReview=el('wf-leader').value;
+  w.verify=el('wf-verify').value;
+  w.note=el('wf-note').value;
+  closeModal('workModal');
+  renderAll();
+}
+
+// 案例
+var editingCaseIdx = -1;
+function openCaseEdit(idx) {
+  editingCaseIdx = idx;
+  var c = CASES[idx];
+  el('cf-branch').value = c.branch||'';
+  el('cf-city').value = c.city||'';
+  el('cf-theme').value = c.theme||'';
+  el('cf-summary').value = c.summary||'';
+  el('cf-format').value = c.format||'';
+  el('cf-module').value = c.module||'';
+  el('cf-channel').value = c.channel||'';
+  el('cf-date').value = c.date||'';
+  el('cf-reads').value = c.reads||'';
+  el('cf-expose').value = c.expose||'';
+  el('cf-owner').value = c.owner||'';
+  el('cf-status').value = c.status||'已完成';
+  el('cf-project').value = c.project||'';
+  el('cf-note').value = c.note||'';
+  el('caseModal').querySelector('.modal-title').textContent = '编辑10W+标杆案例';
+  openModal('caseModal');
+}
+function openCaseModal() {
+  editingCaseIdx = -1;
+  ['cf-city','cf-summary','cf-channel','cf-owner','cf-project','cf-note'].forEach(function(id){el(id).value='';});
+  el('cf-branch').value=''; el('cf-theme').value=''; el('cf-format').value='';
+  el('cf-module').value=''; el('cf-date').value=''; el('cf-reads').value='';
+  el('cf-expose').value=''; el('cf-status').value='已完成';
+  el('caseModal').querySelector('.modal-title').textContent = '+ 新增10W+标杆案例';
+  openModal('caseModal');
+}
+function saveCase() {
+  if (editingCaseIdx >= 0) {
+    var c = CASES[editingCaseIdx];
+    c.branch=el('cf-branch').value; c.city=el('cf-city').value; c.theme=el('cf-theme').value;
+    c.summary=el('cf-summary').value; c.format=el('cf-format').value; c.module=el('cf-module').value;
+    c.channel=el('cf-channel').value; c.date=el('cf-date').value;
+    c.reads=el('cf-reads').value; c.expose=el('cf-expose').value;
+    c.owner=el('cf-owner').value; c.status=el('cf-status').value;
+    c.project=el('cf-project').value; c.note=el('cf-note').value;
+    saveAll();
+    closeModal('caseModal');
+    editingCaseIdx = -1;
+    renderAll(); return;
+  }
+  var required=['cf-branch','cf-theme','cf-format','cf-module','cf-date','cf-reads','cf-expose'];
+  for(var i=0;i<required.length;i++) if(!el(required[i]).value){alert('请填写必填项');return;}
+  CASES.push({
+    branch:el('cf-branch').value, city:el('cf-city').value, theme:el('cf-theme').value,
+    summary:el('cf-summary').value, format:el('cf-format').value, module:el('cf-module').value,
+    channel:el('cf-channel').value, date:el('cf-date').value,
+    reads:el('cf-reads').value, expose:el('cf-expose').value,
+    owner:el('cf-owner').value, status:el('cf-status').value,
+    project:el('cf-project').value, note:el('cf-note').value
+  });
+  saveAll();
+  closeModal('caseModal');
+  ['cf-city','cf-summary','cf-channel','cf-owner','cf-project','cf-note'].forEach(function(id){el(id).value='';});
+  el('cf-status').value='已完成';
+  renderAll();
+}
+function deleteCase(i) { if(!confirm('确认删除？'))return; CASES.splice(i,1); saveAll(); renderAll(); }
+function saveCaseStatus(idx,sel) { CASES[idx].status=sel.value; saveAll(); renderCases(); renderOverview(); }
+
+// 事件
+var editingEventIdx = -1;
+function openEventEdit(idx) {
+  editingEventIdx = idx;
+  var e = EVENTS[idx];
+  el('ef-subject').value = e.subject||'';
+  el('ef-type').value = e.type||'';
+  el('ef-date').value = e.date||'';
+  el('ef-city').value = e.city||'';
+  el('ef-project').value = e.project||'';
+  el('ef-owner').value = e.owner||'';
+  el('ef-status').value = e.status||'已完成';
+  el('ef-own').value = e.own||'';
+  el('ef-media-exp').value = e['media-exp']||'';
+  el('ef-topic').value = e.topic||'';
+  el('ef-other').value = e.other||'';
+  el('ef-mcount').value = e.mcount||'';
+  el('ef-reprint').value = e.reprint||'';
+  el('ef-award').value = e.award||'';
+  el('ef-level').value = e.level||'';
+  el('ef-media').value = e.media||'';
+  el('ef-leader').value = e.leader||'';
+  el('ef-note').value = e.note||'';
+  el('eventModal').querySelector('.modal-title').textContent = '编辑影响力事件营销';
+  openModal('eventModal');
+}
+function openEventModal() {
+  editingEventIdx = -1;
+  ['ef-subject','ef-type','ef-date','ef-city','ef-project','ef-own','ef-media-exp','ef-topic','ef-other','ef-mcount','ef-reprint','ef-award','ef-media','ef-leader','ef-note'].forEach(function(id){el(id).value='';});
+  el('ef-status').value='已完成'; el('ef-level').value='';
+  el('eventModal').querySelector('.modal-title').textContent = '+ 新增影响力事件营销';
+  openModal('eventModal');
+}
+function saveEvent() {
+  if (editingEventIdx >= 0) {
+    var e = EVENTS[editingEventIdx];
+    e.subject=el('ef-subject').value; e.type=el('ef-type').value; e.date=el('ef-date').value;
+    e.city=el('ef-city').value; e.project=el('ef-project').value;
+    e.owner=el('ef-owner').value; e.status=el('ef-status').value;
+    e.own=el('ef-own').value; e['media-exp']=el('ef-media-exp').value;
+    e.topic=el('ef-topic').value; e.other=el('ef-other').value;
+    e.mcount=el('ef-mcount').value; e.reprint=el('ef-reprint').value;
+    e.award=el('ef-award').value; e.level=el('ef-level').value;
+    e.media=el('ef-media').value; e.leader=el('ef-leader').value; e.note=el('ef-note').value;
+    saveAll();
+    closeModal('eventModal');
+    editingEventIdx = -1;
+    renderAll(); return;
+  }
+  var required=['ef-subject','ef-type','ef-date','ef-own'];
+  for(var i=0;i<required.length;i++) if(!el(required[i]).value){alert('请填写必填项');return;}
+  EVENTS.push({
+    subject:el('ef-subject').value, type:el('ef-type').value, date:el('ef-date').value,
+    city:el('ef-city').value, project:el('ef-project').value,
+    owner:el('ef-owner').value, status:el('ef-status').value,
+    own:el('ef-own').value, 'media-exp':el('ef-media-exp').value,
+    topic:el('ef-topic').value, other:el('ef-other').value,
+    mcount:el('ef-mcount').value, reprint:el('ef-reprint').value,
+    award:el('ef-award').value, level:el('ef-level').value,
+    media:el('ef-media').value, leader:el('ef-leader').value, note:el('ef-note').value
+  });
+  saveAll();
+  closeModal('eventModal');
+  ['ef-subject','ef-type','ef-date','ef-city','ef-project','ef-own','ef-media-exp','ef-topic','ef-other','ef-mcount','ef-reprint','ef-award','ef-media','ef-leader','ef-note'].forEach(function(id){el(id).value='';});
+  el('ef-status').value='已完成'; el('ef-level').value='';
+  renderAll();
+}
+function saveEventStatus(idx,sel) { EVENTS[idx].status=sel.value; saveAll(); renderEvents(); renderOverview(); }
+function deleteEvent(i) { if(!confirm('确认删除？'))return; EVENTS.splice(i,1); saveAll(); renderAll(); }
+
+function deleteEvent(i) { if(!confirm('确认删除？'))return; EVENTS.splice(i,1); saveAll(); renderAll(); }
+
+// 媒体
+function openMediaEdit(name) {
+  el('mf-channel').value=name;
+  var mc=null; for(var i=0;i<MEDIA_CHANNELS.length;i++) if(MEDIA_CHANNELS[i].name===name){mc=MEDIA_CHANNELS[i];break;}
+  if(mc) {
+    el('mf-fan-total').value=mc.fanTotal||'';
+    el('mf-expose-total').value=mc.exposeTotal||'';
+    el('mf-read-total').value=mc.readTotal||'';
+  }
+  el('mf-date').value=''; el('mf-fan-add').value=''; el('mf-expose-week').value=''; el('mf-read-week').value=''; el('mf-note').value='';
+  openModal('mediaModal');
+}
+
+function saveMedia() {
+  var channel=el('mf-channel').value; if(!channel){alert('请选择渠道');return;}
+  var idx=-1; for(var i=0;i<MEDIA_CHANNELS.length;i++) if(MEDIA_CHANNELS[i].name===channel){idx=i;break;}
+  if(idx<0){alert('渠道不存在');return;}
+  var weekFan=parseInt(el('mf-fan-add').value)||0;
+  var weekExpose=parseFloat(el('mf-expose-week').value)||0;
+  var weekRead=parseInt(el('mf-read-week').value)||0;
+  MEDIA_CHANNELS[idx].fanTotal=(parseInt(el('mf-fan-total').value)||0);
+  MEDIA_CHANNELS[idx].exposeTotal=parseFloat(el('mf-expose-total').value)||0;
+  MEDIA_CHANNELS[idx].readTotal=parseInt(el('mf-read-total').value)||0;
+  MEDIA_RECORDS.push({
+    channel:channel, date:el('mf-date').value,
+    fanAdd:weekFan, fanTotal:MEDIA_CHANNELS[idx].fanTotal,
+    exposeWeek:weekExpose, exposeTotal:MEDIA_CHANNELS[idx].exposeTotal,
+    readWeek:weekRead, readTotal:MEDIA_CHANNELS[idx].readTotal, note:el('mf-note').value
+  });
+  saveAll();
+  closeModal('mediaModal');
+  renderAll();
+}
+
+var mhChannel='';
+function openMediaHistory(name) {
+  mhChannel=name;
+  var recs=MEDIA_RECORDS.filter(function(r){return r.channel===name;}).reverse();
+  el('mhTitle').textContent=name+' - 历史记录（'+recs.length+'条）';
+  if(!recs.length) {
+    el('mhContent').innerHTML='<div class="empty"><div class="empty-icon">📊</div><div class="empty-text">暂无历史记录</div></div>';
+  } else {
+    var html='<div style="overflow-x:auto"><table class="tbl"><thead><tr><th>日期</th><th>本周粉丝净增</th><th>累计粉丝</th><th>本周曝光(万)</th><th>累计曝光(万)</th><th>本周阅读/播放</th><th>累计阅读/播放</th><th>备注</th></tr></thead><tbody>';
+    recs.forEach(function(r){
+      html+='<tr><td>'+(r.date||'-')+'</td><td style="color:#00c9a7;font-weight:600">'+(r.fanAdd||'-')+'</td><td>'+fmt(r.fanTotal||0)+'</td><td style="color:#ff7a45;font-weight:600">'+(r.exposeWeek||'-')+'</td><td>'+(r.exposeTotal||0).toFixed(1)+'</td><td style="color:#a371f7;font-weight:600">'+(r.readWeek||'-')+'</td><td>'+fmt(r.readTotal||0)+'</td><td style="font-size:11px;color:#86909c">'+(r.note||'-')+'</td></tr>';
+    });
+    html+='</tbody></table></div>';
+    el('mhContent').innerHTML=html;
+  }
+  openModal('mediaHistoryModal');
+}
+
+function exportMediaHistory() {
+  var recs=MEDIA_RECORDS.filter(function(r){return r.channel===mhChannel;});
+  if(!recs.length){alert('暂无数据');return;}
+  downloadCSV([['渠道','日期','本周粉丝净增','累计粉丝','本周曝光(万)','累计曝光(万)','本周阅读/播放','累计阅读/播放','备注']].concat(recs.map(function(r){return [r.channel,r.date,r.fanAdd,r.fanTotal,r.exposeWeek,r.exposeTotal,r.readWeek,r.readTotal,r.note];})),mhChannel+'_历史记录.csv');
+}
+
+function exportMediaAll() {
+  if(!MEDIA_RECORDS.length){alert('暂无数据');return;}
+  downloadCSV([['渠道','日期','本周粉丝净增','累计粉丝','本周曝光(万)','累计曝光(万)','本周阅读/播放','累计阅读/播放','备注']].concat(MEDIA_RECORDS.map(function(r){return [r.channel,r.date,r.fanAdd,r.fanTotal,r.exposeWeek,r.exposeTotal,r.readWeek,r.readTotal,r.note];})),'新媒体矩阵_全部历史.csv');
+}
+
+// 项目
+function saveProject() {
+  var seq=parseInt(el('pf-seq').value); if(!seq){alert('请填写项目序号');return;}
+  var obj={seq:seq,name:el('pf-name').value,city: el('pf-city').value,line: el('pf-line').value,
+    branch: el('pf-branch').value,batch: el('pf-batch').value,grade: el('pf-grade').value,
+    first: el('pf-first').value,inner: el('pf-inner').value,contract: el('pf-contract').value,
+    deliver: el('pf-deliver').value,promote: el('pf-promote').value,
+    highlight: el('pf-highlight').value,pm: el('pf-pm').value,brand: el('pf-brand').value};
+  var found=false;
+  for(var i=0;i<PROJECTS.length;i++) if(PROJECTS[i].seq===seq){PROJECTS[i]=obj;found=true;break;}
+  if(!found) PROJECTS.push(obj);
+  PROJECTS.sort(function(a,b){return a.seq-b.seq;});
+  closeModal('projectModal');
+  renderAll();
+}
+
+// 团队KPI
+var tkIdx=-1;
+function openTeamKpi(idx) {
+  tkIdx=idx;
+  var t=TEAM[idx];
+  el('tkTitle').textContent='更新 '+t.name+' 的KPI';
+  var html='';
+  t.kpis.forEach(function(k,i) {
+    html += '<div class="form-group"><div class="form-label">'+k.label+'（目标：'+k.target+k.unit+'）</div>'+
+      '<input type="number" id="tk_'+i+'" value="'+(k.current||0)+'" min="0" style="width:120px"> <span style="font-size:11px;color:#86909c">当前值 / 目标 '+k.target+k.unit+'</span></div>';
+  });
+  el('tkFormContent').innerHTML=html;
+  openModal('teamKpiModal');
+}
+
+function saveTeamKpi() {
+  var t=TEAM[tkIdx];
+  t.kpis.forEach(function(k,i) {
+    k.current=parseFloat(el('tk_'+i).value)||0;
+  });
+  saveAll();
+  closeModal('teamKpiModal');
+  renderAll();
+}
+
+// 目标
+function saveTarget(type) {
+  TARGETS[type]=parseFloat(el('t-'+type).value)||0;
+  saveAll();
+  renderOverview();
+}
+
+// 导出
+function exportCases() {
+  if(!CASES.length){alert('暂无数据');return;}
+  downloadCSV([['分公司','城市','主题','摘要','形式','模块','渠道','日期','阅读量','曝光(万)','负责人','状态','关联项目','备注']].concat(CASES.map(function(c){return [c.branch,c.city,c.theme,c.summary,c.format,c.module,c.channel,c.date,c.reads,c.expose,c.owner,c.status,c.project,c.note];})),'10W+标杆案例库.csv');
+}
+function exportEvents() {
+  if(!EVENTS.length){alert('暂无数据');return;}
+  downloadCSV([['主体','类型','日期','涉及','关联项目','负责人','状态','自有渠道曝光','媒体渠道曝光','话题曝光','其余渠道','总曝光','媒体报道次数','转载量','认证/奖项','认证级别','媒体报道明细','领导评价','备注']].concat(EVENTS.map(function(e){return [e.subject,e.type,e.date,e.city,e.project,e.owner,e.status,e.own,e['media-exp'],e.topic,e.other,((parseFloat(e.own)||0)+(parseFloat(e['media-exp'])||0)+(parseFloat(e.topic)||0)+(parseFloat(e.other)||0)).toFixed(1),e.mcount,e.reprint,e.award,e.level,e.media,e.leader,e.note];})),'影响力事件营销.csv');
+}
+function exportMedia() {
+  downloadCSV([['渠道','主责人','累计粉丝','累计曝光(万)','累计阅读/播放']].concat(MEDIA_CHANNELS.map(function(m){return [m.name,m.owner,m.fanTotal,m.exposeTotal,m.readTotal];})),'新媒体矩阵数据.csv');
+}
+function exportProjects() {
+  downloadCSV([['序号','城市','名称','产品系','批次','分级','首批','内控日','合同日','交付状态','宣传状态','品牌亮点','项目负责人','品牌对接人']].concat(PROJECTS.map(function(p){return [p.seq,p.city,p.name,p.line,p.batch,p.grade,p.first,p.inner,p.contract,p.deliver,p.promote,p.highlight,p.pm,p.brand];})),'交付项目追踪.csv');
+}
+function exportWorks() {
+  downloadCSV([['序号','模块','事项','级别','Q','负责人','截止日期','状态','进度','产出','效果评估','领导评价','验收文件','备注']].concat(WORKS.map(function(w){return [w.id,w.module,w.name,w.level,w.q,w.owner,w.end,w.status,w.progress+'%',w.产出,w.effect,w.leaderReview,w.verify,w.note];})),'年度工作明细.csv');
+}
+function doExportAll() { alert('请分别在各模块点击「导出」下载对应CSV文件，\n完整存档建议使用浏览器打印功能保存PDF。'); }
+
+function downloadCSV(rows,filename) {
+  var csv=rows.map(function(row){return row.map(function(v){return '"'+((v||'').toString().replace(/"/g,'""'))+'"';}).join(',');}).join('\n');
+  var blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');a.href=url;a.download=filename;a.click();
+  URL.revokeObjectURL(url);
+}
+
+// 启动
+renderAll();
+</script>
+
+</body>
+</html>
