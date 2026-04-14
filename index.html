@@ -491,6 +491,8 @@ textarea{resize:vertical;min-height:60px}
 <!-- ==================== 周报 ==================== -->
 <div class="panel" id="panel-report">
   <div class="tip"><span class="tip-icon">📋</span><div>填写周报时选择「所属事项」，会自动更新对应工作的进度和状态。写周报 = 更新看板，两步变一步。</div></div>
+  <!-- 本周/本周期望更新摘要 -->
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px;margin-bottom:16px" id="reportSummary"></div>
   <div class="table-card">
     <div class="table-header">
       <div class="table-title">周报记录 <span class="table-count" id="reportsCount">0条</span></div>
@@ -707,7 +709,7 @@ textarea{resize:vertical;min-height:60px}
 <!-- 周报填写 -->
 <div class="modal-overlay" id="reportModal">
 <div class="modal large" style="max-width:820px">
-  <div class="modal-header"><div class="modal-title">填写周报</div><div class="modal-close" onclick="closeModal('reportModal')">×</div></div>
+  <div class="modal-header"><div class="modal-title" id="rfTitle">填写周报</div><div class="modal-close" onclick="closeModal('reportModal')">×</div></div>
   <div class="modal-body">
     <!-- 基本信息 -->
     <div class="form-grid" style="margin-bottom:14px">
@@ -1897,7 +1899,10 @@ function getCurrentWeekRange() {
   return fmt(monday) + '\u2014' + fmt(sunday);
 }
 
+var editingReportIdx = -1; // -1 = 新增，其他 = 编辑
+
 function openReportModal() {
+  editingReportIdx = -1;
   el('rf-range').value = getCurrentWeekRange();
   el('rf-person').value = '';
   el('rf-type').value = '';
@@ -1925,8 +1930,60 @@ function openReportModal() {
     workList.innerHTML = '<span style="color:#999;font-size:11px">暂无可选工作事项</span>';
   }
   el('rf-summary').style.display = 'none';
+  el('rfTitle').textContent = '填写周报';
   openModal('reportModal');
   rfOnChange();
+}
+
+function openReportEdit(idx) {
+  editingReportIdx = idx;
+  var r = REPORTS[idx];
+  if (!r) return;
+  el('rf-range').value = r.range || '';
+  el('rf-person').value = r.person || '';
+  el('rf-type').value = r.type || '';
+  el('rf-done').value = r.done || '';
+  el('rf-insight').value = r.insight || '';
+  el('rf-next').value = r.next || '';
+  el('rf-output').value = r.output || '';
+  el('rf-note').value = r.note || '';
+  var workList = el('rf-work-list');
+  if (WORKS && WORKS.length) {
+    workList.innerHTML = WORKS.map(function(w) {
+      var checked = r.workId === w.id ? ' checked' : '';
+      return '<label style="display:flex;align-items:center;gap:5px;padding:4px 8px;background:#fff;border-radius:6px;border:1px solid #e5e7eb;cursor:pointer;font-size:11px">'+
+        '<input type="checkbox" value="'+w.id+'" onclick="rfWorkCheck()"'+checked+' style="accent-color:#5b7fff;width:13px;height:13px">'+
+        '<span style="font-weight:700;color:#5b7fff;font-size:10px">'+w.q+'</span> '+
+        '<span style="font-weight:500">'+w.name+'</span>'+
+        '<span style="color:#999;font-size:10px">('+w.owner+')</span>'+
+        '</label>';
+    }).join('');
+  }
+  if (r.workId) {
+    el('rf-work-status-section').style.display = 'block';
+    var w = null;
+    for (var k = 0; k < WORKS.length; k++) { if (WORKS[k].id === r.workId) { w = WORKS[k]; break; } }
+    if (w) {
+      var sid = 'rw' + r.workId;
+      var statusOptions = ['待启动','进行中','已完成','持续进行','需求分析/立项','资料调研','方案策划','方案提报','流程审批','资源协调','正式执行','过程跟进/督导','阶段性汇报','宣传推广','复盘沉淀'];
+      var optHtml = statusOptions.map(function(o) {
+        return '<option value="'+o+'"'+(r.status === o ? ' selected' : '')+'>'+o+'</option>';
+      }).join('');
+      el('rf-work-items').innerHTML = '<div style="display:grid;grid-template-columns:2fr 1fr 80px 120px;gap:8px;align-items:center;padding:8px 10px;background:#fff;border-radius:8px;border:1px solid #e5e7eb;margin-bottom:6px">'+
+        '<div style="font-weight:600;font-size:12px"><span style="background:#eef1fd;color:#5b7fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:3px;margin-right:4px">'+w.q+'</span>'+w.name+'</div>'+
+        '<select id="'+sid+'s" onchange="rfOnChange()" style="font-size:11px;padding:4px 6px;border-radius:6px;border:1px solid #d1d5db">'+optHtml+'</select>'+
+        '<div style="display:flex;align-items:center;gap:2px"><input type="number" id="'+sid+'p" value="'+r.progress+'" min="0" max="100" onchange="rfOnChange()" style="width:50px;font-size:12px;padding:3px 5px;border-radius:5px;border:1px solid #d1d5db"><span style="font-size:10px;color:#999">%</span></div>'+
+        '<input type="date" id="'+sid+'e" value="'+r.end+'" onchange="rfOnChange()" style="font-size:11px;padding:3px 5px;border-radius:5px;border:1px solid #d1d5db"></div>';
+    }
+  } else {
+    el('rf-work-status-section').style.display = 'none';
+    el('rf-work-items').innerHTML = '';
+  }
+  rfPersonChange();
+  el('rf-summary').style.display = 'block';
+  el('rf-summary-content').innerHTML = '✏ 编辑中：' + r.range + ' ' + r.person + ' ' + (r.workName || '无关联工作');
+  el('rfTitle').textContent = '编辑周报';
+  openModal('reportModal');
 }
 
 function rfWorkCheck() {
@@ -2044,7 +2101,6 @@ function saveReport() {
   var type = el('rf-type').value;
   var range = el('rf-range').value.trim();
   if (!person || !type || !range) { alert('请填写：周次、姓名、任务类型'); return; }
-  // 收集选中的工作项
   var workList = el('rf-work-list');
   var cbs = workList ? workList.querySelectorAll('input[type="checkbox"]:checked') : [];
   var checked = [];
@@ -2076,43 +2132,84 @@ function saveReport() {
       }
     });
   }
-  // 有选中工作项：每项创建一条周报，同时更新该工作项
-  if (checked.length) {
-    checked.forEach(function(id) {
-      var w = null;
-      for (var k = 0; k < WORKS.length; k++) { if (WORKS[k].id === id) { w = WORKS[k]; break; } }
-      if (!w) return;
-      var sid = 'rw' + id;
-      var sEl = document.getElementById(sid + 's');
-      var pEl = document.getElementById(sid + 'p');
-      var eEl = document.getElementById(sid + 'e');
-      var newStatus = sEl ? sEl.value : w.status;
-      var newProgress = pEl && pEl.value ? parseInt(pEl.value) : w.progress;
-      var newEnd = eEl && eEl.value ? eEl.value : w.end;
-      w.status = newStatus;
-      w.progress = newProgress;
-      if (newEnd) w.end = newEnd;
-      if (el('rf-done').value) w.effect = el('rf-done').value;
+  // 编辑模式：更新现有记录
+  if (editingReportIdx >= 0) {
+    var r = REPORTS[editingReportIdx];
+    if (r) {
+      // 更新关联的工作项（用表单里的新值）
+      if (checked.length) {
+        var id = checked[0];
+        var w = null;
+        for (var k = 0; k < WORKS.length; k++) { if (WORKS[k].id === id) { w = WORKS[k]; break; } }
+        if (w) {
+          var sid = 'rw' + id;
+          var sEl = document.getElementById(sid + 's');
+          var pEl = document.getElementById(sid + 'p');
+          var eEl = document.getElementById(sid + 'e');
+          var newStatus = sEl ? sEl.value : w.status;
+          var newProgress = pEl && pEl.value ? parseInt(pEl.value) : w.progress;
+          var newEnd = eEl && eEl.value ? eEl.value : w.end;
+          w.status = newStatus;
+          w.progress = newProgress;
+          if (newEnd) w.end = newEnd;
+          r.workId = id;
+          r.workName = w.name;
+          r.workQ = w.q;
+          r.status = newStatus;
+          r.progress = newProgress;
+          r.end = newEnd;
+        }
+      }
+      r.range = range;
+      r.person = person;
+      r.type = type;
+      r.done = el('rf-done').value;
+      r.insight = el('rf-insight').value;
+      r.next = el('rf-next').value;
+      r.output = el('rf-output').value;
+      r.note = el('rf-note').value;
+      r.date = new Date().toLocaleDateString('zh-CN');
+    }
+  } else {
+    // 新增模式
+    if (checked.length) {
+      checked.forEach(function(id) {
+        var w = null;
+        for (var k = 0; k < WORKS.length; k++) { if (WORKS[k].id === id) { w = WORKS[k]; break; } }
+        if (!w) return;
+        var sid = 'rw' + id;
+        var sEl = document.getElementById(sid + 's');
+        var pEl = document.getElementById(sid + 'p');
+        var eEl = document.getElementById(sid + 'e');
+        var newStatus = sEl ? sEl.value : w.status;
+        var newProgress = pEl && pEl.value ? parseInt(pEl.value) : w.progress;
+        var newEnd = eEl && eEl.value ? eEl.value : w.end;
+        w.status = newStatus;
+        w.progress = newProgress;
+        if (newEnd) w.end = newEnd;
+        if (el('rf-done').value) w.effect = el('rf-done').value;
+        REPORTS.push({
+          range: range, person: person, type: type,
+          workId: id, workName: w.name, workQ: w.q,
+          done: el('rf-done').value, insight: el('rf-insight').value,
+          next: el('rf-next').value, status: newStatus,
+          end: newEnd, progress: newProgress,
+          output: el('rf-output').value, note: el('rf-note').value,
+          date: new Date().toLocaleDateString('zh-CN')
+        });
+      });
+    } else {
       REPORTS.push({
         range: range, person: person, type: type,
-        workId: id, workName: w.name, workQ: w.q,
+        workId: null, workName: '', workQ: '',
         done: el('rf-done').value, insight: el('rf-insight').value,
-        next: el('rf-next').value, status: newStatus,
-        end: newEnd, progress: newProgress,
+        next: el('rf-next').value, status: '', end: '', progress: 0,
         output: el('rf-output').value, note: el('rf-note').value,
         date: new Date().toLocaleDateString('zh-CN')
       });
-    });
-  } else {
-    REPORTS.push({
-      range: range, person: person, type: type,
-      workId: null, workName: '', workQ: '',
-      done: el('rf-done').value, insight: el('rf-insight').value,
-      next: el('rf-next').value, status: '', end: '', progress: 0,
-      output: el('rf-output').value, note: el('rf-note').value,
-      date: new Date().toLocaleDateString('zh-CN')
-    });
+    }
   }
+  editingReportIdx = -1;
   saveAll();
   closeModal('reportModal');
   renderReports();
@@ -2124,6 +2221,8 @@ function saveReport() {
 }
 
 function renderReports() {
+  // 渲染顶部摘要
+  renderReportSummary();
   var fp = el('f-r-person') ? el('f-r-person').value : '';
   var ft = el('f-r-type') ? el('f-r-type').value : '';
   var filtered = REPORTS.filter(function(r) {
@@ -2144,7 +2243,6 @@ function renderReports() {
     if (!grouped[key]) grouped[key] = [];
     grouped[key].push(r);
   });
-  // 排序：最新的在前面
   Object.keys(grouped).sort().reverse().forEach(function(key) {
     var items = grouped[key];
     items.forEach(function(r) {
@@ -2161,11 +2259,66 @@ function renderReports() {
         '<td style="font-size:11px">'+(r.progress?r.progress+'%':'-')+'</td>'+
         '<td style="font-size:11px">'+(r.end||'-')+'</td>'+
         '<td style="max-width:100px;font-size:11px">'+(r.output?'<div style="max-height:40px;overflow:hidden;text-overflow:ellipsis">'+r.output+'</div>':'-')+'</td>'+
-        '<td><button class="btn" style="padding:3px 8px;font-size:10px" onclick="deleteReport('+realIdx+')">删除</button></td>'+
+        '<td><button class="btn primary" style="padding:3px 8px;font-size:10px;margin-right:4px" onclick="openReportEdit('+realIdx+')">编辑</button><button class="btn" style="padding:3px 8px;font-size:10px" onclick="deleteReport('+realIdx+')">删除</button></td>'+
         '</tr>';
     });
   });
   if (el('reportsBody')) el('reportsBody').innerHTML = html;
+}
+
+// 周报页面顶部摘要
+function renderReportSummary() {
+  var sum = el('reportSummary');
+  if (!sum) return;
+  if (!REPORTS.length) {
+    sum.innerHTML = '';
+    return;
+  }
+  // 取最新的前5条记录做摘要
+  var recent = REPORTS.slice(-10).reverse();
+  // 按人员分组看最新一条
+  var byPerson = {};
+  REPORTS.slice(-20).forEach(function(r) {
+    if (!byPerson[r.person]) byPerson[r.person] = r;
+  });
+  var personCards = Object.keys(byPerson).map(function(p) {
+    var r = byPerson[p];
+    var workInfo = r.workName ? '<div style="font-size:11px;color:#555;margin-top:3px"><span style="font-weight:700;color:#5b7fff">'+r.workQ+'</span> '+r.workName+'</div>' : '<div style="font-size:11px;color:#999;margin-top:3px">无关联工作</div>';
+    return '<div style="background:#fff;border-radius:12px;padding:14px;border:1px solid #e5e7eb;box-shadow:0 2px 8px rgba(0,0,0,.04)">'+
+      '<div style="font-weight:700;font-size:13px;color:#111;margin-bottom:4px">'+r.person+'</div>'+
+      '<div style="font-size:11px;color:#888;margin-bottom:6px">'+r.range+' '+badge(r.type)+'</div>'+
+      workInfo+
+      '<div style="font-size:11px;color:#555;margin-top:5px">'+(r.status?badge(r.status):'')+' '+(r.progress?r.progress+'%':'')+'</div>'+
+      '</div>';
+  });
+  // 工作项进度变化摘要
+  var workUpdates = [];
+  if (WORKS.length) {
+    WORKS.forEach(function(w) {
+      if (w.status === '进行中' || w.status === '阶段性汇报') {
+        workUpdates.push(w);
+      }
+    });
+  }
+  var workHtml = workUpdates.length ? workUpdates.slice(0,6).map(function(w) {
+    return '<div style="background:#fff;border-radius:10px;padding:10px 12px;border:1px solid #e5e7eb">"+
+      '<div style="font-size:12px;font-weight:600;margin-bottom:4px">'+w.name+'</div>'+
+      '<div style="display:flex;align-items:center;gap:8px">'+badge(w.status)+' <span style="font-size:11px;color:#555">'+w.progress+'%</span></div>'+
+      '</div>';
+  }).join('') : '<div style="font-size:12px;color:#999;text-align:center;padding:20px">暂无进行中的工作项</div>';
+  sum.innerHTML =
+    '<div>'+
+      '<div style="font-size:11px;font-weight:700;color:#666;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;padding:0 2px">\u5237\u65b0\u4e2a\u4eba\u6700\u8fd1\u66f4\u65b0</div>'+
+      '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px">'+
+        personCards.join('')+
+      '</div>'+
+    '</div>'+
+    '<div>'+
+      '<div style="font-size:11px;font-weight:700;color:#666;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;padding:0 2px">\u8fdb\u884c\u4e2d\u5de5\u4f5c\u9879\uff08\u66f4\u65b0\u81ea\u5468\u62a5\uff09</div>'+
+      '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px">'+
+        workHtml+
+      '</div>'+
+    '</div>';
 }
 
 function deleteReport(idx) {
