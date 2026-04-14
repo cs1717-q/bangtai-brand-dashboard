@@ -713,9 +713,15 @@ textarea{resize:vertical;min-height:60px}
     <div class="form-grid" style="margin-bottom:14px">
       <div class="form-group"><div class="form-label required">周次日期范围</div><input type="text" id="rf-range" style="width:160px"></div>
       <div class="form-group"><div class="form-label required">姓名</div>
-        <select id="rf-person" onchange="rfPersonChange()"><option value="">请选择</option><option>何晓婷</option><option>龙晶晶</option><option>宋香回</option><option>张樊若兰</option></select></div>
+        <select id="rf-person" onchange="rfOnChange()"><option value="">请选择</option><option>何晓婷</option><option>龙晶晶</option><option>宋香回</option><option>张樊若兰</option></select></div>
       <div class="form-group"><div class="form-label required">任务类型</div>
-        <select id="rf-type"><option value="">请选择</option><option>重要工作</option><option>例行工作</option><option>临时工作</option></select></div></div>
+        <select id="rf-type" onchange="rfOnChange()"><option value="">请选择</option><option>重要工作</option><option>例行工作</option><option>临时工作</option></select></div></div>
+
+    <!-- 本次更新摘要 -->
+    <div id="rf-summary" style="display:none;margin-bottom:14px;padding:12px 14px;background:#f0f4ff;border-radius:10px;border:1px solid #c7d2fe">
+      <div style="font-size:11px;font-weight:700;color:#5b7fff;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">📋 本次将更新</div>
+      <div id="rf-summary-content" style="font-size:12px;color:#555;line-height:1.8"></div>
+    </div>
 
     <!-- 所属事项（可多选） -->
     <div style="margin-bottom:14px">
@@ -1918,16 +1924,19 @@ function openReportModal() {
   } else {
     workList.innerHTML = '<span style="color:#999;font-size:11px">暂无可选工作事项</span>';
   }
+  el('rf-summary').style.display = 'none';
   openModal('reportModal');
+  rfOnChange();
 }
 
 function rfWorkCheck() {
   var workList = el('rf-work-list');
-  var checkboxes = workList.querySelectorAll('input[type="checkbox"]:checked');
+  var checkboxes = workList ? workList.querySelectorAll('input[type="checkbox"]:checked') : [];
   var checked = [];
   for (var i = 0; i < checkboxes.length; i++) { checked.push(parseInt(checkboxes[i].value)); }
   if (!checked.length) {
     el('rf-work-status-section').style.display = 'none';
+    rfOnChange();
     return;
   }
   el('rf-work-status-section').style.display = 'block';
@@ -1944,11 +1953,12 @@ function rfWorkCheck() {
     }).join('');
     itemsHtml += '<div style="display:grid;grid-template-columns:2fr 1fr 80px 120px;gap:8px;align-items:center;padding:8px 10px;background:#fff;border-radius:8px;border:1px solid #e5e7eb;margin-bottom:6px">'+
       '<div style="font-weight:600;font-size:12px"><span style="background:#eef1fd;color:#5b7fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:3px;margin-right:4px">'+w.q+'</span>'+w.name+'</div>'+
-      '<select id="'+sid+'s" style="font-size:11px;padding:4px 6px;border-radius:6px;border:1px solid #d1d5db">'+optHtml+'</select>'+
-      '<div style="display:flex;align-items:center;gap:2px"><input type="number" id="'+sid+'p" value="'+w.progress+'" min="0" max="100" style="width:50px;font-size:12px;padding:3px 5px;border-radius:5px;border:1px solid #d1d5db"><span style="font-size:10px;color:#999">%</span></div>'+
-      '<input type="date" id="'+sid+'e" value="'+w.end+'" style="font-size:11px;padding:3px 5px;border-radius:5px;border:1px solid #d1d5db">'+'</div>';
+      '<select id="'+sid+'s" onchange="rfOnChange()" style="font-size:11px;padding:4px 6px;border-radius:6px;border:1px solid #d1d5db">'+optHtml+'</select>'+
+      '<div style="display:flex;align-items:center;gap:2px"><input type="number" id="'+sid+'p" value="'+w.progress+'" min="0" max="100" onchange="rfOnChange()" style="width:50px;font-size:12px;padding:3px 5px;border-radius:5px;border:1px solid #d1d5db"><span style="font-size:10px;color:#999">%</span></div>'+
+      '<input type="date" id="'+sid+'e" value="'+w.end+'" onchange="rfOnChange()" style="font-size:11px;padding:3px 5px;border-radius:5px;border:1px solid #d1d5db">'+'</div>';
   }
   el('rf-work-items').innerHTML = itemsHtml;
+  rfOnChange();
 }
 
 function rfPersonChange() {
@@ -1973,6 +1983,60 @@ function rfPersonChange() {
         '<input type="number" id="rmr_'+safe+'" placeholder="如：10000" style="width:100%;font-size:12px;padding:4px 6px;border-radius:5px;border:1px solid #d1d5db;box-sizing:border-box"></div>'+
       '</div></div>';
   }).join('');
+  rfOnChange();
+}
+
+// 实时更新摘要
+function rfOnChange() {
+  var person = el('rf-person').value;
+  var type = el('rf-type').value;
+  var range = el('rf-range').value.trim();
+  var parts = [];
+  // 基本信息
+  if (person || type || range) {
+    var basic = [];
+    if (range) basic.push('\u300c' + range + '\u300d');
+    if (person) basic.push(person);
+    if (type) basic.push('\u3010' + type + '\u3011');
+    parts.push('\u2714 \u57fa\u672c\u4fe1\u606f\uff1a' + basic.join(' / '));
+  }
+  // 选中的工作项
+  var workList = el('rf-work-list');
+  var cbs = workList ? workList.querySelectorAll('input[type="checkbox"]:checked') : [];
+  if (cbs.length) {
+    var workNames = [];
+    for (var i = 0; i < cbs.length; i++) {
+      var id = parseInt(cbs[i].value);
+      for (var j = 0; j < WORKS.length; j++) {
+        if (WORKS[j].id === id) {
+          var sid = 'rw' + id;
+          var sEl = document.getElementById(sid + 's');
+          var pEl = document.getElementById(sid + 'p');
+          var newStatus = sEl ? sEl.value : WORKS[j].status;
+          var newProg = pEl && pEl.value ? pEl.value + '%' : WORKS[j].progress + '%';
+          workNames.push(WORKS[j].name + ' \u2192 ' + newStatus + ' \u3001\u8fdb\u5ea6' + newProg);
+          break;
+        }
+      }
+    }
+    if (workNames.length) {
+      parts.push('\u2714 \u5de5\u4f5c\u9879\u76ee\u66f4\u65b0\uff08' + cbs.length + '\u9879\uff09\uff1a' + workNames.join('\u3001'));
+    }
+  }
+  // 新媒体渠道
+  if (person) {
+    var myCh = MEDIA_CHANNELS.filter(function(c) { return c.owner === person; });
+    if (myCh.length) {
+      var chNames = myCh.map(function(c) { return c.name; });
+      parts.push('\u2714 \u65b0\u5a92\u4f53\u6e20\u9053\u6570\u636e\uff08' + myCh.length + '\u4e2a\uff09\uff1a' + chNames.join('\u3001'));
+    }
+  }
+  if (parts.length) {
+    el('rf-summary').style.display = 'block';
+    el('rf-summary-content').innerHTML = parts.join('<br>');
+  } else {
+    el('rf-summary').style.display = 'none';
+  }
 }
 
 function saveReport() {
