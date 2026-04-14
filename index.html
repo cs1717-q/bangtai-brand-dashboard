@@ -472,7 +472,7 @@ textarea{resize:vertical;min-height:60px}
     </div>
     <div style="overflow-x:auto">
       <table class="tbl">
-        <thead><tr><th style="width:36px">#</th><th style="width:60px">城市</th><th style="width:120px">名称</th><th style="width:64px">产品系</th><th style="width:64px">批次</th><th style="width:48px">分级</th><th style="width:48px">首批</th><th style="width:96px">内控日</th><th style="width:96px">合同日</th><th style="width:72px">交付状态</th><th style="width:72px">宣传状态</th><th style="width:160px">品牌亮点</th><th style="width:72px">项目负责人</th><th style="width:72px">品牌对接</th></tr></thead>
+        <thead><tr><th style="width:36px">#</th><th style="width:60px">城市</th><th style="width:120px">名称</th><th style="width:64px">产品系</th><th style="width:64px">批次</th><th style="width:48px">分级</th><th style="width:48px">首批</th><th style="width:96px">内控日</th><th style="width:96px">合同日</th><th style="width:72px">交付状态</th><th style="width:72px">宣传状态</th><th style="width:160px">品牌亮点</th><th style="width:72px">项目负责人</th><th style="width:72px">品牌对接</th><th style="width:80px">传播曝光(万)</th><th style="width:160px">领导评价</th></tr></thead>
         <tbody id="projectsBody"></tbody>
       </table>
     </div>
@@ -634,7 +634,10 @@ textarea{resize:vertical;min-height:60px}
       <div class="form-group" style="grid-column:1/-1"><div class="form-label">品牌亮点</div><textarea id="pf-highlight" placeholder="该项目的核心服务亮点、品牌宣传切入点"></textarea></div></div>
     <div class="form-grid">
       <div class="form-group"><div class="form-label">项目负责人</div><input id="pf-pm" placeholder="项目负责人"></div>
-      <div class="form-group"><div class="form-label">品牌对接人</div><input id="pf-brand" value="龙晶晶"></div></div>
+      <div class="form-group"><div class="form-label">品牌对接人</div><input id="pf-brand" value="龙晶晶"></div>
+      <div class="form-group"><div class="form-label">传播曝光(万)</div><input id="pf-expose" type="number" step="0.1" placeholder="如：50"></div></div>
+    <div class="form-grid">
+      <div class="form-group" style="grid-column:1/-1"><div class="form-label">领导评价</div><textarea id="pf-leader" rows="2" placeholder="领导对该项目的评价、指示或认可"></textarea></div></div>
   </div>
   <div class="modal-footer"><button class="btn" onclick="closeModal('projectModal')">取消</button><button class="btn success" onclick="saveProject()">保存</button></div>
 </div>
@@ -1520,6 +1523,10 @@ function renderProjects() {
     html += '<td><span class="ed-cell" id="'+rowId+'-pm" contenteditable="true" onblur="saveProj('+i+',\'pm\',this)" onmouseover="this.style.boxShadow=\'0 0 0 2px #165dff\'" onmouseout="this.style.boxShadow=\'\'" style="display:block;padding:3px 5px;border-radius:4px;outline:none;cursor:text;font-size:11px">'+(p.pm||'')+'</span></td>';
     // 品牌对接
     html += '<td><select id="'+rowId+'-brand" onchange="saveProj('+i+',\'brand\',this)" style="width:100%;font-size:10px;padding:3px 4px;border-radius:4px;cursor:pointer"><option>龙晶晶</option></select></td>';
+    // 传播曝光
+    html += '<td><span class="ed-cell" id="'+rowId+'-expose" contenteditable="true" onblur="saveProj('+i+',\'expose\',this)" onmouseover="this.style.boxShadow=\'0 0 0 2px #165dff\'" onmouseout="this.style.boxShadow=\'\'" style="display:block;padding:3px 5px;border-radius:4px;outline:none;cursor:text;font-size:12px;color:#ff7a45;font-weight:600">'+(p.expose!=null?p.expose:'-')+'</span></td>';
+    // 领导评价
+    html += '<td><span class="ed-cell" id="'+rowId+'-leader" contenteditable="true" onblur="saveProj('+i+',\'leader\',this)" onmouseover="this.style.boxShadow=\'0 0 0 2px #165dff\'" onmouseout="this.style.boxShadow=\'\'" style="display:block;padding:3px 5px;border-radius:4px;outline:none;cursor:text;font-size:11px;color:#646a73;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+(p.leader||'')+'</span></td>';
     html += '</tr>';
   });
   el('projectsBody').innerHTML = html;
@@ -1906,7 +1913,8 @@ function saveProject() {
     branch: el('pf-branch').value,batch: el('pf-batch').value,grade: el('pf-grade').value,
     first: el('pf-first').value,inner: el('pf-inner').value,contract: el('pf-contract').value,
     deliver: el('pf-deliver').value,promote: el('pf-promote').value,
-    highlight: el('pf-highlight').value,pm: el('pf-pm').value,brand: el('pf-brand').value};
+    highlight: el('pf-highlight').value,pm: el('pf-pm').value,brand: el('pf-brand').value,
+    expose: parseFloat(el('pf-expose').value)||0,leader: el('pf-leader').value};
   var found=false;
   for(var i=0;i<PROJECTS.length;i++) if(PROJECTS[i].seq===seq){PROJECTS[i]=obj;found=true;break;}
   if(!found) PROJECTS.push(obj);
@@ -2471,7 +2479,7 @@ function exportMedia() {
   downloadCSV([['渠道','主责人','累计粉丝','累计曝光(万)','累计篇数']].concat(MEDIA_CHANNELS.map(function(m){return [m.name,m.owner,m.fanTotal,m.exposeTotal,m.postsTotal];})),'新媒体矩阵数据.csv');
 }
 function exportProjects() {
-  downloadCSV([['序号','城市','名称','产品系','批次','分级','首批','内控日','合同日','交付状态','宣传状态','品牌亮点','项目负责人','品牌对接人']].concat(PROJECTS.map(function(p){return [p.seq,p.city,p.name,p.line,p.batch,p.grade,p.first,p.inner,p.contract,p.deliver,p.promote,p.highlight,p.pm,p.brand];})),'交付项目追踪.csv');
+  downloadCSV([['序号','城市','名称','产品系','批次','分级','首批','内控日','合同日','交付状态','宣传状态','品牌亮点','项目负责人','品牌对接人','传播曝光(万)','领导评价']].concat(PROJECTS.map(function(p){return [p.seq,p.city,p.name,p.line,p.batch,p.grade,p.first,p.inner,p.contract,p.deliver,p.promote,p.highlight,p.pm,p.brand,p.expose||0,p.leader||''];})),'交付项目追踪.csv');
 }
 function exportWorks() {
   downloadCSV([['序号','模块','事项','级别','Q','负责人','截止日期','状态','进度','产出','效果评估','领导评价','验收文件','备注']].concat(WORKS.map(function(w){return [w.id,w.module,w.name,w.level,w.q,w.owner,w.end,w.status,w.progress+'%',w.产出,w.effect,w.leaderReview,w.verify,w.note];})),'年度工作明细.csv');
