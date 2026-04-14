@@ -2037,30 +2037,29 @@ function rfPersonChange() {
     el('rf-media-channels').innerHTML = '<div style="color:#999;font-size:12px;text-align:center;padding:16px">该成员暂无负责的渠道</div>';
     return;
   }
+  // 取本周已填写的汇总（用于预填）
+  var now = new Date();
+  var day = now.getDay();
+  var diffMon = day === 0 ? -6 : 1 - day;
+  var monday = new Date(now); monday.setDate(now.getDate() + diffMon);
+  monday.setHours(0,0,0,0);
+  var sunday = new Date(now); sunday.setDate(now.getDate() + diffSun || now.getDate() + (7 - day));
+  sunday.setHours(23,59,59,999);
+
   el('rf-media-channels').innerHTML = myChannels.map(function(c) {
     var safe = c.name.replace(/\s/g, '_');
-    // 取该渠道本周在 MEDIA_RECORDS 中的汇总（用 getCurrentWeekRange 计算本周一/日）
-    var weekFanAdd = 0, weekExposeAdd = 0, maxExpose = 0;
-    var now = new Date();
-    var day = now.getDay();
-    var diffMon = day === 0 ? -6 : 1 - day;
-    var diffSun = day === 0 ? 0 : 7 - day;
-    var monday = new Date(now); monday.setDate(now.getDate() + diffMon);
-    monday.setHours(0,0,0,0);
-    var sunday = new Date(now); sunday.setDate(now.getDate() + diffSun);
-    sunday.setHours(23,59,59,999);
-    MEDIA_RECORDS.forEach(function(rec) {
-      if (rec.channel !== c.name || !rec.date) return;
-      var d = new Date(rec.date);
-      if (isNaN(d.getTime())) return;
-      if (d >= monday && d <= sunday) {
-        weekFanAdd += parseInt(rec.fanAdd) || 0;
-        weekExposeAdd += parseFloat(rec.exposeWeek) || 0;
-        var ew = parseFloat(rec.exposeWeek) || 0;
-        if (ew > maxExpose) maxExpose = ew;
+    // 查找本周是否已有该渠道的周报汇总记录
+    var weekFan = 0, weekExp = 0, weekMax = 0;
+    REPORTS.forEach(function(r) {
+      if (!r.mediaChannels) return;
+      var ch = r.mediaChannels[c.name];
+      if (ch) {
+        weekFan += parseInt(ch.fanAdd) || 0;
+        weekExp += parseFloat(ch.exposeAdd) || 0;
+        if ((parseFloat(ch.maxExpose) || 0) > weekMax) weekMax = parseFloat(ch.maxExpose) || 0;
       }
     });
-    // 取最新一条记录作为累计参考
+    // 取最新一条累计记录作为参考
     var latest = null;
     for (var i = MEDIA_RECORDS.length - 1; i >= 0; i--) {
       if (MEDIA_RECORDS[i].channel === c.name) { latest = MEDIA_RECORDS[i]; break; }
@@ -2071,34 +2070,24 @@ function rfPersonChange() {
     return '<div style="background:#fff;border-radius:8px;padding:12px;border:1px solid #e5e7eb;margin-bottom:8px">'+
       '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">'+
         '<div style="font-weight:700;font-size:12px">'+c.name+'</div>'+
-        '<div style="font-size:10px;color:#999">上次登记：'+lastDate+' 累计粉丝:'+lastFan.toLocaleString()+' 累计曝光:'+lastExpose+'万</div>'+
+        '<div style="font-size:10px;color:#999">上次登记：'+lastDate+'  累计粉丝:<span style="color:#111;font-weight:600">'+lastFan.toLocaleString()+'</span>  累计曝光:<span style="color:#111;font-weight:600">'+lastExpose+'万</span></div>'+
       '</div>'+
-      // 自动汇总的本周数据（只读）
-      '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:10px;padding:8px;background:#f0f7ff;border-radius:8px">'+
-        '<div style="text-align:center">'+
-          '<div style="font-size:10px;color:#165dff;margin-bottom:2px">本周粉丝净增</div>'+
-          '<div style="font-size:18px;font-weight:700;color:#165dff" id="rmfa_'+safe+'">'+(weekFanAdd||'—')+'</div>'+
-          '<div style="font-size:10px;color:#999">人</div>'+
+      '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">'+
+        '<div>'+
+          '<div style="font-size:10px;color:#999;margin-bottom:4px">本周粉丝净增（人）</div>'+
+          '<input type="number" id="rmf_'+safe+'" value="'+weekFan+'" placeholder="如：200" style="width:100%;font-size:13px;padding:6px 8px;border-radius:6px;border:1px solid #d1d5db;box-sizing:border-box;font-weight:600">'+
+
         '</div>'+
-        '<div style="text-align:center">'+
-          '<div style="font-size:10px;color:#00c9a7;margin-bottom:2px">本周曝光(万)</div>'+
-          '<div style="font-size:18px;font-weight:700;color:#00c9a7" id="rmea_'+safe+'">'+(weekExposeAdd>0?weekExposeAdd:'—')+'</div>'+
-          '<div style="font-size:10px;color:#999">万</div>'+
+        '<div>'+
+          '<div style="font-size:10px;color:#999;margin-bottom:4px">本周曝光(万)</div>'+
+          '<input type="number" step="0.1" id="rme_'+safe+'" value="'+weekExp+'" placeholder="如：15" style="width:100%;font-size:13px;padding:6px 8px;border-radius:6px;border:1px solid #d1d5db;box-sizing:border-box;font-weight:600">'+
+
         '</div>'+
-        '<div style="text-align:center">'+
-          '<div style="font-size:10px;color:#a371f7;margin-bottom:2px">本周最高曝光</div>'+
-          '<div style="font-size:18px;font-weight:700;color:#a371f7" id="rmmx_'+safe+'">—</div>'+
-          '<div style="font-size:10px;color:#999">万</div>'+
+        '<div>'+
+          '<div style="font-size:10px;color:#999;margin-bottom:4px">本周最高曝光(万)</div>'+
+          '<input type="number" step="0.1" id="rmx_'+safe+'" value="'+weekMax+'" placeholder="如：50" style="width:100%;font-size:13px;padding:6px 8px;border-radius:6px;border:1px solid #d1d5db;box-sizing:border-box;font-weight:600">'+
+
         '</div>'+
-      '</div>'+
-      // 可填写的补充字段
-      '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">'+
-        '<div><div style="font-size:10px;color:#999;margin-bottom:2px">补充粉丝净增</div>'+
-          '<input type="number" id="rmf_'+safe+'" placeholder="如：200" style="width:100%;font-size:12px;padding:4px 6px;border-radius:5px;border:1px solid #d1d5db;box-sizing:border-box"></div>'+
-        '<div><div style="font-size:10px;color:#999;margin-bottom:2px">补充曝光(万)</div>'+
-          '<input type="number" step="0.1" id="rme_'+safe+'" placeholder="如：15" style="width:100%;font-size:12px;padding:4px 6px;border-radius:5px;border:1px solid #d1d5db;box-sizing:border-box"></div>'+
-        '<div><div style="font-size:10px;color:#999;margin-bottom:2px">本周最高曝光(万)</div>'+
-          '<input type="number" step="0.1" id="rmx_'+safe+'" placeholder="如：50" style="width:100%;font-size:12px;padding:4px 6px;border-radius:5px;border:1px solid #d1d5db;box-sizing:border-box"></div>'+
       '</div>'+
     '</div>';
   }).join('');
@@ -2167,40 +2156,41 @@ function saveReport() {
   var cbs = workList ? workList.querySelectorAll('input[type="checkbox"]:checked') : [];
   var checked = [];
   for (var i = 0; i < cbs.length; i++) { checked.push(parseInt(cbs[i].value)); }
-  // 保存新媒体渠道数据（累加到累计值）
+  // 保存新媒体渠道数据到矩阵
   var totalFanAdd = 0, totalExposeAdd = 0;
+  var mediaChannelsData = {}; // {渠道名: {fanAdd, exposeAdd, maxExpose}}
   if (person) {
     var myCh = MEDIA_CHANNELS.filter(function(c) { return getChannelOwner(c.name) === person; });
     myCh.forEach(function(c) {
       var safe = c.name.replace(/\s/g, '_');
       var fanEl = document.getElementById('rmf_' + safe);
       var expEl = document.getElementById('rme_' + safe);
-      var rdEl = document.getElementById('rmr_' + safe);
+      var maxEl = document.getElementById('rmx_' + safe);
       var fan = fanEl && fanEl.value ? parseInt(fanEl.value) : 0;
       var exp = expEl && expEl.value ? parseFloat(expEl.value) : 0;
-      var rd = rdEl && rdEl.value ? parseInt(rdEl.value) : 0;
-      if (fan || exp || rd) {
+      var maxExp = maxEl && maxEl.value ? parseFloat(maxEl.value) : 0;
+      if (fan || exp || maxExp) {
         totalFanAdd += fan;
         totalExposeAdd += exp;
+        mediaChannelsData[c.name] = { fanAdd: fan, exposeAdd: exp, maxExpose: maxExp };
+        // 累加到 MEDIA_CHANNELS 累计值
         MEDIA_CHANNELS.forEach(function(mc) {
           if (mc.name === c.name) {
             mc.fanTotal = (mc.fanTotal || 0) + fan;
             mc.exposeTotal = (mc.exposeTotal || 0) + exp;
-            mc.readTotal = (mc.readTotal || 0) + rd;
+            mc.readTotal = maxExp > 0 ? maxExp : (mc.readTotal || 0);
           }
         });
-        var maxEl = document.getElementById('rmx_' + safe);
-        var maxExp = maxEl && maxEl.value ? parseFloat(maxEl.value) : 0;
+        // 新增一条 MEDIA_RECORDS
         MEDIA_RECORDS.push({
           channel: c.name, date: new Date().toLocaleDateString('zh-CN'),
           fanAdd: fan, fanTotal: (c.fanTotal||0) + fan,
           exposeWeek: exp, exposeTotal: (c.exposeTotal||0) + exp,
-          readWeek: maxExp, readTotal: (c.readTotal||0) + maxExp, note: ''
+          readWeek: maxExp, readTotal: maxExp, note: ''
         });
       }
     });
-  }
-  // 编辑模式：更新现有记录
+  }// 编辑模式：更新现有记录
   if (editingReportIdx >= 0) {
     var r = REPORTS[editingReportIdx];
     if (r) {
@@ -2239,6 +2229,7 @@ function saveReport() {
       r.date = new Date().toLocaleDateString('zh-CN');
       r.mediaFanAdd = totalFanAdd;
       r.mediaExposeAdd = totalExposeAdd;
+      r.mediaChannels = mediaChannelsData;
     }
   } else {
     // 新增模式
@@ -2266,7 +2257,8 @@ function saveReport() {
           end: newEnd, progress: newProgress,
           output: el('rf-output').value, note: el('rf-note').value,
           date: new Date().toLocaleDateString('zh-CN'),
-          mediaFanAdd: totalFanAdd, mediaExposeAdd: totalExposeAdd
+          mediaFanAdd: totalFanAdd, mediaExposeAdd: totalExposeAdd,
+          mediaChannels: mediaChannelsData
         });
       });
     } else {
@@ -2277,6 +2269,7 @@ function saveReport() {
         next: el('rf-next').value, status: '', end: '', progress: 0,
         output: el('rf-output').value, note: el('rf-note').value,
         mediaFanAdd: totalFanAdd, mediaExposeAdd: totalExposeAdd,
+        mediaChannels: mediaChannelsData,
         date: new Date().toLocaleDateString('zh-CN')
       });
     }
