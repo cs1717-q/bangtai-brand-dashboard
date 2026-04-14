@@ -2032,8 +2032,6 @@ function rfPersonChange() {
   var person = el('rf-person').value;
   if (!person) { el('rf-media-section').style.display = 'none'; return; }
   var myChannels = MEDIA_CHANNELS.filter(function(c) { return getChannelOwner(c.name) === person; });
-  console.log('[rfPersonChange] person:', person, 'myChannels:', myChannels.map(function(c){return c.name;}));
-  console.log('[rfPersonChange] MEDIA_CHANNELS:', MEDIA_CHANNELS.map(function(c){return {n:c.name,o:getChannelOwner(c.name)};}));
   el('rf-media-section').style.display = 'block';
   el('rf-media-section').style.display = 'block';
   if (!myChannels.length) {
