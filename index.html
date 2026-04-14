@@ -1573,7 +1573,7 @@ function renderAll() {
 function openModal(id) { el(id).classList.add('show'); }
 function closeModal(id) { el(id).classList.remove('show'); }
 function openAddModal() { openModal('addModal'); }
-function openMediaModal() { el('mf-channel').selectedIndex=0; ['mf-date','mf-fan-add','mf-fan-total','mf-expose-week','mf-expose-total','mf-posts-week','mf-posts-total','mf-note'].forEach(function(id){el(id).value='';}); openModal('mediaModal'); }
+function openMediaModal() { if(editingMediaRecordIdx<0) { el('mf-channel').selectedIndex=0; ['mf-date','mf-fan-add','mf-fan-total','mf-expose-week','mf-expose-total','mf-posts-week','mf-posts-total','mf-note'].forEach(function(id){el(id).value='';}); } openModal('mediaModal'); }
 function openProjectModal() { openModal('projectModal'); }
 function openWorkModal() { openModal('workModal'); fillWorkSelect(); }
 function openWorkEdit(id) { openWorkModal(); el('wf-select').value=id; wfLoad(); }
@@ -1813,15 +1813,32 @@ function saveMedia() {
   var weekFan=parseInt(el('mf-fan-add').value)||0;
   var weekExpose=parseFloat(el('mf-expose-week').value)||0;
   var weekPosts=parseInt(el('mf-posts-week').value)||0;
-  MEDIA_CHANNELS[idx].fanTotal=(parseInt(el('mf-fan-total').value)||0);
-  MEDIA_CHANNELS[idx].exposeTotal=parseFloat(el('mf-expose-total').value)||0;
-  MEDIA_CHANNELS[idx].postsTotal=parseInt(el('mf-posts-total').value)||0;
-  MEDIA_RECORDS.push({
-    channel:channel, date:el('mf-date').value,
-    fanAdd:weekFan, fanTotal:MEDIA_CHANNELS[idx].fanTotal,
-    exposeWeek:weekExpose, exposeTotal:MEDIA_CHANNELS[idx].exposeTotal,
-    postsWeek:weekPosts, postsTotal:MEDIA_CHANNELS[idx].postsTotal, note:el('mf-note').value
-  });
+  var fanTotal=parseInt(el('mf-fan-total').value)||0;
+  var exposeTotal=parseFloat(el('mf-expose-total').value)||0;
+  var postsTotal=parseInt(el('mf-posts-total').value)||0;
+  if(editingMediaRecordIdx>=0) {
+    // 编辑模式：更新现有记录
+    var rec=MEDIA_RECORDS[editingMediaRecordIdx];
+    if(rec) {
+      rec.date=el('mf-date').value;
+      rec.fanAdd=weekFan; rec.fanTotal=fanTotal;
+      rec.exposeWeek=weekExpose; rec.exposeTotal=exposeTotal;
+      rec.postsWeek=weekPosts; rec.postsTotal=postsTotal;
+      rec.note=el('mf-note').value;
+    }
+    editingMediaRecordIdx=-1;
+  } else {
+    // 新增模式：更新渠道累计并新增记录
+    MEDIA_CHANNELS[idx].fanTotal=fanTotal;
+    MEDIA_CHANNELS[idx].exposeTotal=exposeTotal;
+    MEDIA_CHANNELS[idx].postsTotal=postsTotal;
+    MEDIA_RECORDS.push({
+      channel:channel, date:el('mf-date').value,
+      fanAdd:weekFan, fanTotal:fanTotal,
+      exposeWeek:weekExpose, exposeTotal:exposeTotal,
+      postsWeek:weekPosts, postsTotal:postsTotal, note:el('mf-note').value
+    });
+  }
   saveAll();
   closeModal('mediaModal');
   renderAll();
@@ -1835,14 +1852,40 @@ function openMediaHistory(name) {
   if(!recs.length) {
     el('mhContent').innerHTML='<div class="empty"><div class="empty-icon">📊</div><div class="empty-text">暂无历史记录</div></div>';
   } else {
-    var html='<div style="overflow-x:auto"><table class="tbl"><thead><tr><th>日期</th><th>本周粉丝净增</th><th>累计粉丝</th><th>本周曝光(万)</th><th>累计曝光(万)</th><th>本周篇数</th><th>累计篇数</th><th>备注</th></tr></thead><tbody>';
-    recs.forEach(function(r){
-      html+='<tr><td>'+(r.date||'-')+'</td><td style="color:#00c9a7;font-weight:600">'+(r.fanAdd||'-')+'</td><td>'+fmt(r.fanTotal||0)+'</td><td style="color:#ff7a45;font-weight:600">'+(r.exposeWeek||'-')+'</td><td>'+(r.exposeTotal||0).toFixed(1)+'</td><td style="color:#a371f7;font-weight:600">'+(r.postsWeek||'-')+'</td><td>'+fmt(r.postsTotal||0)+'</td><td style="font-size:11px;color:#86909c">'+(r.note||'-')+'</td></tr>';
+    var html='<div style="overflow-x:auto"><table class="tbl"><thead><tr><th>日期</th><th>本周粉丝净增</th><th>累计粉丝</th><th>本周曝光(万)</th><th>累计曝光(万)</th><th>本周篇数</th><th>累计篇数</th><th>备注</th><th>操作</th></tr></thead><tbody>';
+    recs.forEach(function(r,ri){
+      var recIdx=MEDIA_RECORDS.indexOf(r);
+      html+='<tr><td>'+(r.date||'-')+'</td><td style="color:#00c9a7;font-weight:600">'+(r.fanAdd||'-')+'</td><td>'+fmt(r.fanTotal||0)+'</td><td style="color:#ff7a45;font-weight:600">'+(r.exposeWeek||'-')+'</td><td>'+(r.exposeTotal||0).toFixed(1)+'</td><td style="color:#a371f7;font-weight:600">'+(r.postsWeek||'-')+'</td><td>'+fmt(r.postsTotal||0)+'</td><td style="font-size:11px;color:#86909c">'+(r.note||'-')+'</td><td><button class="btn" style="padding:2px 7px;font-size:10px" onclick="editMediaRecord('+recIdx+')">编辑</button> <button class="btn" style="padding:2px 7px;font-size:10px;color:#ff4d4f" onclick="deleteMediaRecord('+recIdx+')">删除</button></td></tr>';
     });
     html+='</tbody></table></div>';
     el('mhContent').innerHTML=html;
   }
   openModal('mediaHistoryModal');
+}
+
+var editingMediaRecordIdx=-1;
+function editMediaRecord(idx) {
+  var r=MEDIA_RECORDS[idx];
+  if(!r) return;
+  editingMediaRecordIdx=idx;
+  el('mf-channel').value=r.channel;
+  el('mf-date').value=r.date||'';
+  el('mf-fan-add').value=r.fanAdd||'';
+  el('mf-fan-total').value=r.fanTotal||'';
+  el('mf-expose-week').value=r.exposeWeek||'';
+  el('mf-expose-total').value=r.exposeTotal||'';
+  el('mf-posts-week').value=r.postsWeek||'';
+  el('mf-posts-total').value=r.postsTotal||'';
+  el('mf-note').value=r.note||'';
+  closeModal('mediaHistoryModal');
+  openModal('mediaModal');
+}
+function deleteMediaRecord(idx) {
+  if(!confirm('确认删除该条历史记录？')) return;
+  MEDIA_RECORDS.splice(idx,1);
+  saveAll();
+  renderAll();
+  openMediaHistory(mhChannel);
 }
 
 function exportMediaHistory() {
