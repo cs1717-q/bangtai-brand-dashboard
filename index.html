@@ -1573,7 +1573,7 @@ function renderAll() {
 function openModal(id) { el(id).classList.add('show'); }
 function closeModal(id) { el(id).classList.remove('show'); }
 function openAddModal() { openModal('addModal'); }
-function openMediaModal() { el('mf-channel').selectedIndex=0; ['mf-date','mf-fan-add','mf-fan-total','mf-expose-week','mf-expose-total','mf-posts-week','mf-posts-total','mf-note'].forEach(function(id){el(id).value='';}); openModal('mediaModal'); }
+function openMediaModal() { editingMediaRecordIdx = -1; el('mediaModal').querySelector('.modal-title').textContent = '+ 更新新媒体渠道数据'; el('mf-channel').selectedIndex=0; ['mf-date','mf-fan-add','mf-fan-total','mf-expose-week','mf-expose-total','mf-posts-week','mf-posts-total','mf-note'].forEach(function(id){el(id).value='';}); openModal('mediaModal'); }
 function openProjectModal() { openModal('projectModal'); }
 function openWorkModal() { openModal('workModal'); fillWorkSelect(); }
 function openWorkEdit(id) { openWorkModal(); el('wf-select').value=id; wfLoad(); }
@@ -1795,6 +1795,8 @@ function deleteEvent(i) { if(!confirm('确认删除？'))return; EVENTS.splice(i
 
 // 媒体
 function openMediaEdit(name) {
+  editingMediaRecordIdx = -1;
+  el('mediaModal').querySelector('.modal-title').textContent = '+ 更新新媒体渠道数据';
   el('mf-channel').value=name;
   var mc=null; for(var i=0;i<MEDIA_CHANNELS.length;i++) if(MEDIA_CHANNELS[i].name===name){mc=MEDIA_CHANNELS[i];break;}
   if(mc) {
@@ -1816,12 +1818,30 @@ function saveMedia() {
   MEDIA_CHANNELS[idx].fanTotal=(parseInt(el('mf-fan-total').value)||0);
   MEDIA_CHANNELS[idx].exposeTotal=parseFloat(el('mf-expose-total').value)||0;
   MEDIA_CHANNELS[idx].postsTotal=parseInt(el('mf-posts-total').value)||0;
-  MEDIA_RECORDS.push({
-    channel:channel, date:el('mf-date').value,
-    fanAdd:weekFan, fanTotal:MEDIA_CHANNELS[idx].fanTotal,
-    exposeWeek:weekExpose, exposeTotal:MEDIA_CHANNELS[idx].exposeTotal,
-    postsWeek:weekRead, postsTotal:MEDIA_CHANNELS[idx].postsTotal, note:el('mf-note').value
-  });
+  if (editingMediaRecordIdx >= 0) {
+    // 编辑模式：更新现有记录
+    var rec = MEDIA_RECORDS[editingMediaRecordIdx];
+    if (rec) {
+      rec.date = el('mf-date').value;
+      rec.fanAdd = weekFan;
+      rec.fanTotal = MEDIA_CHANNELS[idx].fanTotal;
+      rec.exposeWeek = weekExpose;
+      rec.exposeTotal = MEDIA_CHANNELS[idx].exposeTotal;
+      rec.postsWeek = weekRead;
+      rec.postsTotal = MEDIA_CHANNELS[idx].postsTotal;
+      rec.note = el('mf-note').value;
+    }
+  } else {
+    // 新增模式
+    MEDIA_RECORDS.push({
+      channel:channel, date:el('mf-date').value,
+      fanAdd:weekFan, fanTotal:MEDIA_CHANNELS[idx].fanTotal,
+      exposeWeek:weekExpose, exposeTotal:MEDIA_CHANNELS[idx].exposeTotal,
+      postsWeek:weekRead, postsTotal:MEDIA_CHANNELS[idx].postsTotal, note:el('mf-note').value
+    });
+  }
+  editingMediaRecordIdx = -1;
+  el('mediaModal').querySelector('.modal-title').textContent = '+ 更新新媒体渠道数据';
   saveAll();
   closeModal('mediaModal');
   renderAll();
@@ -1840,6 +1860,29 @@ function deleteMediaRecord(idx) {
 }
 
 var mhChannel='';
+var editingMediaRecordIdx=-1; // -1=新增, >=0=编辑MEDIA_RECORDS中的索引
+
+function editMediaRecord(idx) {
+  var recs = MEDIA_RECORDS.filter(function(r){return r.channel===mhChannel;});
+  if (idx < 0 || idx >= recs.length) { alert('记录不存在'); return; }
+  var rec = recs[idx];
+  // 找到在MEDIA_RECORDS中的原始索引
+  var origIdx = MEDIA_RECORDS.indexOf(rec);
+  editingMediaRecordIdx = origIdx;
+  // 填充表单
+  el('mf-channel').value = rec.channel || '';
+  el('mf-date').value = rec.date || '';
+  el('mf-fan-add').value = rec.fanAdd || '';
+  el('mf-fan-total').value = rec.fanTotal || '';
+  el('mf-expose-week').value = rec.exposeWeek || '';
+  el('mf-posts-week').value = rec.postsWeek || '';
+  el('mf-expose-total').value = rec.exposeTotal || '';
+  el('mf-posts-total').value = rec.postsTotal || '';
+  el('mf-note').value = rec.note || '';
+  el('mediaModal').querySelector('.modal-title').textContent = '编辑历史记录';
+  openModal('mediaModal');
+}
+
 function openMediaHistory(name) {
   mhChannel=name;
   var recs=MEDIA_RECORDS.filter(function(r){return r.channel===name;}).reverse();
@@ -1849,7 +1892,7 @@ function openMediaHistory(name) {
   } else {
     var html='<div style="overflow-x:auto"><table class="tbl"><thead><tr><th>日期</th><th>本周粉丝净增</th><th>累计粉丝</th><th>本周曝光(万)</th><th>累计曝光(万)</th><th>本周发布篇数</th><th>累计发布篇数</th><th>备注</th><th>操作</th></tr></thead><tbody>';
     recs.forEach(function(r,idx){
-      html+='<tr><td>'+(r.date||'-')+'</td><td style="color:#00c9a7;font-weight:600">'+(r.fanAdd||'-')+'</td><td>'+fmt(r.fanTotal||0)+'</td><td style="color:#ff7a45;font-weight:600">'+(r.exposeWeek||'-')+'</td><td>'+(r.exposeTotal||0).toFixed(1)+'</td><td style="color:#a371f7;font-weight:600">'+(r.postsWeek||'-')+'</td><td>'+fmt(r.postsTotal||0)+'</td><td style="font-size:11px;color:#86909c">'+(r.note||'-')+'</td><td><button class="btn" style="padding:2px 8px;font-size:10px;color:#ef4444" onclick="deleteMediaRecord('+idx+')">删除</button></td></tr>';
+      html+='<tr><td>'+(r.date||'-')+'</td><td style="color:#00c9a7;font-weight:600">'+(r.fanAdd||'-')+'</td><td>'+fmt(r.fanTotal||0)+'</td><td style="color:#ff7a45;font-weight:600">'+(r.exposeWeek||'-')+'</td><td>'+(r.exposeTotal||0).toFixed(1)+'</td><td style="color:#a371f7;font-weight:600">'+(r.postsWeek||'-')+'</td><td>'+fmt(r.postsTotal||0)+'</td><td style="font-size:11px;color:#86909c">'+(r.note||'-')+'</td><td><button class="btn" style="padding:2px 8px;font-size:10px;color:#ef4444" onclick="editMediaRecord('+idx+')" style=\"margin-right:4px\">编辑</button><button class=\"btn\" style=\"padding:2px 8px;font-size:10px;color:#ef4444\" onclick="deleteMediaRecord('+idx+')\">删除</button></td></tr>';
     });
     html+='</tbody></table></div>';
     el('mhContent').innerHTML=html;
