@@ -407,7 +407,7 @@ textarea{resize:vertical;min-height:60px}
     </div>
     <div style="overflow-x:auto">
       <table class="tbl">
-        <thead><tr><th>渠道名称</th><th>主责人</th><th>本周粉丝净增</th><th>累计粉丝总量</th><th>本周曝光(万)</th><th>累计曝光(万)</th><th>本周阅读/播放量</th><th>累计阅读/播放量</th><th>更新时间</th><th>历史记录</th><th>操作</th></tr></thead>
+        <thead><tr><th>渠道名称</th><th>主责人</th><th>本周粉丝净增</th><th>累计粉丝总量</th><th>本周曝光(万)</th><th>累计曝光(万)</th><th>本周篇数</th><th>累计篇数</th><th>更新时间</th><th>历史记录</th><th>操作</th></tr></thead>
         <tbody id="mediaBody"></tbody>
       </table>
     </div>
@@ -600,10 +600,10 @@ textarea{resize:vertical;min-height:60px}
       <div class="form-group"><div class="form-label">本周粉丝净增</div><input id="mf-fan-add" type="number" placeholder="如：200" min="0"></div>
       <div class="form-group"><div class="form-label">累计粉丝总量</div><input id="mf-fan-total" type="number" placeholder="如：50000" min="0"></div>
       <div class="form-group"><div class="form-label required">本周曝光(万)</div><input id="mf-expose-week" type="number" placeholder="如：15" min="0" step="0.1"></div>
-      <div class="form-group"><div class="form-label">本周阅读/播放量</div><input id="mf-read-week" type="number" placeholder="如：10000" min="0"></div></div>
+      <div class="form-group"><div class="form-label">本周篇数</div><input id="mf-posts-week" type="number" placeholder="如：5" min="0"></div></div>
     <div class="form-grid">
       <div class="form-group"><div class="form-label">累计曝光(万)</div><input id="mf-expose-total" type="number" placeholder="如：200" min="0" step="0.1"></div>
-      <div class="form-group"><div class="form-label">累计阅读/播放量</div><input id="mf-read-total" type="number" placeholder="如：50000" min="0"></div>
+      <div class="form-group"><div class="form-label">累计篇数</div><input id="mf-posts-total" type="number" placeholder="如：30" min="0"></div>
       <div class="form-group"><div class="form-label">备注</div><input id="mf-note" placeholder="补充说明"></div></div>
   </div>
   <div class="modal-footer"><button class="btn" onclick="closeModal('mediaModal')">取消</button><button class="btn primary" onclick="saveMedia()">保存</button></div>
@@ -835,7 +835,7 @@ function loadFromFirebase() {
     }
     if (d.mediaChannels) {
       d.mediaChannels.forEach(function(mc,i) {
-        if (MEDIA_CHANNELS[i]) { MEDIA_CHANNELS[i].fanTotal=mc.fanTotal||0; MEDIA_CHANNELS[i].exposeTotal=mc.exposeTotal||0; MEDIA_CHANNELS[i].readTotal=mc.readTotal||0; }
+        if (MEDIA_CHANNELS[i]) { MEDIA_CHANNELS[i].fanTotal=mc.fanTotal||0; MEDIA_CHANNELS[i].exposeTotal=mc.exposeTotal||0; MEDIA_CHANNELS[i].postsTotal=mc.postsTotal||0; }
       });
     }
   }
@@ -847,7 +847,7 @@ function loadFromFirebase() {
 
 function saveToFirebase() {
   var teamKpiData = TEAM.map(function(t) { return t.kpis.map(function(k) { return {current: k.current||0}; }); });
-  var mediaChannelsData = MEDIA_CHANNELS.map(function(m) { return {fanTotal:m.fanTotal,exposeTotal:m.exposeTotal,readTotal:m.readTotal}; });
+  var mediaChannelsData = MEDIA_CHANNELS.map(function(m) { return {fanTotal:m.fanTotal,exposeTotal:m.exposeTotal,postsTotal:m.postsTotal}; });
   var data = {cases:CASES, events:EVENTS, mediaRecords:MEDIA_RECORDS, targets:TARGETS, teamKpi:teamKpiData, mediaChannels:mediaChannelsData};
   localStorage.setItem(LS, JSON.stringify(data));
   fbPut(data);
@@ -873,9 +873,9 @@ function initFirebase() {
         TEAM.forEach(function(t,i) { if (d.teamKpi[i]) t.kpis.forEach(function(k,j) { if (d.teamKpi[i][j]) k.current = d.teamKpi[i][j].current||0; }); });
       }
       if (d.mediaChannels) {
-        d.mediaChannels.forEach(function(mc,i) { if (MEDIA_CHANNELS[i]) { MEDIA_CHANNELS[i].fanTotal=mc.fanTotal||0; MEDIA_CHANNELS[i].exposeTotal=mc.exposeTotal||0; MEDIA_CHANNELS[i].readTotal=mc.readTotal||0; } });
+        d.mediaChannels.forEach(function(mc,i) { if (MEDIA_CHANNELS[i]) { MEDIA_CHANNELS[i].fanTotal=mc.fanTotal||0; MEDIA_CHANNELS[i].exposeTotal=mc.exposeTotal||0; MEDIA_CHANNELS[i].postsTotal=mc.postsTotal||0; } });
       }
-      localStorage.setItem(LS, JSON.stringify({cases:CASES, events:EVENTS, mediaRecords:MEDIA_RECORDS, reports:REPORTS, targets:TARGETS, teamKpi:TEAM.map(function(t){return t.kpis.map(function(k){return {current:k.current||0};});}), mediaChannels:MEDIA_CHANNELS.map(function(m){return {fanTotal:m.fanTotal,exposeTotal:m.exposeTotal,readTotal:m.readTotal};})}));
+      localStorage.setItem(LS, JSON.stringify({cases:CASES, events:EVENTS, mediaRecords:MEDIA_RECORDS, reports:REPORTS, targets:TARGETS, teamKpi:TEAM.map(function(t){return t.kpis.map(function(k){return {current:k.current||0};});}), mediaChannels:MEDIA_CHANNELS.map(function(m){return {fanTotal:m.fanTotal,exposeTotal:m.exposeTotal,postsTotal:m.postsTotal};})}));
     }
     document.getElementById('t-social').value = TARGETS.social;
     document.getElementById('t-deliver').value = TARGETS.deliver;
@@ -896,7 +896,7 @@ function initFirebase() {
           REPORTS = d.reports || [];
           TARGETS = d.targets || {social:3000,deliver:1000,newmedia:1000};
           if (d.teamKpi) { TEAM.forEach(function(t,i) { if (d.teamKpi[i]) t.kpis.forEach(function(k,j) { if (d.teamKpi[i][j]) k.current = d.teamKpi[i][j].current||0; }); }); }
-          if (d.mediaChannels) { d.mediaChannels.forEach(function(mc,i) { if (MEDIA_CHANNELS[i]) { MEDIA_CHANNELS[i].fanTotal=mc.fanTotal||0; MEDIA_CHANNELS[i].exposeTotal=mc.exposeTotal||0; MEDIA_CHANNELS[i].readTotal=mc.readTotal||0; } }); }
+          if (d.mediaChannels) { d.mediaChannels.forEach(function(mc,i) { if (MEDIA_CHANNELS[i]) { MEDIA_CHANNELS[i].fanTotal=mc.fanTotal||0; MEDIA_CHANNELS[i].exposeTotal=mc.exposeTotal||0; MEDIA_CHANNELS[i].postsTotal=mc.postsTotal||0; } }); }
           document.getElementById('t-social').value = TARGETS.social;
           document.getElementById('t-deliver').value = TARGETS.deliver;
           document.getElementById('t-newmedia').value = TARGETS.newmedia;
@@ -976,12 +976,12 @@ var CHANNEL_OWNER_MAP = {
 };
 function getChannelOwner(name) { return CHANNEL_OWNER_MAP[name] || ''; }
 var MEDIA_CHANNELS = [
-  {name:'邦泰智汇生活公众号',fanTotal:0,exposeTotal:0,readTotal:0},
-  {name:'邦泰智汇生活视频号',fanTotal:0,exposeTotal:0,readTotal:0},
-  {name:'生活有好报视频号',fanTotal:0,exposeTotal:0,readTotal:0},
-  {name:'邦泰智汇生活抖音号',fanTotal:0,exposeTotal:0,readTotal:0},
-  {name:'邦泰智汇生活小红书',fanTotal:0,exposeTotal:0,readTotal:0},
-  {name:'片区新媒体矩阵',fanTotal:0,exposeTotal:0,readTotal:0}
+  {name:'邦泰智汇生活公众号',owner:'龙晶晶',fanTotal:0,exposeTotal:0,postsTotal:0},
+  {name:'邦泰智汇生活视频号',owner:'何晓婷',fanTotal:0,exposeTotal:0,postsTotal:0},
+  {name:'生活有好报视频号',owner:'张樊若兰',fanTotal:0,exposeTotal:0,postsTotal:0},
+  {name:'邦泰智汇生活抖音号',owner:'张樊若兰',fanTotal:0,exposeTotal:0,postsTotal:0},
+  {name:'邦泰智汇生活小红书',owner:'龙晶晶',fanTotal:0,exposeTotal:0,postsTotal:0},
+  {name:'片区新媒体矩阵',owner:'张樊若兰',fanTotal:0,exposeTotal:0,postsTotal:0}
 ];
 
 // 团队
@@ -1057,7 +1057,7 @@ function loadAll() {
         if (MEDIA_CHANNELS[i]) {
           MEDIA_CHANNELS[i].fanTotal = mc.fanTotal || 0;
           MEDIA_CHANNELS[i].exposeTotal = mc.exposeTotal || 0;
-          MEDIA_CHANNELS[i].readTotal = mc.readTotal || 0;
+          MEDIA_CHANNELS[i].postsTotal = mc.postsTotal || 0;
         }
       });
     }
@@ -1072,7 +1072,7 @@ function saveAll() {
     return t.kpis.map(function(k) { return {current: k.current||0}; });
   });
   var mediaChannelsData = MEDIA_CHANNELS.map(function(m) {
-    return {fanTotal:m.fanTotal,exposeTotal:m.exposeTotal,readTotal:m.readTotal};
+    return {fanTotal:m.fanTotal,exposeTotal:m.exposeTotal,postsTotal:m.postsTotal};
   });
   var data = {
     cases:CASES, events:EVENTS, mediaRecords:MEDIA_RECORDS, reports:REPORTS,
@@ -1318,8 +1318,8 @@ function renderMedia() {
       '<td style="font-weight:600">'+fmt(m.fanTotal)+'</td>'+
       '<td style="color:#ff7a45;font-weight:600">'+(latest&&latest.exposeWeek?latest.exposeWeek:'-')+'</td>'+
       '<td style="color:#165dff;font-weight:600">'+(m.exposeTotal||0).toFixed(1)+'</td>'+
-      '<td style="color:#a371f7;font-weight:600">'+(latest&&latest.readWeek?latest.readWeek:'-')+'</td>'+
-      '<td style="font-weight:600">'+fmt(m.readTotal)+'</td>'+
+      '<td style="color:#a371f7;font-weight:600">'+(latest&&latest.postsWeek?latest.postsWeek:'-')+'</td>'+
+      '<td style="font-weight:600">'+fmt(m.postsTotal)+'</td>'+
       '<td>'+(latest&&latest.date?latest.date:'-')+'</td>'+
       '<td><button class="btn" style="padding:2px 7px;font-size:10px" onclick="openMediaHistory(\''+m.name+'\')">'+histCount+'条记录</button></td>'+
       '<td><button class="btn" style="padding:3px 8px;font-size:10px" onclick="openMediaEdit(\''+m.name+'\')">更新</button></td></tr>';
@@ -1330,12 +1330,12 @@ function renderMedia() {
   // 汇总
   var totalExpose = MEDIA_CHANNELS.reduce(function(s,m){return s+(m.exposeTotal||0);},0);
   var totalFan = MEDIA_CHANNELS.reduce(function(s,m){return s+(m.fanTotal||0);},0);
-  var totalRead = MEDIA_CHANNELS.reduce(function(s,m){return s+(m.readTotal||0);},0);
+  var totalPosts = MEDIA_CHANNELS.reduce(function(s,m){return s+(m.postsTotal||0);},0);
   var perOwner = {
-    '何晓婷':{expose:0,fan:0,read:0},
-    '龙晶晶':{expose:0,fan:0,read:0},
-    '宋香回':{expose:0,fan:0,read:0},
-    '张樊若兰':{expose:0,fan:0,read:0}
+    '何晓婷':{expose:0,fan:0,posts:0},
+    '龙晶晶':{expose:0,fan:0,posts:0},
+    '宋香回':{expose:0,fan:0,posts:0},
+    '张樊若兰':{expose:0,fan:0,posts:0}
   };
   MEDIA_CHANNELS.forEach(function(m) {
     var owners = getChannelOwner(m.name).split('+');
@@ -1343,7 +1343,7 @@ function renderMedia() {
       if (perOwner[o]) {
         perOwner[o].expose += (m.exposeTotal||0)/owners.length;
         perOwner[o].fan += (m.fanTotal||0)/owners.length;
-        perOwner[o].read += (m.readTotal||0)/owners.length;
+        perOwner[o].posts += (m.postsTotal||0)/owners.length;
       }
     });
   });
@@ -1352,7 +1352,7 @@ function renderMedia() {
     '<div class="big-circles">'+
     '<div class="big-circle blue"><div class="big-circle-num">'+totalExpose.toFixed(0)+'<span class="big-circle-unit">万</span></div><div class="big-circle-label">总曝光</div><div class="big-circle-sub">6大渠道合计</div></div>'+
     '<div class="big-circle green"><div class="big-circle-num">'+fmt(totalFan)+'<span class="big-circle-unit">人</span></div><div class="big-circle-label">粉丝总量</div><div class="big-circle-sub">全渠道累计</div></div>'+
-    '<div class="big-circle purple"><div class="big-circle-num">'+fmt(totalRead)+'<span class="big-circle-unit">次</span></div><div class="big-circle-label">阅读/播放量</div><div class="big-circle-sub">全渠道累计</div></div>'+
+    '<div class="big-circle purple"><div class="big-circle-num">'+fmt(totalPosts)+'<span class="big-circle-unit">篇</span></div><div class="big-circle-label">发布篇数</div><div class="big-circle-sub">全渠道累计</div></div>'+
     '</div>'+
     '<div class="section"><div class="section-title">按主责人汇总</div>'+
     Object.keys(perOwner).filter(function(n){return n!=='何晓婷';}).map(function(name) {
@@ -1573,7 +1573,7 @@ function renderAll() {
 function openModal(id) { el(id).classList.add('show'); }
 function closeModal(id) { el(id).classList.remove('show'); }
 function openAddModal() { openModal('addModal'); }
-function openMediaModal() { el('mf-channel').selectedIndex=0; ['mf-date','mf-fan-add','mf-fan-total','mf-expose-week','mf-expose-total','mf-read-week','mf-read-total','mf-note'].forEach(function(id){el(id).value='';}); openModal('mediaModal'); }
+function openMediaModal() { el('mf-channel').selectedIndex=0; ['mf-date','mf-fan-add','mf-fan-total','mf-expose-week','mf-expose-total','mf-posts-week','mf-posts-total','mf-note'].forEach(function(id){el(id).value='';}); openModal('mediaModal'); }
 function openProjectModal() { openModal('projectModal'); }
 function openWorkModal() { openModal('workModal'); fillWorkSelect(); }
 function openWorkEdit(id) { openWorkModal(); el('wf-select').value=id; wfLoad(); }
@@ -1800,9 +1800,9 @@ function openMediaEdit(name) {
   if(mc) {
     el('mf-fan-total').value=mc.fanTotal||'';
     el('mf-expose-total').value=mc.exposeTotal||'';
-    el('mf-read-total').value=mc.readTotal||'';
+    el('mf-posts-total').value=mc.postsTotal||'';
   }
-  el('mf-date').value=''; el('mf-fan-add').value=''; el('mf-expose-week').value=''; el('mf-read-week').value=''; el('mf-note').value='';
+  el('mf-date').value=''; el('mf-fan-add').value=''; el('mf-expose-week').value=''; el('mf-posts-week').value=''; el('mf-note').value='';
   openModal('mediaModal');
 }
 
@@ -1812,15 +1812,15 @@ function saveMedia() {
   if(idx<0){alert('渠道不存在');return;}
   var weekFan=parseInt(el('mf-fan-add').value)||0;
   var weekExpose=parseFloat(el('mf-expose-week').value)||0;
-  var weekRead=parseInt(el('mf-read-week').value)||0;
+  var weekPosts=parseInt(el('mf-posts-week').value)||0;
   MEDIA_CHANNELS[idx].fanTotal=(parseInt(el('mf-fan-total').value)||0);
   MEDIA_CHANNELS[idx].exposeTotal=parseFloat(el('mf-expose-total').value)||0;
-  MEDIA_CHANNELS[idx].readTotal=parseInt(el('mf-read-total').value)||0;
+  MEDIA_CHANNELS[idx].postsTotal=parseInt(el('mf-posts-total').value)||0;
   MEDIA_RECORDS.push({
     channel:channel, date:el('mf-date').value,
     fanAdd:weekFan, fanTotal:MEDIA_CHANNELS[idx].fanTotal,
     exposeWeek:weekExpose, exposeTotal:MEDIA_CHANNELS[idx].exposeTotal,
-    readWeek:weekRead, readTotal:MEDIA_CHANNELS[idx].readTotal, note:el('mf-note').value
+    postsWeek:weekPosts, postsTotal:MEDIA_CHANNELS[idx].postsTotal, note:el('mf-note').value
   });
   saveAll();
   closeModal('mediaModal');
@@ -1835,9 +1835,9 @@ function openMediaHistory(name) {
   if(!recs.length) {
     el('mhContent').innerHTML='<div class="empty"><div class="empty-icon">📊</div><div class="empty-text">暂无历史记录</div></div>';
   } else {
-    var html='<div style="overflow-x:auto"><table class="tbl"><thead><tr><th>日期</th><th>本周粉丝净增</th><th>累计粉丝</th><th>本周曝光(万)</th><th>累计曝光(万)</th><th>本周阅读/播放</th><th>累计阅读/播放</th><th>备注</th></tr></thead><tbody>';
+    var html='<div style="overflow-x:auto"><table class="tbl"><thead><tr><th>日期</th><th>本周粉丝净增</th><th>累计粉丝</th><th>本周曝光(万)</th><th>累计曝光(万)</th><th>本周篇数</th><th>累计篇数</th><th>备注</th></tr></thead><tbody>';
     recs.forEach(function(r){
-      html+='<tr><td>'+(r.date||'-')+'</td><td style="color:#00c9a7;font-weight:600">'+(r.fanAdd||'-')+'</td><td>'+fmt(r.fanTotal||0)+'</td><td style="color:#ff7a45;font-weight:600">'+(r.exposeWeek||'-')+'</td><td>'+(r.exposeTotal||0).toFixed(1)+'</td><td style="color:#a371f7;font-weight:600">'+(r.readWeek||'-')+'</td><td>'+fmt(r.readTotal||0)+'</td><td style="font-size:11px;color:#86909c">'+(r.note||'-')+'</td></tr>';
+      html+='<tr><td>'+(r.date||'-')+'</td><td style="color:#00c9a7;font-weight:600">'+(r.fanAdd||'-')+'</td><td>'+fmt(r.fanTotal||0)+'</td><td style="color:#ff7a45;font-weight:600">'+(r.exposeWeek||'-')+'</td><td>'+(r.exposeTotal||0).toFixed(1)+'</td><td style="color:#a371f7;font-weight:600">'+(r.postsWeek||'-')+'</td><td>'+fmt(r.postsTotal||0)+'</td><td style="font-size:11px;color:#86909c">'+(r.note||'-')+'</td></tr>';
     });
     html+='</tbody></table></div>';
     el('mhContent').innerHTML=html;
@@ -1848,12 +1848,12 @@ function openMediaHistory(name) {
 function exportMediaHistory() {
   var recs=MEDIA_RECORDS.filter(function(r){return r.channel===mhChannel;});
   if(!recs.length){alert('暂无数据');return;}
-  downloadCSV([['渠道','日期','本周粉丝净增','累计粉丝','本周曝光(万)','累计曝光(万)','本周阅读/播放','累计阅读/播放','备注']].concat(recs.map(function(r){return [r.channel,r.date,r.fanAdd,r.fanTotal,r.exposeWeek,r.exposeTotal,r.readWeek,r.readTotal,r.note];})),mhChannel+'_历史记录.csv');
+  downloadCSV([['渠道','日期','本周粉丝净增','累计粉丝','本周曝光(万)','累计曝光(万)','本周篇数','累计篇数','备注']].concat(recs.map(function(r){return [r.channel,r.date,r.fanAdd,r.fanTotal,r.exposeWeek,r.exposeTotal,r.postsWeek,r.postsTotal,r.note];})),mhChannel+'_历史记录.csv');
 }
 
 function exportMediaAll() {
   if(!MEDIA_RECORDS.length){alert('暂无数据');return;}
-  downloadCSV([['渠道','日期','本周粉丝净增','累计粉丝','本周曝光(万)','累计曝光(万)','本周阅读/播放','累计阅读/播放','备注']].concat(MEDIA_RECORDS.map(function(r){return [r.channel,r.date,r.fanAdd,r.fanTotal,r.exposeWeek,r.exposeTotal,r.readWeek,r.readTotal,r.note];})),'新媒体矩阵_全部历史.csv');
+  downloadCSV([['渠道','日期','本周粉丝净增','累计粉丝','本周曝光(万)','累计曝光(万)','本周篇数','累计篇数','备注']].concat(MEDIA_RECORDS.map(function(r){return [r.channel,r.date,r.fanAdd,r.fanTotal,r.exposeWeek,r.exposeTotal,r.postsWeek,r.postsTotal,r.note];})),'新媒体矩阵_全部历史.csv');
 }
 
 // 项目
@@ -2424,7 +2424,7 @@ function exportEvents() {
   downloadCSV([['主体','类型','日期','涉及','关联项目','负责人','状态','自有渠道曝光','媒体渠道曝光','话题曝光','其余渠道','总曝光','媒体报道次数','转载量','认证/奖项','认证级别','媒体报道明细','领导评价','备注']].concat(EVENTS.map(function(e){return [e.subject,e.type,e.date,e.city,e.project,e.owner,e.status,e.own,e['media-exp'],e.topic,e.other,((parseFloat(e.own)||0)+(parseFloat(e['media-exp'])||0)+(parseFloat(e.topic)||0)+(parseFloat(e.other)||0)).toFixed(1),e.mcount,e.reprint,e.award,e.level,e.media,e.leader,e.note];})),'影响力事件营销.csv');
 }
 function exportMedia() {
-  downloadCSV([['渠道','主责人','累计粉丝','累计曝光(万)','累计阅读/播放']].concat(MEDIA_CHANNELS.map(function(m){return [m.name,getChannelOwner(m.name),m.fanTotal,m.exposeTotal,m.readTotal];})),'新媒体矩阵数据.csv');
+  downloadCSV([['渠道','主责人','累计粉丝','累计曝光(万)','累计篇数']].concat(MEDIA_CHANNELS.map(function(m){return [m.name,m.owner,m.fanTotal,m.exposeTotal,m.postsTotal];})),'新媒体矩阵数据.csv');
 }
 function exportProjects() {
   downloadCSV([['序号','城市','名称','产品系','批次','分级','首批','内控日','合同日','交付状态','宣传状态','品牌亮点','项目负责人','品牌对接人']].concat(PROJECTS.map(function(p){return [p.seq,p.city,p.name,p.line,p.batch,p.grade,p.first,p.inner,p.contract,p.deliver,p.promote,p.highlight,p.pm,p.brand];})),'交付项目追踪.csv');
