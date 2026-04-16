@@ -863,7 +863,7 @@ function loadFromFirebase() {
 function saveToFirebase() {
   var teamKpiData = TEAM.map(function(t) { return t.kpis.map(function(k) { return {current: k.current||0}; }); });
   var mediaChannelsData = MEDIA_CHANNELS.map(function(m) { return {fanTotal:m.fanTotal,exposeTotal:m.exposeTotal,postsTotal:m.postsTotal}; });
-  var data = {cases:CASES, events:EVENTS, mediaRecords:MEDIA_RECORDS, targets:TARGETS, teamKpi:teamKpiData, mediaChannels:mediaChannelsData};
+  var data = {cases:CASES, events:EVENTS, mediaRecords:MEDIA_RECORDS, reports:REPORTS, targets:TARGETS, teamKpi:teamKpiData, mediaChannels:mediaChannelsData, projects:PROJECTS};
   localStorage.setItem(LS, JSON.stringify(data));
   fbPut(data);
 }
@@ -890,7 +890,10 @@ function initFirebase() {
       if (d.mediaChannels) {
         d.mediaChannels.forEach(function(mc,i) { if (MEDIA_CHANNELS[i]) { MEDIA_CHANNELS[i].fanTotal=mc.fanTotal||0; MEDIA_CHANNELS[i].exposeTotal=mc.exposeTotal||0; MEDIA_CHANNELS[i].postsTotal=mc.postsTotal||0; } });
       }
-      localStorage.setItem(LS, JSON.stringify({cases:CASES, events:EVENTS, mediaRecords:MEDIA_RECORDS, reports:REPORTS, targets:TARGETS, teamKpi:TEAM.map(function(t){return t.kpis.map(function(k){return {current:k.current||0};});}), mediaChannels:MEDIA_CHANNELS.map(function(m){return {fanTotal:m.fanTotal,exposeTotal:m.exposeTotal,postsTotal:m.postsTotal};})}));
+      if (d.projects && d.projects.length) {
+        d.projects.forEach(function(sp,i) { if (PROJECTS[i]) Object.keys(sp).forEach(function(k){ PROJECTS[i][k] = sp[k]; }); });
+      }
+      localStorage.setItem(LS, JSON.stringify({cases:CASES, events:EVENTS, mediaRecords:MEDIA_RECORDS, reports:REPORTS, targets:TARGETS, teamKpi:TEAM.map(function(t){return t.kpis.map(function(k){return {current:k.current||0};});}), mediaChannels:MEDIA_CHANNELS.map(function(m){return {fanTotal:m.fanTotal,exposeTotal:m.exposeTotal,postsTotal:m.postsTotal};}), projects:PROJECTS}));
     }
     document.getElementById('t-social').value = TARGETS.social;
     document.getElementById('t-deliver').value = TARGETS.deliver;
@@ -912,6 +915,7 @@ function initFirebase() {
           TARGETS = d.targets || {social:3000,deliver:1000,newmedia:1000};
           if (d.teamKpi) { TEAM.forEach(function(t,i) { if (d.teamKpi[i]) t.kpis.forEach(function(k,j) { if (d.teamKpi[i][j]) k.current = d.teamKpi[i][j].current||0; }); }); }
           if (d.mediaChannels) { d.mediaChannels.forEach(function(mc,i) { if (MEDIA_CHANNELS[i]) { MEDIA_CHANNELS[i].fanTotal=mc.fanTotal||0; MEDIA_CHANNELS[i].exposeTotal=mc.exposeTotal||0; MEDIA_CHANNELS[i].postsTotal=mc.postsTotal||0; } }); }
+          if (d.projects && d.projects.length) { d.projects.forEach(function(sp,i) { if (PROJECTS[i]) Object.keys(sp).forEach(function(k){ PROJECTS[i][k] = sp[k]; }); }); }
           document.getElementById('t-social').value = TARGETS.social;
           document.getElementById('t-deliver').value = TARGETS.deliver;
           document.getElementById('t-newmedia').value = TARGETS.newmedia;
