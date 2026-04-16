@@ -1076,6 +1076,14 @@ function loadAll() {
         }
       });
     }
+    // projects
+    if (d.projects) {
+      d.projects.forEach(function(sp,i) {
+        if (PROJECTS[i]) {
+          Object.keys(sp).forEach(function(k){ PROJECTS[i][k] = sp[k]; });
+        }
+      });
+    }
   }
   document.getElementById('t-social').value = TARGETS.social;
   document.getElementById('t-deliver').value = TARGETS.deliver;
@@ -1091,7 +1099,8 @@ function saveAll() {
   });
   var data = {
     cases:CASES, events:EVENTS, mediaRecords:MEDIA_RECORDS, reports:REPORTS,
-    targets:TARGETS, teamKpi:teamKpiData, mediaChannels:mediaChannelsData
+    targets:TARGETS, teamKpi:teamKpiData, mediaChannels:mediaChannelsData,
+    projects:PROJECTS
   };
   localStorage.setItem(LS, JSON.stringify(data));
   fbPut(data);
