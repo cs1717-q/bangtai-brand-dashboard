@@ -1200,7 +1200,7 @@ function renderOverview() {
   // 新媒体矩阵渠道汇总
   MEDIA_CHANNELS.forEach(function(m) { sumNewmedia += m.exposeTotal||0; });
 
-  var total = sumSocial + sumNewmedia;
+  var total = sumSocial + sumDeliver + sumNewmedia;
   el('sum-social').textContent = sumSocial.toFixed(1)+'万';
   el('bar-social').style.width = pct(sumSocial,TARGETS.social)+'%';
   el('pct-social').textContent = pct(sumSocial,TARGETS.social);
@@ -1220,7 +1220,7 @@ function renderOverview() {
 
   el('overviewMain').innerHTML =
     statCard('blue','全渠道总曝光',total.toFixed(1)+'万',(TARGETS.social+TARGETS.newmedia)+'万',pct(total,TARGETS.social+TARGETS.newmedia),'blue-b',
-      '事件:'+sumSocial.toFixed(1)+'万 + 矩阵:'+sumNewmedia.toFixed(1)+'万') +
+      '事件:'+sumSocial.toFixed(1)+'万 + 交付:'+sumDeliver.toFixed(1)+'万 + 矩阵:'+sumNewmedia.toFixed(1)+'万') +
     statCard('green','10W+标杆案例',CASES.length+'个','20个',pct(CASES.length,20),'green-b',
       '已完成:'+casesCnt+' | 进行中:'+(CASES.length-casesCnt)) +
     statCard('orange','影响力事件营销',EVENTS.length+'个','2个',pct(eventDone,2),'orange-b',
