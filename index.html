@@ -2257,6 +2257,7 @@ function saveReport() {
   var type = el('rf-type').value;
   var range = el('rf-range').value.trim();
   if (!person || !type || !range) { alert('请填写：周次、姓名、任务类型'); return; }
+  var isEdit = editingReportIdx >= 0; // 保存原始状态
   var workList = el('rf-work-list');
   var cbs = workList ? workList.querySelectorAll('input[type="checkbox"]:checked') : [];
   var checked = [];
@@ -2280,6 +2281,13 @@ function saveReport() {
         mediaChannelsData[c.name] = { fanAdd: fan, exposeAdd: exp, postsWeek: postsWeek };
       }
     });
+  }
+  // 编辑模式：从当前报告的mediaChannels取数据（表单媒体区域为空，用已有数据）
+  if (isEdit) {
+    var editReport = REPORTS[editingReportIdx];
+    if (editReport && editReport.mediaChannels) {
+      mediaChannelsData = JSON.parse(JSON.stringify(editReport.mediaChannels));
+    }
   }
   // 周报只更新REPORTS本身，不再改动MEDIA_CHANNELS累计值（由renderMedia实时从MEDIA_RECORDS计算）
   if (editingReportIdx >= 0) {
@@ -2367,6 +2375,39 @@ function saveReport() {
     }
   }
   editingReportIdx = -1;
+  // 同步写MEDIA_RECORDS（让新媒体运营看板能读取到周报数据）
+  // 同一渠道本周有记录则更新，无则新增（避免重复）
+  if (person && Object.keys(mediaChannelsData).length) {
+    Object.keys(mediaChannelsData).forEach(function(chName) {
+      var chData = mediaChannelsData[chName];
+      var today = new Date().toLocaleDateString('zh-CN');
+      // 找该渠道的最新MEDIA_RECORDS，计算新的累计值
+      var chRecs = MEDIA_RECORDS.filter(function(r){ return r.channel === chName; });
+      var lastFan = chRecs.length ? (chRecs[chRecs.length-1].fanTotal||0) : 0;
+      var lastExp = chRecs.length ? (chRecs[chRecs.length-1].exposeTotal||0) : 0;
+      var lastPosts = chRecs.length ? (chRecs[chRecs.length-1].postsTotal||0) : 0;
+      var newFan = chData.fanAdd||0;
+      var newExp = chData.exposeAdd||0;
+      var newPosts = chData.postsWeek||0;
+      // 检查该渠道本周是否已有记录（有则覆盖最后一条，无则新增）
+      var sameWeekRec = null;
+      for (var i = chRecs.length - 1; i >= 0; i--) {
+        if (chRecs[i].date === today) { sameWeekRec = chRecs[i]; break; }
+      }
+      if (sameWeekRec) {
+        sameWeekRec.fanAdd = newFan; sameWeekRec.fanTotal = lastFan;
+        sameWeekRec.exposeWeek = newExp; sameWeekRec.exposeTotal = lastExp;
+        sameWeekRec.postsWeek = newPosts; sameWeekRec.postsTotal = lastPosts;
+      } else {
+        MEDIA_RECORDS.push({
+          channel: chName, date: today,
+          fanAdd: newFan, fanTotal: lastFan + newFan,
+          exposeWeek: newExp, exposeTotal: lastExp + newExp,
+          postsWeek: newPosts, postsTotal: lastPosts + newPosts, note: ''
+        });
+      }
+    });
+  }
   saveAll();
   closeModal('reportModal');
   renderReports();
