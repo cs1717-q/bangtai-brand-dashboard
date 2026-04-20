@@ -1439,9 +1439,9 @@ function renderCases() {
 
   el('casesSummary').innerHTML =
     '<div class="big-circles">'+
-    '<div class="big-circle orange"><div class="big-circle-num">'+sumSocial.toFixed(0)+'<span class="big-circle-unit">万</span></div><div class="big-circle-label">社会化营销+可持续友好</div><div class="big-circle-sub">'+CASES.filter(function(c){return c.module==='社会营销'||c.module==='可持续友好';}).length+'个案例</div></div>'+
-    '<div class="big-circle blue"><div class="big-circle-num">'+sumDeliver.toFixed(0)+'<span class="big-circle-unit">万</span></div><div class="big-circle-label">交付事件品牌化</div><div class="big-circle-sub">'+CASES.filter(function(c){return c.module==='交付事件';}).length+'个案例</div></div>'+
-    '<div class="big-circle purple"><div class="big-circle-num">'+sumNewmedia.toFixed(0)+'<span class="big-circle-unit">万</span></div><div class="big-circle-label">新媒体矩阵运营</div><div class="big-circle-sub">'+CASES.filter(function(c){return c.module==='新媒体矩阵';}).length+'个案例</div></div>'+
+    '<div class="big-circle orange"><div class="big-circle-num">'+sumSocial.toFixed(1)+'<span class="big-circle-unit">万</span></div><div class="big-circle-label">社会化营销+可持续友好</div><div class="big-circle-sub">'+CASES.filter(function(c){return c.module==='社会营销'||c.module==='可持续友好';}).length+'个案例</div></div>'+
+    '<div class="big-circle blue"><div class="big-circle-num">'+sumDeliver.toFixed(1)+'<span class="big-circle-unit">万</span></div><div class="big-circle-label">交付事件品牌化</div><div class="big-circle-sub">'+CASES.filter(function(c){return c.module==='交付事件';}).length+'个案例</div></div>'+
+    '<div class="big-circle purple"><div class="big-circle-num">'+sumNewmedia.toFixed(1)+'<span class="big-circle-unit">万</span></div><div class="big-circle-label">新媒体矩阵运营</div><div class="big-circle-sub">'+CASES.filter(function(c){return c.module==='新媒体矩阵';}).length+'个案例</div></div>'+
     '</div>'+
     '<div class="section"><div class="section-title">案例分布</div>'+
     '<div class="data-row"><span class="data-row-label">已完成</span><span class="data-row-value">'+CASES.filter(function(c){return c.status==='已完成';}).length+' <span>个</span></span></div>'+
@@ -1488,7 +1488,7 @@ function renderEvents() {
     '<div class="big-circles">'+
     '<div class="big-circle green"><div class="big-circle-num">'+EVENTS.length+'<span class="big-circle-unit">个</span></div><div class="big-circle-label">事件总数</div><div class="big-circle-sub">已完成:'+eventDone+'</div></div>'+
     '<div class="big-circle blue"><div class="big-circle-num">'+totalMedia+'<span class="big-circle-unit">次</span></div><div class="big-circle-label">媒体报道次数</div><div class="big-circle-sub">国/省/市/县域四级</div></div>'+
-    '<div class="big-circle purple"><div class="big-circle-num">'+totalExpose.toFixed(0)+'<span class="big-circle-unit">万</span></div><div class="big-circle-label">事件总曝光</div><div class="big-circle-sub">全渠道合计</div></div>'+
+    '<div class="big-circle purple"><div class="big-circle-num">'+totalExpose.toFixed(1)+'<span class="big-circle-unit">万</span></div><div class="big-circle-label">事件总曝光</div><div class="big-circle-sub">全渠道合计</div></div>'+
     '</div>'+
     '<div class="section"><div class="section-title">认证/奖项分布</div>'+
     '<div class="data-row"><span class="data-row-label">国家级</span><span class="data-row-value">'+EVENTS.filter(function(e){return e.level==='国家级';}).length+' <span>个</span></span></div>'+
@@ -1906,7 +1906,7 @@ function openMediaHistory(name) {
     var html='<div style="overflow-x:auto"><table class="tbl"><thead><tr><th>日期</th><th>本周粉丝净增</th><th>累计粉丝</th><th>本周曝光(万)</th><th>累计曝光(万)</th><th>本周篇数</th><th>累计篇数</th><th>备注</th><th>操作</th></tr></thead><tbody>';
     recs.forEach(function(r,ri){
       var recIdx=MEDIA_RECORDS.indexOf(r);
-      html+='<tr><td>'+(r.date||'-')+'</td><td style="color:#00c9a7;font-weight:600">'+(r.fanAdd||'-')+'</td><td>'+fmt(r.fanTotal||0)+'</td><td style="color:#ff7a45;font-weight:600">'+(r.exposeWeek||'-')+'</td><td>'+(r.exposeTotal||0).toFixed(1)+'</td><td style="color:#a371f7;font-weight:600">'+(r.postsWeek||'-')+'</td><td>'+fmt(r.postsTotal||0)+'</td><td style="font-size:11px;color:#86909c">'+(r.note||'-')+'</td><td><button class="btn" style="padding:2px 7px;font-size:10px" onclick="editMediaRecord('+recIdx+')">编辑</button> <button class="btn" style="padding:2px 7px;font-size:10px;color:#ff4d4f" onclick="deleteMediaRecord('+recIdx+')">删除</button></td></tr>';
+      html+='<tr><td>'+(r.date||'-')+'</td><td style="color:#00c9a7;font-weight:600">'+(r.fanAdd||'-')+'</td><td>'+fmt(r.fanTotal||0)+'</td><td style="color:#ff7a45;font-weight:600">'+(r.exposeWeek||'-')+'</td><td>'+(r.exposeTotal||0).toFixed(0)+'</td><td style="color:#a371f7;font-weight:600">'+(r.postsWeek||'-')+'</td><td>'+fmt(r.postsTotal||0)+'</td><td style="font-size:11px;color:#86909c">'+(r.note||'-')+'</td><td><button class="btn" style="padding:2px 7px;font-size:10px" onclick="editMediaRecord('+recIdx+')">编辑</button> <button class="btn" style="padding:2px 7px;font-size:10px;color:#ff4d4f" onclick="deleteMediaRecord('+recIdx+')">删除</button></td></tr>';
     });
     html+='</tbody></table></div>';
     el('mhContent').innerHTML=html;
@@ -2484,19 +2484,40 @@ function renderReportSummary() {
 
   // 环形数字卡片
   var cards = [
-    { label: '本周曝光净增', value: weekExposeAdd.toFixed(1), unit: '万', color: '#165dff', bg: '#e8f0ff' },
-    { label: '本周粉丝净增', value: weekFanAdd, unit: '人', color: '#00c9a7', bg: '#e0f7f4' },
+    { label: '本周曝光净增', value: weekExposeAdd.toFixed(0), unit: '万', color: '#165dff', bg: '#e8f0ff' },
+    { label: '本周粉丝净增', value: weekFanAdd.toFixed(0), unit: '人', color: '#00c9a7', bg: '#e0f7f4' },
     { label: '本周进度更新', value: workUpdates, unit: '项', color: '#ff7a45', bg: '#fff2e8' },
   ];
 
   var circles = cards.map(function(card) {
-    var detailMap = {
-      '本周曝光净增': thisWeekReports.filter(function(r){return r.mediaExposeAdd>0;}).map(function(r){return r.person+'：'+r.mediaExposeAdd+'万';}).join('\n') || '暂无数据',
-      '本周粉丝净增': thisWeekReports.filter(function(r){return r.mediaFanAdd>0;}).map(function(r){return r.person+'：'+r.mediaFanAdd+'人';}).join('\n') || '暂无数据',
-      '本周进度更新': thisWeekReports.filter(function(r){return r.workName;}).map(function(r){return (r.workName||'无关联事项')+'（'+r.person+'）：\n  状态：'+(r.status||'-')+' 进度：'+(r.progress||0)+'%';}).join('\n\n') || '暂无数据'
-    };
-    var detail = detailMap[card.label] || '';
-    return '<div onclick="showReportDetail(\''+card.label+'\',\''+detail.replace(/\n/g,'↵')+'\')" style="background:#fff;border-radius:16px;padding:20px 16px;text-align:center;border:1px solid #e5e7eb;box-shadow:0 2px 8px rgba(0,0,0,.04);cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor=\'#5b7fff\';this.style.boxShadow=\'0 4px 12px rgba(91,127,255,.15)\'" onmouseout="this.style.borderColor=\'#e5e7eb\';this.style.boxShadow=\'0 2px 8px rgba(0,0,0,.04)\'">'+
+    var detailLines = [];
+    if (card.label === '本周曝光净增') {
+      thisWeekReports.forEach(function(r) {
+        if (!r.mediaChannels) return;
+        var chParts = [];
+        Object.keys(r.mediaChannels).forEach(function(ch) {
+          var v = r.mediaChannels[ch].exposeAdd;
+          if (v > 0) chParts.push(ch + '：' + v.toFixed(0) + '万');
+        });
+        if (chParts.length) detailLines.push(r.person + '：\n  ' + chParts.join('\n  '));
+      });
+    } else if (card.label === '本周粉丝净增') {
+      thisWeekReports.forEach(function(r) {
+        if (!r.mediaChannels) return;
+        var chParts = [];
+        Object.keys(r.mediaChannels).forEach(function(ch) {
+          var v = r.mediaChannels[ch].fanAdd;
+          if (v > 0) chParts.push(ch + '：' + v.toFixed(0) + '人');
+        });
+        if (chParts.length) detailLines.push(r.person + '：\n  ' + chParts.join('\n  '));
+      });
+    } else if (card.label === '本周进度更新') {
+      thisWeekReports.forEach(function(r) {
+        if (r.workName) detailLines.push((r.workName||'无关联事项')+'（'+r.person+'）：\n  状态：'+(r.status||'-')+' 进度：'+(r.progress||0)+'%');
+      });
+    }
+    var detail = detailLines.length ? detailLines.join('\n\n') : '暂无数据';
+    return '<div onclick="showReportDetail(\''+card.label+'\',\''+detail.replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'↵')+'\')" style="background:#fff;border-radius:16px;padding:20px 16px;text-align:center;border:1px solid #e5e7eb;box-shadow:0 2px 8px rgba(0,0,0,.04);cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor=\'#5b7fff\';this.style.boxShadow=\'0 4px 12px rgba(91,127,255,.15)\'" onmouseout="this.style.borderColor=\'#e5e7eb\';this.style.boxShadow=\'0 2px 8px rgba(0,0,0,.04)\'">'+
       '<div style="width:72px;height:72px;border-radius:50%;background:'+card.bg+';display:flex;align-items:center;justify-content:center;margin:0 auto 10px">'+
         '<span style="font-size:22px;font-weight:700;color:'+card.color+'">'+card.value+'</span>'+
       '</div>'+
@@ -2539,7 +2560,7 @@ function deleteReport(idx) {
   renderReports();
 }
 function showReportDetail(label, detail) {
-  var body = detail.replace(/↵/g,'\n');
+  var body = detail.replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/↵/g,'\n');
   el('reportDetailContent').innerHTML = '<div style="font-size:13px;line-height:1.8;white-space:pre-wrap;color:#374151">'+body+'</div>';
   el('reportDetailLabel').textContent = label;
   openModal('reportDetailModal');
@@ -2566,7 +2587,7 @@ function exportCases() {
 }
 function exportEvents() {
   if(!EVENTS.length){alert('暂无数据');return;}
-  downloadCSV([['主体','类型','日期','涉及','关联项目','负责人','状态','自有渠道曝光','媒体渠道曝光','话题曝光','其余渠道','总曝光','媒体报道次数','转载量','认证/奖项','认证级别','媒体报道明细','领导评价','备注']].concat(EVENTS.map(function(e){return [e.subject,e.type,e.date,e.city,e.project,e.owner,e.status,e.own,e['media-exp'],e.topic,e.other,((parseFloat(e.own)||0)+(parseFloat(e['media-exp'])||0)+(parseFloat(e.topic)||0)+(parseFloat(e.other)||0)).toFixed(1),e.mcount,e.reprint,e.award,e.level,e.media,e.leader,e.note];})),'影响力事件营销.csv');
+  downloadCSV([['主体','类型','日期','涉及','关联项目','负责人','状态','自有渠道曝光','媒体渠道曝光','话题曝光','其余渠道','总曝光','媒体报道次数','转载量','认证/奖项','认证级别','媒体报道明细','领导评价','备注']].concat(EVENTS.map(function(e){return [e.subject,e.type,e.date,e.city,e.project,e.owner,e.status,e.own,e['media-exp'],e.topic,e.other,((parseFloat(e.own)||0)+(parseFloat(e['media-exp'])||0)+(parseFloat(e.topic)||0)+(parseFloat(e.other)||0)).toFixed(0),e.mcount,e.reprint,e.award,e.level,e.media,e.leader,e.note];})),'影响力事件营销.csv');
 }
 function exportMedia() {
   downloadCSV([['渠道','主责人','累计粉丝','累计曝光(万)','累计篇数']].concat(MEDIA_CHANNELS.map(function(m){return [m.name,m.owner,m.fanTotal,m.exposeTotal,m.postsTotal];})),'新媒体矩阵数据.csv');
