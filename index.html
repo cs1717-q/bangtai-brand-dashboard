@@ -783,6 +783,17 @@ textarea{resize:vertical;min-height:60px}
 </div>
 </div>
 
+<!-- 周报汇总详情弹窗 -->
+<div class="modal-overlay" id="reportDetailModal">
+<div class="modal">
+  <div class="modal-header"><div class="modal-title" id="reportDetailLabel">详情</div><div class="modal-close" onclick="closeModal('reportDetailModal')">×</div></div>
+  <div class="modal-body" style="max-height:60vh;overflow-y:auto">
+    <div id="reportDetailContent"></div>
+  </div>
+  <div class="modal-footer"><button class="btn" onclick="closeModal('reportDetailModal')">关闭</button></div>
+</div>
+</div>
+
 <!-- 新媒体历史记录 -->
 <div class="modal-overlay" id="mediaHistoryModal">
 <div class="modal large">
@@ -2438,14 +2449,20 @@ function renderReportSummary() {
   ];
 
   var circles = cards.map(function(card) {
-    return '<div style="background:#fff;border-radius:16px;padding:20px 16px;text-align:center;border:1px solid #e5e7eb;box-shadow:0 2px 8px rgba(0,0,0,.04)">'+
+    var detailMap = {
+      '本周曝光净增': thisWeekReports.filter(function(r){return r.mediaExposeAdd>0;}).map(function(r){return r.person+'：'+r.mediaExposeAdd+'万';}).join('\n') || '暂无数据',
+      '本周粉丝净增': thisWeekReports.filter(function(r){return r.mediaFanAdd>0;}).map(function(r){return r.person+'：'+r.mediaFanAdd+'人';}).join('\n') || '暂无数据',
+      '本周进度更新': thisWeekReports.filter(function(r){return r.workName;}).map(function(r){return (r.workName||'无关联事项')+'（'+r.person+'）：\n  状态：'+(r.status||'-')+' 进度：'+(r.progress||0)+'%';}).join('\n\n') || '暂无数据'
+    };
+    var detail = detailMap[card.label] || '';
+    return '<div onclick="showReportDetail(\''+card.label+'\',\''+detail.replace(/\n/g,'↵')+'\')" style="background:#fff;border-radius:16px;padding:20px 16px;text-align:center;border:1px solid #e5e7eb;box-shadow:0 2px 8px rgba(0,0,0,.04);cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor=\'#5b7fff\';this.style.boxShadow=\'0 4px 12px rgba(91,127,255,.15)\'" onmouseout="this.style.borderColor=\'#e5e7eb\';this.style.boxShadow=\'0 2px 8px rgba(0,0,0,.04)\'">'+
       '<div style="width:72px;height:72px;border-radius:50%;background:'+card.bg+';display:flex;align-items:center;justify-content:center;margin:0 auto 10px">'+
         '<span style="font-size:22px;font-weight:700;color:'+card.color+'">'+card.value+'</span>'+
       '</div>'+
       '<div style="font-size:12px;color:#555;font-weight:600">'+card.label+'</div>'+
       '<div style="font-size:11px;color:#999;margin-top:2px">'+card.unit+'</div>'+
     '</div>';
-  });
+  }.bind({thisWeekReports:thisWeekReports}));
 
   // 本周各人填写状态
   var TEAM_MEMBERS = ['何晓婷', '龙晶晶', '宋香回', '张樊若兰'];
@@ -2479,6 +2496,12 @@ function deleteReport(idx) {
   REPORTS.splice(idx, 1);
   saveAll();
   renderReports();
+}
+function showReportDetail(label, detail) {
+  var body = detail.replace(/↵/g,'\n');
+  el('reportDetailContent').innerHTML = '<div style="font-size:13px;line-height:1.8;white-space:pre-wrap;color:#374151">'+body+'</div>';
+  el('reportDetailLabel').textContent = label;
+  openModal('reportDetailModal');
 }
 
 function exportReports() {
