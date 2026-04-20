@@ -783,6 +783,17 @@ textarea{resize:vertical;min-height:60px}
 </div>
 </div>
 
+<!-- 周报汇总详情弹窗 -->
+<div class="modal-overlay" id="reportDetailModal">
+<div class="modal">
+  <div class="modal-header"><div class="modal-title" id="reportDetailLabel">详情</div><div class="modal-close" onclick="closeModal('reportDetailModal')">×</div></div>
+  <div class="modal-body" style="max-height:60vh;overflow-y:auto">
+    <div id="reportDetailContent"></div>
+  </div>
+  <div class="modal-footer"><button class="btn" onclick="closeModal('reportDetailModal')">关闭</button></div>
+</div>
+</div>
+
 <!-- 新媒体历史记录 -->
 <div class="modal-overlay" id="mediaHistoryModal">
 <div class="modal large">
@@ -1988,6 +1999,16 @@ function getCurrentWeekRange() {
   var fmt = function(d) { return (d.getMonth()+1) + '.' + d.getDate(); };
   return fmt(monday) + '\u2014' + fmt(sunday);
 }
+function getLastWeekRange() {
+  var now = new Date();
+  var day = now.getDay();
+  var diffMon = day === 0 ? -6 : 1 - day;
+  var diffSun = day === 0 ? 0 : 7 - day;
+  var monday = new Date(now); monday.setDate(now.getDate() + diffMon - 7);
+  var sunday = new Date(now); sunday.setDate(now.getDate() + diffSun - 7);
+  var fmt = function(d) { return (d.getMonth()+1) + '.' + d.getDate(); };
+  return fmt(monday) + '\u2014' + fmt(sunday);
+}
 
 var editingReportIdx = -1; // -1 = 新增，其他 = 编辑
 
@@ -2416,21 +2437,19 @@ function renderReports() {
 function renderReportSummary() {
   var sum = el('reportSummary');
   if (!sum) return;
-  var weekRange = getCurrentWeekRange();
+  var weekRange = getLastWeekRange();
 
-  // 取当前周周报记录
+  // 取上周周报记录
   var thisWeekReports = REPORTS.filter(function(r) { return r.range === weekRange; });
 
-  // 统计本周新增：曝光、粉丝、工作进度更新次数
+  // 统计上周新增：曝光、粉丝、工作进度更新次数
   var weekExposeAdd = 0, weekFanAdd = 0, workUpdates = 0;
   thisWeekReports.forEach(function(r) {
     if (r.mediaExposeAdd) weekExposeAdd += parseFloat(r.mediaExposeAdd) || 0;
     if (r.mediaFanAdd) weekFanAdd += parseFloat(r.mediaFanAdd) || 0;
   });
-  // 本周进度更新 = 有周报关联工作项的数量
   workUpdates = thisWeekReports.filter(function(r) { return r.workName; }).length;
 
-  // 环形数字卡片
   var cards = [
     { label: '本周曝光净增', value: weekExposeAdd.toFixed(1), unit: '万', color: '#165dff', bg: '#e8f0ff' },
     { label: '本周粉丝净增', value: weekFanAdd, unit: '人', color: '#00c9a7', bg: '#e0f7f4' },
@@ -2438,16 +2457,42 @@ function renderReportSummary() {
   ];
 
   var circles = cards.map(function(card) {
-    return '<div style="background:#fff;border-radius:16px;padding:20px 16px;text-align:center;border:1px solid #e5e7eb;box-shadow:0 2px 8px rgba(0,0,0,.04)">'+
+    var detailLines = [];
+    if (card.label === '本周曝光净增') {
+      thisWeekReports.forEach(function(r) {
+        if (!r.mediaChannels) return;
+        var chParts = [];
+        Object.keys(r.mediaChannels).forEach(function(ch) {
+          var v = r.mediaChannels[ch].exposeAdd;
+          if (v > 0) chParts.push(ch + '：' + v + '万');
+        });
+        if (chParts.length) detailLines.push(r.person + '：\n  ' + chParts.join('\n  '));
+      });
+    } else if (card.label === '本周粉丝净增') {
+      thisWeekReports.forEach(function(r) {
+        if (!r.mediaChannels) return;
+        var chParts = [];
+        Object.keys(r.mediaChannels).forEach(function(ch) {
+          var v = r.mediaChannels[ch].fanAdd;
+          if (v > 0) chParts.push(ch + '：' + v + '人');
+        });
+        if (chParts.length) detailLines.push(r.person + '：\n  ' + chParts.join('\n  '));
+      });
+    } else if (card.label === '本周进度更新') {
+      thisWeekReports.forEach(function(r) {
+        if (r.workName) detailLines.push((r.workName||'无关联事项')+'（'+r.person+'）：\n  状态：'+(r.status||'-')+' 进度：'+(r.progress||0)+'%');
+      });
+    }
+    var detail = detailLines.length ? detailLines.join('\n\n') : '暂无数据';
+    return '<div onclick="showReportDetail(\''+card.label+'\',\''+detail.replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'↵')+'\')" style="background:#fff;border-radius:16px;padding:20px 16px;text-align:center;border:1px solid #e5e7eb;box-shadow:0 2px 8px rgba(0,0,0,.04);cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor=\'#5b7fff\';this.style.boxShadow=\'0 4px 12px rgba(91,127,255,.15)\'" onmouseout="this.style.borderColor=\'#e5e7eb\';this.style.boxShadow=\'0 2px 8px rgba(0,0,0,.04)\'">'+
       '<div style="width:72px;height:72px;border-radius:50%;background:'+card.bg+';display:flex;align-items:center;justify-content:center;margin:0 auto 10px">'+
         '<span style="font-size:22px;font-weight:700;color:'+card.color+'">'+card.value+'</span>'+
       '</div>'+
       '<div style="font-size:12px;color:#555;font-weight:600">'+card.label+'</div>'+
       '<div style="font-size:11px;color:#999;margin-top:2px">'+card.unit+'</div>'+
     '</div>';
-  });
+  }.bind({thisWeekReports:thisWeekReports}));
 
-  // 本周各人填写状态
   var TEAM_MEMBERS = ['何晓婷', '龙晶晶', '宋香回', '张樊若兰'];
   var submitted = {};
   thisWeekReports.forEach(function(r) { submitted[r.person] = true; });
@@ -2463,7 +2508,7 @@ function renderReportSummary() {
 
   sum.innerHTML =
     '<div style="margin-bottom:16px">'+
-      '<div style="font-size:11px;font-weight:700;color:#666;letter-spacing:.5px;margin-bottom:12px">本周(' + weekRange + ')</div>'+
+      '<div style="font-size:11px;font-weight:700;color:#666;letter-spacing:.5px;margin-bottom:12px">上周(' + weekRange + ')</div>'+
       '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px">'+
         circles.join('')+
       '</div>'+
@@ -2472,6 +2517,12 @@ function renderReportSummary() {
       '<div style="font-size:11px;font-weight:700;color:#666;letter-spacing:.5px;margin-bottom:8px">填写状态</div>'+
       personDots.join('')+
     '</div>';
+}
+function showReportDetail(label, detail) {
+  var body = detail.replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/↵/g,'\n');
+  el('reportDetailContent').innerHTML = '<div style="font-size:13px;line-height:1.8;white-space:pre-wrap;color:#374151">'+body+'</div>';
+  el('reportDetailLabel').textContent = label;
+  openModal('reportDetailModal');
 }
 
 function deleteReport(idx) {
