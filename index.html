@@ -1988,6 +1988,16 @@ function getCurrentWeekRange() {
   var fmt = function(d) { return (d.getMonth()+1) + '.' + d.getDate(); };
   return fmt(monday) + '\u2014' + fmt(sunday);
 }
+function getLastWeekRange() {
+  var now = new Date();
+  var day = now.getDay();
+  var diffMon = day === 0 ? -6 : 1 - day;
+  var diffSun = day === 0 ? 0 : 7 - day;
+  var monday = new Date(now); monday.setDate(now.getDate() + diffMon - 7);
+  var sunday = new Date(now); sunday.setDate(now.getDate() + diffSun - 7);
+  var fmt = function(d) { return (d.getMonth()+1) + '.' + d.getDate(); };
+  return fmt(monday) + '\u2014' + fmt(sunday);
+}
 
 var editingReportIdx = -1; // -1 = 新增，其他 = 编辑
 
@@ -2431,9 +2441,9 @@ function renderReports() {
 function renderReportSummary() {
   var sum = el('reportSummary');
   if (!sum) return;
-  var weekRange = getCurrentWeekRange();
+  var weekRange = getLastWeekRange();
 
-  // 取当前周周报记录
+  // 取上周周报记录
   var thisWeekReports = REPORTS.filter(function(r) { return r.range === weekRange; });
 
   // 统计本周新增：曝光、粉丝、工作进度更新次数
@@ -2478,7 +2488,7 @@ function renderReportSummary() {
 
   sum.innerHTML =
     '<div style="margin-bottom:16px">'+
-      '<div style="font-size:11px;font-weight:700;color:#666;letter-spacing:.5px;margin-bottom:12px">本周(' + weekRange + ')</div>'+
+      '<div style="font-size:11px;font-weight:700;color:#666;letter-spacing:.5px;margin-bottom:12px">上周(' + weekRange + ')</div>'+
       '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px">'+
         circles.join('')+
       '</div>'+
