@@ -1332,6 +1332,13 @@ function renderKanban(boardId,summaryId,filterWorks,projFilter) {
 }
 
 function renderMedia() {
+  // 实时从MEDIA_RECORDS计算每个渠道的累计值（避免保存时累加导致数据膨胀，删除历史记录自动扣减）
+  MEDIA_CHANNELS.forEach(function(m) {
+    var recs = MEDIA_RECORDS.filter(function(r){ return r.channel === m.name; });
+    m.fanTotal = recs.length ? recs[recs.length-1].fanTotal : 0;
+    m.exposeTotal = recs.length ? recs[recs.length-1].exposeTotal : 0;
+    m.postsTotal = recs.length ? recs[recs.length-1].postsTotal : 0;
+  });
   var html = '';
   var colors = ['#165dff','#00c9a7','#a371f7','#ff7a45','#165dff','#a371f7'];
   MEDIA_CHANNELS.forEach(function(m,i) {
@@ -1864,10 +1871,7 @@ function saveMedia() {
     }
     editingMediaRecordIdx=-1;
   } else {
-    // 新增模式：更新渠道累计并新增记录
-    MEDIA_CHANNELS[idx].fanTotal=fanTotal;
-    MEDIA_CHANNELS[idx].exposeTotal=exposeTotal;
-    MEDIA_CHANNELS[idx].postsTotal=postsTotal;
+    // 新增模式：只新增记录，MEDIA_CHANNELS累计值由renderMedia实时计算
     MEDIA_RECORDS.push({
       channel:channel, date:el('mf-date').value,
       fanAdd:weekFan, fanTotal:fanTotal,
@@ -2266,36 +2270,7 @@ function saveReport() {
       }
     });
   }
-  // 只有【新增模式】才真正累加到矩阵和历史记录，编辑模式不重复累加
-  if (editingReportIdx < 0) {
-    if (person) {
-      var myCh = MEDIA_CHANNELS.filter(function(c) { return getChannelOwner(c.name) === person; });
-      myCh.forEach(function(c) {
-        var safe = c.name.replace(/\s/g, '_');
-        var fanEl = document.getElementById('rmf_' + safe);
-        var expEl = document.getElementById('rme_' + safe);
-        var postsEl = document.getElementById('rmx_' + safe);
-        var fan = fanEl && fanEl.value ? parseInt(fanEl.value) : 0;
-        var exp = expEl && expEl.value ? parseFloat(expEl.value) : 0;
-        var postsWeek = postsEl && postsEl.value ? parseInt(postsEl.value) : 0;
-        if (fan || exp || postsWeek) {
-          MEDIA_CHANNELS.forEach(function(mc) {
-            if (mc.name === c.name) {
-              mc.fanTotal = (mc.fanTotal || 0) + fan;
-              mc.exposeTotal = (mc.exposeTotal || 0) + exp;
-              mc.postsTotal = (mc.postsTotal || 0) + postsWeek;
-            }
-          });
-          MEDIA_RECORDS.push({
-            channel: c.name, date: new Date().toLocaleDateString('zh-CN'),
-            fanAdd: fan, fanTotal: (c.fanTotal||0) + fan,
-            exposeWeek: exp, exposeTotal: (c.exposeTotal||0) + exp,
-            postsWeek: postsWeek, postsTotal: (c.postsTotal||0) + postsWeek, note: ''
-          });
-        }
-      });
-    }
-  }
+  // 周报只更新REPORTS本身，不再改动MEDIA_CHANNELS累计值（由renderMedia实时从MEDIA_RECORDS计算）
   if (editingReportIdx >= 0) {
     var r = REPORTS[editingReportIdx];
     if (r) {
