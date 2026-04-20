@@ -2240,7 +2240,9 @@ function saveReport() {
   // 保存新媒体渠道数据到矩阵
   var totalFanAdd = 0, totalExposeAdd = 0;
   var mediaChannelsData = {}; // {渠道名: {fanAdd, exposeAdd, postsWeek}}
-  if (person) {
+  // 判断此人本周是否已有报告（避免重复计入：新增时已有本周报告则跳过媒体累加，编辑时也跳过）
+  var hasExistingThisWeek = REPORTS.some(function(r) { return r.person === person && r.range === range; });
+  if (person && !hasExistingThisWeek) {
     var myCh = MEDIA_CHANNELS.filter(function(c) { return getChannelOwner(c.name) === person; });
     myCh.forEach(function(c) {
       var safe = c.name.replace(/\s/g, '_');
@@ -2271,7 +2273,7 @@ function saveReport() {
         });
       }
     });
-  }// 编辑模式：更新现有记录
+  }
   if (editingReportIdx >= 0) {
     var r = REPORTS[editingReportIdx];
     if (r) {
