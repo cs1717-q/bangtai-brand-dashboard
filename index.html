@@ -1343,12 +1343,13 @@ function renderKanban(boardId,summaryId,filterWorks,projFilter) {
 }
 
 function renderMedia() {
-  // 实时从MEDIA_RECORDS计算每个渠道的累计值（避免保存时累加导致数据膨胀，删除历史记录自动扣减）
+  // 实时从MEDIA_RECORDS计算每个渠道的累计值
+  // 累计值 = 所有 exposeWeek 的累加（不依赖 exposeTotal 字段，避免历史错误累积）
   MEDIA_CHANNELS.forEach(function(m) {
     var recs = MEDIA_RECORDS.filter(function(r){ return r.channel === m.name; });
-    m.fanTotal = recs.length ? recs[recs.length-1].fanTotal : 0;
-    m.exposeTotal = recs.length ? recs[recs.length-1].exposeTotal : 0;
-    m.postsTotal = recs.length ? recs[recs.length-1].postsTotal : 0;
+    m.exposeTotal = recs.reduce(function(s,r){return s+(parseFloat(r.exposeWeek)||0);},0);
+    m.fanTotal = recs.reduce(function(s,r){return s+(parseInt(r.fanAdd)||0);},0);
+    m.postsTotal = recs.reduce(function(s,r){return s+(parseInt(r.postsWeek)||0);},0);
   });
   var html = '';
   var colors = ['#165dff','#00c9a7','#a371f7','#ff7a45','#165dff','#a371f7'];
@@ -2375,31 +2376,31 @@ function saveReport() {
     }
   }
   editingReportIdx = -1;
-  // 同步写MEDIA_RECORDS：仅【新增模式】且该渠道本周无记录时才新增
-  // 编辑模式不写，避免重复叠加
+  // 同步写MEDIA_RECORDS：仅【新增模式】时写入
+  // 同一渠道当天只保留一条记录（更新或新增），避免重复
   if (!isEdit && person && Object.keys(mediaChannelsData).length) {
     Object.keys(mediaChannelsData).forEach(function(chName) {
       var chData = mediaChannelsData[chName];
       var today = new Date().toLocaleDateString('zh-CN');
+      var newFan = chData.fanAdd||0;
+      var newExp = chData.exposeAdd||0;
+      var newPosts = chData.postsWeek||0;
       var chRecs = MEDIA_RECORDS.filter(function(r){ return r.channel === chName; });
       var lastFan = chRecs.length ? (chRecs[chRecs.length-1].fanTotal||0) : 0;
       var lastExp = chRecs.length ? (chRecs[chRecs.length-1].exposeTotal||0) : 0;
       var lastPosts = chRecs.length ? (chRecs[chRecs.length-1].postsTotal||0) : 0;
-      var newFan = chData.fanAdd||0;
-      var newExp = chData.exposeAdd||0;
-      var newPosts = chData.postsWeek||0;
-      // 该渠道本周是否已有记录
-      var sameWeekRec = null;
+      // 该渠道今天是否已有记录（index）
+      var todayIdx = -1;
       for (var i = chRecs.length - 1; i >= 0; i--) {
-        if (chRecs[i].date === today) { sameWeekRec = chRecs[i]; break; }
+        if (chRecs[i].date === today) { todayIdx = i; break; }
       }
-      if (sameWeekRec) {
-        // 已有则更新
-        sameWeekRec.fanAdd = newFan; sameWeekRec.fanTotal = lastFan;
-        sameWeekRec.exposeWeek = newExp; sameWeekRec.exposeTotal = lastExp;
-        sameWeekRec.postsWeek = newPosts; sameWeekRec.postsTotal = lastPosts;
+      if (todayIdx >= 0) {
+        // 已有今天记录：更新它（累计值取历史最大，不用累加）
+        chRecs[todayIdx].fanAdd = newFan; chRecs[todayIdx].fanTotal = lastFan;
+        chRecs[todayIdx].exposeWeek = newExp; chRecs[todayIdx].exposeTotal = lastExp;
+        chRecs[todayIdx].postsWeek = newPosts; chRecs[todayIdx].postsTotal = lastPosts;
       } else {
-        // 无则新增（exposeTotal = 历史累计 + 本周新增）
+        // 今天无记录：新增（累计 = 历史累计 + 本周新增）
         MEDIA_RECORDS.push({
           channel: chName, date: today,
           fanAdd: newFan, fanTotal: lastFan + newFan,
