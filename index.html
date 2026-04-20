@@ -2375,13 +2375,12 @@ function saveReport() {
     }
   }
   editingReportIdx = -1;
-  // 同步写MEDIA_RECORDS（让新媒体运营看板能读取到周报数据）
-  // 同一渠道本周有记录则更新，无则新增（避免重复）
-  if (person && Object.keys(mediaChannelsData).length) {
+  // 同步写MEDIA_RECORDS：仅【新增模式】且该渠道本周无记录时才新增
+  // 编辑模式不写，避免重复叠加
+  if (!isEdit && person && Object.keys(mediaChannelsData).length) {
     Object.keys(mediaChannelsData).forEach(function(chName) {
       var chData = mediaChannelsData[chName];
       var today = new Date().toLocaleDateString('zh-CN');
-      // 找该渠道的最新MEDIA_RECORDS，计算新的累计值
       var chRecs = MEDIA_RECORDS.filter(function(r){ return r.channel === chName; });
       var lastFan = chRecs.length ? (chRecs[chRecs.length-1].fanTotal||0) : 0;
       var lastExp = chRecs.length ? (chRecs[chRecs.length-1].exposeTotal||0) : 0;
@@ -2389,16 +2388,18 @@ function saveReport() {
       var newFan = chData.fanAdd||0;
       var newExp = chData.exposeAdd||0;
       var newPosts = chData.postsWeek||0;
-      // 检查该渠道本周是否已有记录（有则覆盖最后一条，无则新增）
+      // 该渠道本周是否已有记录
       var sameWeekRec = null;
       for (var i = chRecs.length - 1; i >= 0; i--) {
         if (chRecs[i].date === today) { sameWeekRec = chRecs[i]; break; }
       }
       if (sameWeekRec) {
+        // 已有则更新
         sameWeekRec.fanAdd = newFan; sameWeekRec.fanTotal = lastFan;
         sameWeekRec.exposeWeek = newExp; sameWeekRec.exposeTotal = lastExp;
         sameWeekRec.postsWeek = newPosts; sameWeekRec.postsTotal = lastPosts;
       } else {
+        // 无则新增（exposeTotal = 历史累计 + 本周新增）
         MEDIA_RECORDS.push({
           channel: chName, date: today,
           fanAdd: newFan, fanTotal: lastFan + newFan,
