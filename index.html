@@ -347,6 +347,7 @@ textarea{resize:vertical;min-height:60px}
 
 <!-- ==================== 全部工作明细 ==================== -->
 <div class="panel" id="panel-allwork">
+  <div id="worksSummary" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:16px"></div>
   <div class="table-card">
     <div class="table-header">
       <div class="table-title">2026年度工作明细总表 <span class="table-count" id="worksCount">15项</span></div>
@@ -1280,6 +1281,31 @@ function renderWorks() {
   });
   el('worksCount').textContent = filtered.length + '项';
   el('worksFiltered').textContent = filtered.length !== WORKS.length ? '（共' + WORKS.length + '项，已筛选' + filtered.length + '项）' : '';
+
+  // 总览统计
+  var total = WORKS.length;
+  var done = WORKS.filter(function(w){return w.status==='已完成'||w.status==='复盘沉淀';}).length;
+  var inProgress = WORKS.filter(function(w){return w.status==='进行中'||w.status==='正式执行'||w.status==='过程跟进/督导';}).length;
+  var notStart = WORKS.filter(function(w){return w.status==='待启动'||w.status==='需求分析/立项'||w.status==='资料调研'||w.status==='方案策划';}).length;
+  var modules = {};
+  WORKS.forEach(function(w){ modules[w.module]=(modules[w.module]||0)+1; });
+  var modHtml = Object.keys(modules).map(function(k){return '<span style="background:#eef1fd;color:#5b7fff;font-size:10px;font-weight:600;padding:2px 8px;border-radius:10px;margin:2px;display:inline-block">'+k+' '+modules[k]+'</span>';}).join('');
+
+  el('worksSummary').innerHTML =
+    '<div style="background:#fff;border-radius:12px;padding:16px;border:1px solid #e5e7eb">'+
+      '<div style="font-size:11px;font-weight:700;color:#666;letter-spacing:.5px;margin-bottom:10px">工作总览</div>'+
+      '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;text-align:center">'+
+        '<div><div style="font-size:22px;font-weight:800;color:#5b7fff">'+total+'</div><div style="font-size:11px;color:#999">总工作项</div></div>'+
+        '<div><div style="font-size:22px;font-weight:800;color:#10b981">'+done+'</div><div style="font-size:11px;color:#999">已完成/复盘</div></div>'+
+        '<div><div style="font-size:22px;font-weight:800;color:#f59e0b">'+inProgress+'</div><div style="font-size:11px;color:#999">进行中</div></div>'+
+        '<div><div style="font-size:22px;font-weight:800;color:#9ca3af">'+notStart+'</div><div style="font-size:11px;color:#999">待启动</div></div>'+
+      '</div>'+
+    '</div>'+
+    '<div style="background:#fff;border-radius:12px;padding:16px;border:1px solid #e5e7eb">'+
+      '<div style="font-size:11px;font-weight:700;color:#666;letter-spacing:.5px;margin-bottom:8px">模块分布</div>'+
+      '<div>'+modHtml+'</div>'+
+    '</div>';
+
   var html = '';
   filtered.forEach(function(w) {
     var prog = getProgress(w.status);
@@ -1301,7 +1327,15 @@ function renderWorks() {
 }
 function saveWorkStatus(id,sel) {
   var w = WORKS.find(function(x){return x.id===id;});
-  if (w) { w.status = sel.value; saveAll(); renderWorks(); renderOverview(); }
+  if (w) {
+    w.status = sel.value;
+    saveAll();
+    renderWorks();
+    renderOverview();
+    renderKanban('q2Board','q2Summary',WORKS.filter(function(w){return w.q==='Q2'||w.q==='Q2-Q3';}));
+    renderKanban('q3Board','q3Summary',WORKS.filter(function(w){return w.q==='Q3'||w.q==='Q2-Q3'||w.q==='Q1-Q3';}));
+    renderKanban('q4Board','q4Summary',WORKS.filter(function(w){return w.q==='Q4';}));
+  }
 }
 function clearWorkFilter() {
   el('f-module').value=''; el('f-owner').value=''; el('f-status').value=''; el('f-level').value=''; el('f-q').value='';
