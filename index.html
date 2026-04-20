@@ -1322,7 +1322,7 @@ function renderWorks() {
       '<td style="max-width:120px;font-size:11px;color:#646a73">'+(w.effect||'-')+'</td>'+
       '<td style="max-width:120px;font-size:11px;color:#165dff">'+(w.leaderReview||'-')+'</td>'+
       '<td style="font-size:11px;color:#646a73">'+(w.verify||'-')+'</td>'+
-      '<td><button class="btn" style="padding:3px 8px;font-size:10px" onclick="openWorkEdit('+w.id+')">编辑</button></td></tr>';
+      '<td><button class="btn" style="padding:3px 8px;font-size:10px" onclick="openWorkEdit('+w.id+')">编辑</button> <button class="btn" style="padding:3px 8px;font-size:10px;color:#ff4d4f" onclick="deleteWork('+w.id+')">删除</button></td></tr>';
   });
   el('worksBody').innerHTML = html;
 }
@@ -1337,6 +1337,18 @@ function saveWorkStatus(id,sel) {
     renderKanban('q3Board','q3Summary',WORKS.filter(function(w){return w.q==='Q3'||w.q==='Q2-Q3'||w.q==='Q1-Q3';}));
     renderKanban('q4Board','q4Summary',WORKS.filter(function(w){return w.q==='Q4';}));
   }
+}
+function deleteWork(id) {
+  if (!confirm('确认删除该工作项？')) return;
+  var idx = WORKS.findIndex(function(x){return x.id===id;});
+  if (idx < 0) return;
+  WORKS.splice(idx, 1);
+  saveAll();
+  renderWorks();
+  renderOverview();
+  renderKanban('q2Board','q2Summary',WORKS.filter(function(w){return w.q==='Q2'||w.q==='Q2-Q3';}));
+  renderKanban('q3Board','q3Summary',WORKS.filter(function(w){return w.q==='Q3'||w.q==='Q2-Q3'||w.q==='Q1-Q3';}));
+  renderKanban('q4Board','q4Summary',WORKS.filter(function(w){return w.q==='Q4';}));
 }
 function clearWorkFilter() {
   el('f-module').value=''; el('f-owner').value=''; el('f-status').value=''; el('f-level').value=''; el('f-q').value='';
@@ -1971,6 +1983,17 @@ function editMediaRecord(idx) {
 }
 function deleteMediaRecord(idx) {
   if(!confirm('确认删除该条历史记录？')) return;
+  var rec = MEDIA_RECORDS[idx];
+  if (rec) {
+    // 同步扣减 MEDIA_CHANNELS 的累计值
+    MEDIA_CHANNELS.forEach(function(mc) {
+      if (mc.name === rec.channel) {
+        mc.fanTotal = Math.max(0, (mc.fanTotal||0) - (rec.fanAdd||0));
+        mc.exposeTotal = Math.max(0, (mc.exposeTotal||0) - (rec.exposeWeek||0));
+        mc.postsTotal = Math.max(0, (mc.postsTotal||0) - (rec.postsWeek||0));
+      }
+    });
+  }
   MEDIA_RECORDS.splice(idx,1);
   saveAll();
   renderAll();
@@ -2317,24 +2340,10 @@ function saveReport() {
         totalFanAdd += fan;
         totalExposeAdd += exp;
         mediaChannelsData[c.name] = { fanAdd: fan, exposeAdd: exp, postsWeek: postsWeek };
-        // 累加到 MEDIA_CHANNELS 累计值
-        MEDIA_CHANNELS.forEach(function(mc) {
-          if (mc.name === c.name) {
-            mc.fanTotal = (mc.fanTotal || 0) + fan;
-            mc.exposeTotal = (mc.exposeTotal || 0) + exp;
-            mc.postsTotal = (mc.postsTotal || 0) + postsWeek;
-          }
-        });
-        // 新增一条 MEDIA_RECORDS
-        MEDIA_RECORDS.push({
-          channel: c.name, date: new Date().toLocaleDateString('zh-CN'),
-          fanAdd: fan, fanTotal: (c.fanTotal||0) + fan,
-          exposeWeek: exp, exposeTotal: (c.exposeTotal||0) + exp,
-          postsWeek: postsWeek, postsTotal: (c.postsTotal||0) + postsWeek, note: ''
-        });
       }
     });
-  }// 编辑模式：更新现有记录
+  }
+  // 编辑模式：更新现有记录
   if (editingReportIdx >= 0) {
     var r = REPORTS[editingReportIdx];
     if (r) {
@@ -2535,7 +2544,7 @@ function renderReportSummary() {
     '</div>';
   }.bind({thisWeekReports:thisWeekReports}));
 
-  var TEAM_MEMBERS = ['何晓婷', '龙晶晶', '宋香回', '张樊若兰'];
+  var TEAM_MEMBERS = ['龙晶晶', '宋香回', '张樊若兰'];
   var submitted = {};
   thisWeekReports.forEach(function(r) { submitted[r.person] = true; });
   var personDots = TEAM_MEMBERS.map(function(p) {
