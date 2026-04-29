@@ -78,6 +78,8 @@ a{color:inherit;text-decoration:none}
 .bar-fill{height:100%;border-radius:4px;transition:width .8s cubic-bezier(.22,.68,0,1.2)}
 .blue-b{background:linear-gradient(90deg,#5b7fff,#7c9fff)}.green-b{background:linear-gradient(90deg,#10b981,#34d399)}.orange-b{background:linear-gradient(90deg,#f59e0b,#fbbf24)}.purple-b{background:linear-gradient(90deg,#8b5cf6,#a78bfa)}.red-b{background:linear-gradient(90deg,#ef4444,#f87171)}
 .stat-meta{display:flex;justify-content:space-between;font-size:11px;color:var(--text-muted);flex-wrap:wrap;gap:4px}
+.ed-kpi{transition:box-shadow .15s,background .15s}
+.ed-kpi:focus{background:#f5f3ff}
 
 /* Section */
 .section{background:var(--surface);border-radius:var(--radius);padding:20px;border:1px solid var(--border);margin-bottom:16px;box-shadow:var(--shadow-sm)}
@@ -1131,6 +1133,16 @@ function saveAll() {
   lastDataHash = JSON.stringify({c:CASES.length,e:EVENTS.length,r:REPORTS.length});
 }
 
+function saveEditableKpi(teamIdx, kpiIdx, el) {
+  var val = parseInt(el.textContent.replace(/,/g,'')) || 0;
+  TEAM[teamIdx].kpis[kpiIdx].current = val;
+  // 同步张樊若兰的孵化业主创作者（也是第4个kpi）
+  if (teamIdx === 0 && kpiIdx === 4) {
+    TEAM[3].kpis[3].current = val;
+  }
+  saveAll();
+}
+
 // ==================== 工具 ====================
 function el(id) { return document.getElementById(id); }
 function pct(a,b) { if(!b) return 0; return Math.min(100,Math.round(a/b*100)); }
@@ -1245,15 +1257,14 @@ function renderOverview() {
       '已完成:'+casesCnt+' | 进行中:'+(CASES.length-casesCnt)) +
     statCard('orange','影响力事件营销',EVENTS.length+'个','2个',pct(eventDone,2),'orange-b',
       '已完成:'+eventDone+' | 媒体报道:'+fmt(EVENTS.reduce(function(s,e){return s+(parseInt(e.mcount)||0);},0))+'次') +
-    statCard('purple','业主自发内容','待更新','2100条',0,'purple-b',
-      '孵化创作者:待更新 | 粉丝总量:'+fmt(fanTotal));
+    '<div class="stat-card purple"><div class="stat-label">业主自发内容</div><div class="stat-value"><span class="ed-kpi" id="ed-owner-content" contenteditable="true" onblur="saveEditableKpi(0,3,this)" onmouseover="this.style.boxShadow=\'0 0 0 2px #8b5cf6\';this.style.borderRadius=\'4px\'" onmouseout="this.style.boxShadow=\'\';this.style.borderRadius=\'\'" style="outline:none;cursor:text;padding:0 4px">'+fmt(TEAM[0].kpis[3].current)+'</span> <span>/ 2100条</span></div><div class="stat-bar"><div class="bar-fill purple-b" style="width:'+pct(TEAM[0].kpis[3].current,2100)+'%"></div></div><div class="stat-meta"><span>孵化创作者:'+fmt(TEAM[0].kpis[4].current)+'人 | 粉丝总量:'+fmt(fanTotal)+'</span><span>'+pct(TEAM[0].kpis[3].current,2100)+'%</span></div></div>';
 
   el('overviewSub').innerHTML =
     statCard('blue','媒体报道数量',fmt(EVENTS.reduce(function(s,e){return s+(parseInt(e.mcount)||0);},0)),'20家',pct(EVENTS.reduce(function(s,e){return s+(parseInt(e.mcount)||0);},0),20),'blue-b','国/省/市/县域四级') +
     statCard('green','工作完成率',Math.round(WORKS.filter(function(w){return w.status==='已完成'||w.status==='宣传推广'||w.status==='复盘沉淀';}).length/WORKS.length*100)+'%','100%',pct(WORKS.filter(function(w){return w.status==='已完成'||w.status==='宣传推广'||w.status==='复盘沉淀';}).length,WORKS.length),'green-b',
       WORKS.filter(function(w){return w.status==='已完成'||w.status==='宣传推广'||w.status==='复盘沉淀';}).length+'/'+WORKS.length+'项已完成') +
-    statCard('orange','生活有好报增粉','待更新','1万人',0,'orange-b','张樊若兰主责') +
-    statCard('purple','孵化业主创作者','待更新','50人',0,'purple-b','张樊若兰主责');
+    '<div class="stat-card orange"><div class="stat-label">生活有好报增粉</div><div class="stat-value">'+fmt(MEDIA_CHANNELS[2].fanTotal)+' <span>/ 1万人</span></div><div class="stat-bar"><div class="bar-fill orange-b" style="width:'+pct(MEDIA_CHANNELS[2].fanTotal,10000)+'%"></div></div><div class="stat-meta"><span>张樊若兰主责</span><span>'+pct(MEDIA_CHANNELS[2].fanTotal,10000)+'%</span></div></div>' +
+    '<div class="stat-card purple"><div class="stat-label">孵化业主创作者</div><div class="stat-value"><span class="ed-kpi" id="ed-creator" contenteditable="true" onblur="saveEditableKpi(0,4,this)" onmouseover="this.style.boxShadow=\'0 0 0 2px #8b5cf6\';this.style.borderRadius=\'4px\'" onmouseout="this.style.boxShadow=\'\';this.style.borderRadius=\'\'" style="outline:none;cursor:text;padding:0 4px">'+fmt(TEAM[0].kpis[4].current)+'</span> <span>/ 50人</span></div><div class="stat-bar"><div class="bar-fill purple-b" style="width:'+pct(TEAM[0].kpis[4].current,50)+'%"></div></div><div class="stat-meta"><span>张樊若兰主责</span><span>'+pct(TEAM[0].kpis[4].current,50)+'%</span></div></div>';
 
   // 四大模块
   var mods = [
