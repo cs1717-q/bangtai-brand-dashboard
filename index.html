@@ -1095,12 +1095,15 @@ function loadAll() {
         }
       });
     }
-    // 加载后用MEDIA_RECORDS的exposeWeek重新计算累计曝光（避免旧数据累加错误）
+    // 用MEDIA_RECORDS的最新记录更新各渠道的累计数据
     MEDIA_CHANNELS.forEach(function(m) {
       var recs = MEDIA_RECORDS.filter(function(r){ return r.channel === m.name; });
-      m.exposeTotal = recs.reduce(function(s,r){return s+(parseFloat(r.exposeWeek)||0);},0);
-      m.fanTotal = recs.reduce(function(s,r){return s+(parseInt(r.fanAdd)||0);},0);
-      m.postsTotal = recs.reduce(function(s,r){return s+(parseInt(r.postsWeek)||0);},0);
+      if (recs.length > 0) {
+        var latest = recs[recs.length - 1];
+        m.exposeTotal = parseFloat(latest.exposeTotal) || 0;
+        m.fanTotal = parseInt(latest.fanTotal) || 0;
+        m.postsTotal = parseInt(latest.postsTotal) || 0;
+      }
     });
     // projects
     if (d.projects) {
